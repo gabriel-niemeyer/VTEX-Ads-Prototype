@@ -44,6 +44,122 @@ const parseBr = (s: string): number => {
 /** Valor máximo em centavos (99.999.999,99) */
 const MAX_CENTS = 999999999;
 
+const MAX_MONEY = MAX_CENTS / 100;
+
+function clampMoney(n: number): number {
+  if (!Number.isFinite(n)) return 0;
+  return Math.min(MAX_MONEY, Math.max(0, n));
+}
+
+function roundMoneyDecimals(n: number, decimals: number): number {
+  const f = 10 ** decimals;
+  return Math.round(n * f) / f;
+}
+
+/** Só dígitos, ponto e vírgula (formato pt-BR). */
+function normalizeMoneyDraft(s: string): string {
+  return s.replace(/[^\d.,]/g, '');
+}
+
+/** Quantidade de dígitos estritamente antes do índice `caret` em `raw`. */
+function countDigitsBefore(raw: string, caret: number): number {
+  let c = 0;
+  const stop = Math.max(0, Math.min(caret, raw.length));
+  for (let i = 0; i < stop; i++) {
+    if (/\d/.test(raw[i])) c++;
+  }
+  return c;
+}
+
+/** Posição no texto formatado após os primeiros `digitIndex` dígitos (0 = início). */
+function caretFromDigitIndex(formatted: string, digitIndex: number): number {
+  const digits = (formatted.match(/\d/g) || []).length;
+  const k = Math.max(0, Math.min(digitIndex, digits));
+  if (k === 0) return 0;
+  let seen = 0;
+  for (let i = 0; i < formatted.length; i++) {
+    if (/\d/.test(formatted[i])) {
+      seen++;
+      if (seen === k) return i + 1;
+    }
+  }
+  return formatted.length;
+}
+
+/** Parte inteira com separador de milhar (pt-BR), sem decimais. */
+function formatBrIntegerPart(intN: number): string {
+  const n = Math.max(0, Math.min(Math.floor(intN), Math.floor(MAX_MONEY)));
+  const fixed = n.toFixed(0);
+  const [intPart] = fixed.split('.');
+  return intPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+}
+
+/**
+ * Interpreta texto mascarado: se termina em `,` essa vírgula é só cursor; a decimal é a última dentro do núcleo.
+ * Sem vírgula: só parte inteira (pontos = milhar).
+ */
+function parseMaskedMoneyFull(cleaned: string, decimals: number): number {
+  const t = cleaned.trim();
+  if (!t) return 0;
+  const core = t.endsWith(',') ? t.slice(0, -1) : t;
+  const lastComma = core.lastIndexOf(',');
+  if (lastComma === -1) {
+    const intPart = core.replace(/\D/g, '');
+    return intPart ? parseInt(intPart, 10) : 0;
+  }
+  const intPart = core.slice(0, lastComma).replace(/\D/g, '');
+  const fracPart = core.slice(lastComma + 1).replace(/\D/g, '');
+  const intN = intPart ? parseInt(intPart, 10) : 0;
+  const fd = fracPart.slice(0, decimals);
+  const fracPadded = (fd + '0'.repeat(decimals)).slice(0, decimals);
+  const fracVal = fd.length > 0 ? parseInt(fracPadded, 10) / 10 ** decimals : 0;
+  return intN + fracVal;
+}
+
+/** Aplica máscara pt-BR (milhar e decimal) e devolve texto + seleção estável pelo índice de dígitos. */
+function applyMoneyMask(
+  raw: string,
+  selStart: number,
+  selEnd: number,
+  decimals: number
+): { text: string; selStart: number; selEnd: number } {
+  const cleaned = normalizeMoneyDraft(raw);
+  const d0 = countDigitsBefore(raw, selStart);
+  const d1 = countDigitsBefore(raw, selEnd);
+
+  const trailComma = cleaned.endsWith(',');
+
+  let text: string;
+  if (trailComma) {
+    const inner = cleaned.slice(0, -1);
+    const lc = inner.lastIndexOf(',');
+    let intN: number;
+    let fracRaw: string;
+    if (lc === -1) {
+      const id = inner.replace(/\D/g, '');
+      intN = id ? parseInt(id, 10) : 0;
+      fracRaw = '';
+    } else {
+      const id = inner.slice(0, lc).replace(/\D/g, '');
+      intN = id ? parseInt(id, 10) : 0;
+      fracRaw = inner.slice(lc + 1).replace(/\D/g, '').slice(0, decimals);
+    }
+    const intClamped = Math.max(0, Math.min(Math.floor(intN), Math.floor(MAX_MONEY)));
+    text =
+      fracRaw === ''
+        ? `${formatBrIntegerPart(intClamped)},`
+        : `${formatBrIntegerPart(intClamped)},${fracRaw}`;
+  } else {
+    text = formatBr(clampMoney(parseMaskedMoneyFull(cleaned, decimals)), decimals);
+  }
+
+  return {
+    text,
+    selStart: caretFromDigitIndex(text, d0),
+    selEnd: caretFromDigitIndex(text, d1),
+  };
+}
+
 const STATUS_MAP: Record<string, { label: string }> = {
   [CampaignStatus.DRAFT]:     { label: 'Rascunho' },
   [CampaignStatus.ACTIVE]:    { label: 'Ativo' },
@@ -1241,44 +1357,75 @@ const DropdownMenu: React.FC<{ onClose: () => void; children: React.ReactNode; w
   );
 };
 
-/** Linha editável de valor (Investimento): mesmo comportamento 0,00, dígitos pela direita */
+/** Linha editável (Investimento): máscara pt-BR (. milhar, , decimal), valida no blur. */
 const EditableMoneyRow: React.FC<{
   label: string;
   value: number;
   onChange: (v: number) => void;
 }> = ({ label, value, onChange }) => {
   const [editing, setEditing] = useState(false);
-  const [cents, setCents] = useState(0);
+  const [draft, setDraft] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
+  const skipBlurCommitRef = useRef(false);
+  const decimals = 2;
 
   const commit = () => {
-    onChange(cents / 100);
+    const t = draft.trim();
+    if (t === '') {
+      setDraft(formatBr(value, decimals));
+      setEditing(false);
+      return;
+    }
+    onChange(roundMoneyDecimals(clampMoney(parseMaskedMoneyFull(t, decimals)), decimals));
+    setEditing(false);
+  };
+
+  const revert = () => {
+    setDraft(formatBr(value, decimals));
     setEditing(false);
   };
 
   const startEditing = () => {
-    setCents(Math.round(value * 100));
+    setDraft(formatBr(value, decimals));
     setEditing(true);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') { commit(); return; }
-    if (e.key === 'Escape') { setCents(Math.round(value * 100)); setEditing(false); return; }
-    if (e.key === 'Backspace') {
-      e.preventDefault();
-      setCents((c) => Math.floor(c / 10));
+  const handleDraftChange = (ev: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = ev.target.value;
+    const selStart = ev.target.selectionStart ?? 0;
+    const selEnd = ev.target.selectionEnd ?? 0;
+    const { text, selStart: nextStart, selEnd: nextEnd } = applyMoneyMask(raw, selStart, selEnd, decimals);
+    setDraft(text);
+    queueMicrotask(() => {
+      const el = inputRef.current;
+      if (!el) return;
+      try {
+        el.setSelectionRange(nextStart, nextEnd);
+      } catch {
+        /* ignore */
+      }
+    });
+  };
+
+  const handleKeyDown = (ev: React.KeyboardEvent<HTMLInputElement>) => {
+    if (ev.key === 'Enter') {
+      ev.preventDefault();
+      skipBlurCommitRef.current = true;
+      commit();
       return;
     }
-    const digit = e.key.replace(/\D/g, '');
-    if (digit.length === 1) {
-      e.preventDefault();
-      setCents((c) => Math.min(MAX_CENTS, c * 10 + parseInt(digit, 10)));
+    if (ev.key === 'Escape') {
+      ev.preventDefault();
+      revert();
     }
   };
 
-  const handlePaste = (e: React.ClipboardEvent) => {
-    e.preventDefault();
-    const parsed = parseBr(e.clipboardData.getData('text'));
-    setCents(Math.min(MAX_CENTS, Math.max(0, Math.round(parsed * 100))));
+  const handleBlur = () => {
+    if (skipBlurCommitRef.current) {
+      skipBlurCommitRef.current = false;
+      return;
+    }
+    commit();
   };
 
   return (
@@ -1289,21 +1436,25 @@ const EditableMoneyRow: React.FC<{
       <div className="flex-1 min-w-0">
         {editing ? (
           <input
+            ref={inputRef}
             type="text"
             inputMode="decimal"
-            value={formatBr(cents / 100)}
-            readOnly
+            enterKeyHint="done"
+            autoComplete="off"
+            spellCheck={false}
+            aria-label={label}
+            value={draft}
+            onChange={handleDraftChange}
             onKeyDown={handleKeyDown}
-            onPaste={handlePaste}
-            onBlur={commit}
-            className="text-sm leading-5 tracking-[-0.14px] text-[#1f1f1f] bg-blue-50/60 border border-blue-200 rounded-lg px-2 py-1 outline-none w-[180px]"
+            onBlur={handleBlur}
+            className="box-border min-w-[180px] w-max max-w-full rounded-lg border border-solid px-2 py-1 outline-none focus:outline-none text-sm leading-5 tracking-[-0.14px] text-[#1f1f1f] bg-blue-50/60 border-blue-200 caret-[#0a0a0a] whitespace-nowrap tabular-nums [field-sizing:content]"
             autoFocus
           />
         ) : (
           <button
             type="button"
             onClick={startEditing}
-            className="text-sm leading-5 tracking-[-0.14px] text-[#1f1f1f] hover:bg-black/[0.03] rounded px-1 py-0.5 -ml-1 transition-colors cursor-text"
+            className="box-border min-w-[180px] w-max max-w-full rounded-lg border border-solid px-2 py-1 outline-none text-sm leading-5 tracking-[-0.14px] text-[#1f1f1f] bg-transparent border-transparent hover:bg-black/[0.03] text-left transition-colors cursor-text whitespace-nowrap tabular-nums"
           >
             {fmtMoney(value)}
           </button>
@@ -1314,8 +1465,8 @@ const EditableMoneyRow: React.FC<{
 };
 
 /**
- * Input monetário: começa em 0,00 e cada dígito entra pela direita (centavos primeiro).
- * Ex.: digitar 1,2,3,4 → 0,01 → 0,12 → 1,23 → 12,34
+ * Valor monetário editável (pt-BR): máscara com milhar (.) e decimal (,),
+ * caret estável por índice de dígitos; Enter confirma, Escape cancela, blur normaliza.
  */
 const EditableMoneyCell: React.FC<{
   value: number;
@@ -1323,64 +1474,102 @@ const EditableMoneyCell: React.FC<{
   suffix?: string;
   decimals?: number;
   size?: 'sm' | 'md';
-}> = ({ value, onChange, suffix = '', decimals = 2, size = 'sm' }) => {
+  ariaLabel?: string;
+}> = ({ value, onChange, suffix = '', decimals = 2, size = 'sm', ariaLabel = 'Valor monetário' }) => {
   const [editing, setEditing] = useState(false);
-  const [cents, setCents] = useState(0);
-  const inputW = size === 'md' ? 'min-w-[88px] w-[120px]' : 'w-[88px]';
+  const [draft, setDraft] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
+  const skipBlurCommitRef = useRef(false);
+  const cellShape =
+    size === 'md'
+      ? 'min-w-[12rem] rounded-md px-1.5 py-0.5 whitespace-nowrap tabular-nums w-max max-w-full [field-sizing:content]'
+      : 'min-w-[6.5rem] rounded-md px-1.5 py-0.5 whitespace-nowrap tabular-nums w-max max-w-full [field-sizing:content]';
 
   const commit = () => {
-    onChange(cents / 100);
+    const t = draft.trim();
+    if (t === '') {
+      setDraft(formatBr(value, decimals));
+      setEditing(false);
+      return;
+    }
+    onChange(roundMoneyDecimals(clampMoney(parseMaskedMoneyFull(t, decimals)), decimals));
+    setEditing(false);
+  };
+
+  const revert = () => {
+    setDraft(formatBr(value, decimals));
     setEditing(false);
   };
 
   const startEditing = () => {
-    setCents(Math.round(value * 100));
+    setDraft(formatBr(value, decimals));
     setEditing(true);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') { commit(); return; }
-    if (e.key === 'Escape') { setCents(Math.round(value * 100)); setEditing(false); return; }
-    if (e.key === 'Backspace') {
-      e.preventDefault();
-      setCents((c) => Math.floor(c / 10));
+  const handleDraftChange = (ev: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = ev.target.value;
+    const selStart = ev.target.selectionStart ?? 0;
+    const selEnd = ev.target.selectionEnd ?? 0;
+    const { text, selStart: nextStart, selEnd: nextEnd } = applyMoneyMask(raw, selStart, selEnd, decimals);
+    setDraft(text);
+    queueMicrotask(() => {
+      const el = inputRef.current;
+      if (!el) return;
+      try {
+        el.setSelectionRange(nextStart, nextEnd);
+      } catch {
+        /* ignore */
+      }
+    });
+  };
+
+  const handleKeyDown = (ev: React.KeyboardEvent<HTMLInputElement>) => {
+    if (ev.key === 'Enter') {
+      ev.preventDefault();
+      skipBlurCommitRef.current = true;
+      commit();
       return;
     }
-    const digit = e.key.replace(/\D/g, '');
-    if (digit.length === 1) {
-      e.preventDefault();
-      setCents((c) => Math.min(MAX_CENTS, c * 10 + parseInt(digit, 10)));
+    if (ev.key === 'Escape') {
+      ev.preventDefault();
+      revert();
     }
   };
 
-  const handlePaste = (e: React.ClipboardEvent) => {
-    e.preventDefault();
-    const text = e.clipboardData.getData('text');
-    const parsed = parseBr(text);
-    setCents(Math.min(MAX_CENTS, Math.max(0, Math.round(parsed * 100))));
+  const handleBlur = () => {
+    if (skipBlurCommitRef.current) {
+      skipBlurCommitRef.current = false;
+      return;
+    }
+    commit();
   };
 
   return (
-    <div className="flex flex-col justify-center">
+    <div className="flex flex-col justify-center w-max max-w-full shrink-0">
       {editing ? (
         <input
+          ref={inputRef}
           type="text"
           inputMode="decimal"
-          value={formatBr(cents / 100, decimals)}
-          readOnly
+          enterKeyHint="done"
+          autoComplete="off"
+          spellCheck={false}
+          aria-label={ariaLabel}
+          value={draft}
+          onChange={handleDraftChange}
           onKeyDown={handleKeyDown}
-          onPaste={handlePaste}
-          onBlur={commit}
-          className={`text-sm leading-5 tracking-[-0.14px] text-[#1f1f1f] bg-blue-50/60 border border-blue-200 rounded-md px-1.5 py-0.5 outline-none ${inputW}`}
+          onBlur={handleBlur}
+          className={`box-border border border-solid outline-none focus:outline-none text-sm leading-5 tracking-[-0.14px] text-[#1f1f1f] bg-blue-50/60 border-blue-200 caret-[#0a0a0a] ${cellShape}`}
           autoFocus
         />
       ) : (
         <button
           type="button"
           onClick={startEditing}
-          className={`text-sm leading-5 tracking-[-0.14px] text-[#1f1f1f] hover:bg-black/[0.04] rounded px-1 py-0.5 -ml-1 text-left transition-colors cursor-text ${size === 'md' ? 'min-w-[88px]' : ''}`}
+          className={`box-border border border-solid outline-none text-sm leading-5 tracking-[-0.14px] text-[#1f1f1f] bg-transparent border-transparent hover:bg-black/[0.04] text-left transition-colors cursor-text ${cellShape}`}
         >
-          {formatBr(value, decimals)}{suffix ? ` ${suffix}` : ''}
+          {formatBr(value, decimals)}
+          {suffix ? ` ${suffix}` : ''}
         </button>
       )}
     </div>
@@ -1445,40 +1634,48 @@ const MediaRow: React.FC<{
               <span className="text-xs leading-4 text-[#707070]">{descText}</span>
             </div>
           </div>
-          <div className="flex items-center gap-10 shrink-0" onClick={stop}>
-            <div className="flex flex-col justify-center">
+          <div className="flex items-center gap-10 shrink-0 min-w-0" onClick={stop}>
+            <div className="flex flex-col justify-center shrink-0 whitespace-nowrap">
               <span className="text-xs leading-4 text-[#707070]">Alocação total</span>
               {canEdit && onAllocationChange ? (
-                <EditableMoneyCell value={allocation} onChange={onAllocationChange} suffix="BRL" size="md" />
+                <EditableMoneyCell
+                  value={allocation}
+                  onChange={onAllocationChange}
+                  suffix="BRL"
+                  size="md"
+                  ariaLabel={`Alocação total em reais, ${labels.name}`}
+                />
               ) : (
-                <span className="text-sm leading-5 tracking-[-0.14px] text-[#1f1f1f]">{fmtMoney(allocation)}</span>
+                <span className="text-sm leading-5 tracking-[-0.14px] text-[#1f1f1f] tabular-nums">{fmtMoney(allocation)}</span>
               )}
             </div>
             {bid && labels.bidLabel && (
-              <div className="flex flex-col justify-center whitespace-nowrap">
+              <div className="flex flex-col justify-center shrink-0 whitespace-nowrap">
                 <span className="text-xs leading-4 text-[#707070]">{labels.bidLabel}</span>
                 {canEdit && onBidChange ? (
                   <EditableMoneyCell
                     value={bid.currentBid}
                     onChange={(v) => onBidChange({ currentBid: v })}
                     suffix="BRL"
+                    ariaLabel={`${labels.bidLabel} em reais, ${labels.name}`}
                   />
                 ) : (
-                  <span className="text-sm leading-5 tracking-[-0.14px] text-[#1f1f1f]">{formatBr(bid.currentBid)} BRL</span>
+                  <span className="text-sm leading-5 tracking-[-0.14px] text-[#1f1f1f] tabular-nums">{formatBr(bid.currentBid)} BRL</span>
                 )}
               </div>
             )}
             {bid && showSecondBid && (
-              <div className="flex flex-col justify-center whitespace-nowrap">
+              <div className="flex flex-col justify-center shrink-0 whitespace-nowrap">
                 <span className="text-xs leading-4 text-[#707070]">CPM</span>
                 {canEdit && onBidChange ? (
                   <EditableMoneyCell
                     value={bid.suggestedBid}
                     onChange={(v) => onBidChange({ suggestedBid: v })}
                     suffix="BRL"
+                    ariaLabel={`CPM em reais, ${labels.name}`}
                   />
                 ) : (
-                  <span className="text-sm leading-5 tracking-[-0.14px] text-[#1f1f1f]">{formatBr(bid.suggestedBid)} BRL</span>
+                  <span className="text-sm leading-5 tracking-[-0.14px] text-[#1f1f1f] tabular-nums">{formatBr(bid.suggestedBid)} BRL</span>
                 )}
               </div>
             )}
