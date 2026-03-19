@@ -4,12 +4,19 @@ import { next } from '@vercel/functions';
  * Proteção por senha no Vercel (Basic Auth).
  * Ative definindo no dashboard: PROTOTYPE_PASSWORD (e opcionalmente PROTOTYPE_USER).
  * Se nenhum estiver definido, o site fica aberto (útil em dev/local).
+ * Após definir as variáveis, é obrigatório fazer um novo deploy.
  */
-export const config = {
-  matcher: ['/((?!assets/|favicon\\.ico).*)'],
-};
-
 export default function middleware(request) {
+  const url = new URL(request.url);
+  const pathname = url.pathname || '/';
+  if (
+    pathname.startsWith('/assets/') ||
+    pathname === '/favicon.ico' ||
+    /\\.(ico|png|svg|js|css|woff2?)(\\?|$)/i.test(pathname)
+  ) {
+    return next();
+  }
+
   const password = process.env.PROTOTYPE_PASSWORD;
   const user = process.env.PROTOTYPE_USER || 'prototype';
 
