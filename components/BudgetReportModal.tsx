@@ -16,6 +16,7 @@ import {
 import annotationPlugin from 'chartjs-plugin-annotation';
 import { Chart, Line as ChartLine, Bar as ChartBar } from 'react-chartjs-2';
 import { Campaign } from '../types';
+import { inferCampaignObjective } from '../utils/campaignObjective';
 
 ChartJS.register(
   CategoryScale, LinearScale, PointElement, LineElement, BarElement,
@@ -656,13 +657,6 @@ interface InsightCardData {
   description: string;
   recommendation: string;
   tone: InsightTone;
-}
-
-function inferCampaignObjective(campaign: Campaign): 'Conversão' | 'Consideração' | 'Alcance' {
-  const mediaTypes = campaign.mediaTypes ?? [];
-  if (mediaTypes.some((type) => type === 'Produto patrocinado' || type === 'Instore display')) return 'Conversão';
-  if (mediaTypes.some((type) => type === 'Marca patrocinada' || type === 'Video')) return 'Consideração';
-  return 'Alcance';
 }
 
 function formatPercent(value: number, digits = 0): string {
