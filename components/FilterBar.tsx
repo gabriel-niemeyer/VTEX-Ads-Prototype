@@ -11,6 +11,9 @@ interface FilterBarProps {
   mediaTypes: string[];
   selectedMediaType: string;
   onMediaTypeChange: (mediaType: string) => void;
+  objectives: string[];
+  selectedObjective: string;
+  onObjectiveChange: (objective: string) => void;
   rightAction?: React.ReactNode;
 }
 
@@ -24,9 +27,12 @@ export const FilterBar: React.FC<FilterBarProps> = ({
   mediaTypes,
   selectedMediaType,
   onMediaTypeChange,
+  objectives,
+  selectedObjective,
+  onObjectiveChange,
   rightAction
 }) => {
-  const [openDropdown, setOpenDropdown] = useState<'publisher' | 'status' | 'media' | null>(null);
+  const [openDropdown, setOpenDropdown] = useState<'publisher' | 'status' | 'media' | 'objective' | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -39,7 +45,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const toggleDropdown = (name: 'publisher' | 'status' | 'media') => {
+  const toggleDropdown = (name: 'publisher' | 'status' | 'media' | 'objective') => {
     setOpenDropdown(prev => prev === name ? null : name);
   };
 
@@ -171,6 +177,51 @@ export const FilterBar: React.FC<FilterBarProps> = ({
                 >
                   {type}
                   {selectedMediaType === type && (
+                    <span className="material-symbols-outlined text-[18px]">check</span>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Objetivo — mesmo estilo do filtro de mídia */}
+      <div className="relative">
+        <div
+          onClick={() => toggleDropdown('objective')}
+          className={`flex items-center px-2 py-2 rounded-xl text-sm font-medium cursor-pointer transition-all border-none shadow-none ${
+            openDropdown === 'objective' ? 'bg-[#ebebeb]' : 'bg-[#f2f2f2] hover:bg-[#ebebeb]'
+          }`}
+        >
+          <span className="text-[color:var(--sl-fg-base-soft)] font-normal">Objetivo:</span>
+          <span className="ml-1 text-[color:var(--sl-fg-base)] font-medium">{selectedObjective}</span>
+          <span className={`material-symbols-outlined text-[18px] ml-1 transition-transform duration-200 text-[color:var(--sl-fg-base)] ${openDropdown === 'objective' ? 'rotate-180' : ''}`}>
+            expand_more
+          </span>
+        </div>
+
+        {openDropdown === 'objective' && (
+          <div className="absolute top-full left-0 mt-2 w-56 bg-white border border-gray-100 rounded-xl shadow-2xl z-[100] overflow-hidden py-1 animate-in fade-in zoom-in duration-200">
+            <div className="px-3 py-2 text-[12px] font-normal text-[color:var(--sl-fg-base-soft)] tracking-[-0.002em]">
+              Filtrar por Objetivo
+            </div>
+            <div className="max-h-64 overflow-y-auto">
+              {objectives.map((obj) => (
+                <div
+                  key={obj}
+                  onClick={() => {
+                    onObjectiveChange(obj);
+                    setOpenDropdown(null);
+                  }}
+                  className={`px-4 py-2.5 text-sm cursor-pointer flex items-center justify-between transition-colors ${
+                    selectedObjective === obj
+                      ? 'bg-blue-50 text-[color:var(--sl-fg-base-soft)] font-semibold'
+                      : 'text-[color:var(--sl-fg-base)] hover:bg-gray-50'
+                  }`}
+                >
+                  {obj}
+                  {selectedObjective === obj && (
                     <span className="material-symbols-outlined text-[18px]">check</span>
                   )}
                 </div>

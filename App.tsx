@@ -14,6 +14,7 @@ import { Tooltip } from './components/Tooltip';
 import { AgentLayout } from './components/AgentLayout';
 import { Campaign, CampaignStatus, SortKey, ColumnConfig, MediaType, Product, Bid } from './types';
 import { COLUMNS, PERFORMANCE_COLUMNS, ALL_MEDIA_TYPES, calculateOverallStrength } from './constants';
+import { inferCampaignObjective } from './utils/campaignObjective';
 
 class FormErrorBoundary extends Component<
   { children: React.ReactNode; onClose: () => void },
@@ -1427,6 +1428,7 @@ const App: React.FC = () => {
   const [selectedPublisher, setSelectedPublisher] = useState<string>('Todos');
   const [selectedStatus, setSelectedStatus] = useState<string>('Todos');
   const [selectedMediaType, setSelectedMediaType] = useState<string>('Todas');
+  const [selectedObjective, setSelectedObjective] = useState<string>('Todos');
   const [selectedBidStrength, setSelectedBidStrength] = useState<string>('Todas');
   const [selectedSpendingPace, setSelectedSpendingPace] = useState<string>('Todos');
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
@@ -1473,6 +1475,7 @@ const App: React.FC = () => {
 
   const statuses = useMemo(() => ['Todos', ...Object.values(CampaignStatus)], []);
   const mediaTypes = useMemo(() => ['Todas', ...ALL_MEDIA_TYPES], []);
+  const objectives = useMemo(() => ['Todos', 'Conversão', 'Consideração', 'Alcance'], []);
   const bidStrengths = useMemo(() => ['Todas', 'Forte', 'Intermediário', 'Fraco'], []);
   const spendingPaces = useMemo(() => ['Todos', 'Abaixo', 'No Ritmo', 'Acima'], []);
 
@@ -1493,18 +1496,19 @@ const App: React.FC = () => {
   };
 
   const hasActiveFilters = useMemo(() => {
-    return selectedPublisher !== 'Todos' || selectedStatus !== 'Todos' || selectedMediaType !== 'Todas' || selectedBidStrength !== 'Todas' || selectedSpendingPace !== 'Todos';
-  }, [selectedPublisher, selectedStatus, selectedMediaType, selectedBidStrength, selectedSpendingPace]);
+    return selectedPublisher !== 'Todos' || selectedStatus !== 'Todos' || selectedMediaType !== 'Todas' || selectedObjective !== 'Todos' || selectedBidStrength !== 'Todas' || selectedSpendingPace !== 'Todos';
+  }, [selectedPublisher, selectedStatus, selectedMediaType, selectedObjective, selectedBidStrength, selectedSpendingPace]);
 
   const activeFiltersCount = useMemo(() => {
     let count = 0;
     if (selectedPublisher !== 'Todos') count++;
     if (selectedStatus !== 'Todos') count++;
     if (selectedMediaType !== 'Todas') count++;
+    if (selectedObjective !== 'Todos') count++;
     if (selectedBidStrength !== 'Todas') count++;
     if (selectedSpendingPace !== 'Todos') count++;
     return count;
-  }, [selectedPublisher, selectedStatus, selectedMediaType, selectedBidStrength, selectedSpendingPace]);
+  }, [selectedPublisher, selectedStatus, selectedMediaType, selectedObjective, selectedBidStrength, selectedSpendingPace]);
 
   const filteredCampaigns = useMemo(() => {
     const q = searchTerm.toLowerCase().trim();
@@ -1514,17 +1518,20 @@ const App: React.FC = () => {
         c.publisher.toLowerCase().includes(q) ||
         c.status.toLowerCase().includes(q) ||
         c.mediaTypes.some(mt => mt.toLowerCase().includes(q)) ||
+        inferCampaignObjective(c).toLowerCase().includes(q) ||
         (c.bidStrength && c.bidStrength.toLowerCase().includes(q));
       const matchesPublisher = selectedPublisher === 'Todos' || c.publisher === selectedPublisher;
       const matchesStatus = selectedStatus === 'Todos' || c.status === selectedStatus;
       const matchesMedia = selectedMediaType === 'Todas' || c.mediaTypes.includes(selectedMediaType as MediaType);
+      const matchesObjective =
+        selectedObjective === 'Todos' || inferCampaignObjective(c) === selectedObjective;
       const matchesStrength = selectedBidStrength === 'Todas' || c.bidStrength === selectedBidStrength;
       const pacingLabel = getBudgetPacingLabel(c);
       const matchesPace = selectedSpendingPace === 'Todos' || pacingLabel === selectedSpendingPace;
 
-      return matchesSearch && matchesPublisher && matchesStatus && matchesMedia && matchesStrength && matchesPace;
+      return matchesSearch && matchesPublisher && matchesStatus && matchesMedia && matchesObjective && matchesStrength && matchesPace;
     });
-  }, [campaigns, searchTerm, selectedPublisher, selectedStatus, selectedMediaType, selectedBidStrength, selectedSpendingPace]);
+  }, [campaigns, searchTerm, selectedPublisher, selectedStatus, selectedMediaType, selectedObjective, selectedBidStrength, selectedSpendingPace]);
 
   const handleCampaignUpdate = (id: string, startDate: Date, endDate: Date) => {
     setCampaigns(prev => prev.map(c => {
@@ -1812,6 +1819,7 @@ impressions: 0, clicks: 0, conversions: 0, revenue: 0,
     setSelectedPublisher('Todos');
     setSelectedStatus('Todos');
     setSelectedMediaType('Todas');
+    setSelectedObjective('Todos');
     setSelectedBidStrength('Todas');
     setSelectedSpendingPace('Todos');
   };
@@ -1992,6 +2000,9 @@ impressions: 0, clicks: 0, conversions: 0, revenue: 0,
           mediaTypes={mediaTypes}
           selectedMediaType={selectedMediaType}
           onMediaTypeChange={setSelectedMediaType}
+          objectives={objectives}
+          selectedObjective={selectedObjective}
+          onObjectiveChange={setSelectedObjective}
           bidStrengths={bidStrengths}
           selectedBidStrength={selectedBidStrength}
           onBidStrengthChange={setSelectedBidStrength}

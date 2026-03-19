@@ -13,6 +13,9 @@ interface FilterDrawerProps {
   mediaTypes: string[];
   selectedMediaType: string;
   onMediaTypeChange: (mediaType: string) => void;
+  objectives: string[];
+  selectedObjective: string;
+  onObjectiveChange: (objective: string) => void;
   bidStrengths: string[];
   selectedBidStrength: string;
   onBidStrengthChange: (strength: string) => void;
@@ -22,7 +25,7 @@ interface FilterDrawerProps {
   onReset: () => void;
 }
 
-type SectionId = 'status' | 'media' | 'publisher' | 'strength' | 'pace';
+type SectionId = 'status' | 'media' | 'objective' | 'publisher' | 'strength' | 'pace';
 
 // Reusable Section Component extracted to avoid re-definition and typing issues
 interface FilterSectionProps {
@@ -88,6 +91,9 @@ export const FilterDrawer: React.FC<FilterDrawerProps> = ({
   mediaTypes,
   selectedMediaType,
   onMediaTypeChange,
+  objectives,
+  selectedObjective,
+  onObjectiveChange,
   bidStrengths,
   selectedBidStrength,
   onBidStrengthChange,
@@ -103,6 +109,7 @@ export const FilterDrawer: React.FC<FilterDrawerProps> = ({
   const [expandedSections, setExpandedSections] = useState<Record<SectionId, boolean>>({
     status: true,
     media: true,
+    objective: true,
     publisher: true,
     strength: true,
     pace: true
@@ -157,6 +164,16 @@ export const FilterDrawer: React.FC<FilterDrawerProps> = ({
       case 'Instore display': return 'storefront';
       case 'Todas': return 'apps';
       default: return 'circle';
+    }
+  };
+
+  const getObjectiveIcon = (obj: string) => {
+    switch (obj) {
+      case 'Todos': return 'apps';
+      case 'Conversão': return 'shopping_bag';
+      case 'Consideração': return 'visibility';
+      case 'Alcance': return 'campaign';
+      default: return 'flag';
     }
   };
 
@@ -467,6 +484,39 @@ export const FilterDrawer: React.FC<FilterDrawerProps> = ({
                       {getMediaIcon(type)}
                     </span>
                     <span>{type}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </FilterSection>
+
+          {/* Objetivo — mesmo padrão de chips do tipo de mídia */}
+          <FilterSection
+            title="Objetivo"
+            selectedValue={selectedObjective}
+            isExpanded={expandedSections.objective}
+            onToggle={() => toggleSection('objective')}
+          >
+            <div className="flex flex-wrap gap-2 px-3">
+              {objectives.map((obj) => {
+                const isSelected = selectedObjective === obj;
+                return (
+                  <button
+                    key={obj}
+                    type="button"
+                    onClick={() => onObjectiveChange(obj)}
+                    className={`
+                      flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium border transition-all duration-200 outline-none select-none
+                      ${isSelected
+                        ? 'bg-blue-50 border-blue-200 text-[color:var(--sl-fg-base-soft)]'
+                        : 'bg-white border-gray-200 text-[color:var(--sl-fg-base-soft)] hover:border-gray-300 hover:bg-gray-50'
+                      }
+                    `}
+                  >
+                    <span className={`material-symbols-outlined text-[18px] ${isSelected ? 'text-[color:var(--sl-fg-base-soft)]' : 'text-[color:var(--sl-fg-base-muted)]'}`}>
+                      {getObjectiveIcon(obj)}
+                    </span>
+                    <span>{obj}</span>
                   </button>
                 );
               })}
