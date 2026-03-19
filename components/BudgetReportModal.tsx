@@ -636,7 +636,15 @@ interface BudgetReportModalProps {
 }
 
 const FADE_MS = 200;
-const INSIGHTS_SIDEBAR_MS = 300;
+/** Duração da expansão/colapso do painel de insights (alinhar com `duration-[520ms]` nas classes abaixo). */
+const INSIGHTS_SIDEBAR_MS = 520;
+/** Conteúdo entra um pouco antes do fim do layout para a abertura parecer contínua, não em dois passos. */
+const INSIGHTS_SIDEBAR_CONTENT_DELAY_MS = Math.round(INSIGHTS_SIDEBAR_MS * 0.34);
+const INSIGHTS_SIDEBAR_EASE_CLASS = 'ease-[cubic-bezier(0.22,1,0.36,1)]';
+const INSIGHTS_SIDEBAR_DEFAULT_W = 400;
+const INSIGHTS_SIDEBAR_MIN_W = 280;
+const INSIGHTS_SIDEBAR_HANDLE_PX = 6;
+const INSIGHTS_MAIN_MIN_W = 320;
 
 type InsightTone = 'neutral' | 'success' | 'warning' | 'danger';
 
@@ -670,6 +678,10 @@ export const BudgetReportModal: React.FC<BudgetReportModalProps> = ({ campaign, 
   const [isExiting, setIsExiting] = useState(false);
   const [isInsightsOpen, setIsInsightsOpen] = useState(false);
   const [isInsightsContentVisible, setIsInsightsContentVisible] = useState(false);
+  const [insightsSidebarWidth, setInsightsSidebarWidth] = useState(INSIGHTS_SIDEBAR_DEFAULT_W);
+  const [isInsightsResizeDragging, setIsInsightsResizeDragging] = useState(false);
+  const insightsLayoutRef = useRef<HTMLDivElement>(null);
+  const insightsResizeDragRef = useRef<{ pointerId: number; startX: number; startW: number } | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const dailyChartContainerRef = useRef<HTMLDivElement>(null);
   const hourlyChartContainerRef = useRef<HTMLDivElement>(null);
@@ -705,7 +717,84 @@ export const BudgetReportModal: React.FC<BudgetReportModalProps> = ({ campaign, 
 
   useEffect(() => {
     setIsInsightsOpen(false);
+    setInsightsSidebarWidth(INSIGHTS_SIDEBAR_DEFAULT_W);
   }, [campaign.id]);
+
+  const insightsGridTemplateColumns = useMemo(() => {
+    if (!isInsightsOpen) return 'minmax(0,1fr) 0px';
+    return `minmax(0,1fr) ${INSIGHTS_SIDEBAR_HANDLE_PX}px ${insightsSidebarWidth}px`;
+  }, [isInsightsOpen, insightsSidebarWidth]);
+
+  const clampInsightsSidebarWidth = useCallback((w: number) => {
+    const grid = insightsLayoutRef.current;
+    if (!grid) return Math.max(INSIGHTS_SIDEBAR_MIN_W, w);
+    const gridW = grid.getBoundingClientRect().width;
+    const maxSidebar = Math.max(
+      INSIGHTS_SIDEBAR_MIN_W,
+      gridW - INSIGHTS_MAIN_MIN_W - INSIGHTS_SIDEBAR_HANDLE_PX,
+    );
+    return Math.min(maxSidebar, Math.max(INSIGHTS_SIDEBAR_MIN_W, Math.round(w)));
+  }, []);
+
+  const onInsightsResizePointerDown = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      if (!isInsightsOpen || e.button !== 0) return;
+      e.preventDefault();
+      e.currentTarget.setPointerCapture(e.pointerId);
+      insightsResizeDragRef.current = {
+        pointerId: e.pointerId,
+        startX: e.clientX,
+        startW: insightsSidebarWidth,
+      };
+      setIsInsightsResizeDragging(true);
+    },
+    [isInsightsOpen, insightsSidebarWidth],
+  );
+
+  const onInsightsResizePointerMove = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      const d = insightsResizeDragRef.current;
+      if (!d || e.pointerId !== d.pointerId) return;
+      const delta = e.clientX - d.startX;
+      const next = d.startW - delta;
+      setInsightsSidebarWidth(clampInsightsSidebarWidth(next));
+    },
+    [clampInsightsSidebarWidth],
+  );
+
+  const endInsightsResize = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    const d = insightsResizeDragRef.current;
+    if (!d || e.pointerId !== d.pointerId) return;
+    insightsResizeDragRef.current = null;
+    try {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    } catch {
+      /* já liberado */
+    }
+    setIsInsightsResizeDragging(false);
+  }, []);
+
+  const onInsightsResizeKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLDivElement>) => {
+      if (!isInsightsOpen) return;
+      if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+      e.preventDefault();
+      const step = 16;
+      setInsightsSidebarWidth((prev) =>
+        clampInsightsSidebarWidth(prev + (e.key === 'ArrowLeft' ? step : -step)),
+      );
+    },
+    [isInsightsOpen, clampInsightsSidebarWidth],
+  );
+
+  useEffect(() => {
+    if (!isInsightsOpen) return;
+    const onResize = () => {
+      setInsightsSidebarWidth((w) => clampInsightsSidebarWidth(w));
+    };
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, [isInsightsOpen, clampInsightsSidebarWidth]);
 
   useEffect(() => {
     if (!isInsightsOpen) {
@@ -719,7 +808,7 @@ export const BudgetReportModal: React.FC<BudgetReportModalProps> = ({ campaign, 
       return;
     }
 
-    const t = window.setTimeout(() => setIsInsightsContentVisible(true), INSIGHTS_SIDEBAR_MS);
+    const t = window.setTimeout(() => setIsInsightsContentVisible(true), INSIGHTS_SIDEBAR_CONTENT_DELAY_MS);
     return () => window.clearTimeout(t);
   }, [isInsightsOpen]);
 
@@ -2061,8 +2150,13 @@ export const BudgetReportModal: React.FC<BudgetReportModalProps> = ({ campaign, 
         </div>
 
         <div
-          className="min-h-0 flex-1 grid overflow-hidden transition-[grid-template-columns] duration-300 ease-out"
-          style={{ gridTemplateColumns: isInsightsOpen ? 'minmax(0,1fr) 360px' : 'minmax(0,1fr) 0px' }}
+          ref={insightsLayoutRef}
+          className={`min-h-0 flex-1 grid overflow-hidden ${
+            isInsightsResizeDragging
+              ? ''
+              : `transition-[grid-template-columns] duration-[520ms] ${INSIGHTS_SIDEBAR_EASE_CLASS}`
+          }`}
+          style={{ gridTemplateColumns: insightsGridTemplateColumns }}
         >
         <div
           ref={scrollRef}
@@ -2283,11 +2377,6 @@ export const BudgetReportModal: React.FC<BudgetReportModalProps> = ({ campaign, 
                   Meta do dia já atingida.
                 </p>
               )}
-              {projectedHitHour != null && projectedHitHour <= 23 && consumptionDay < expectedDay && (
-                <p className="text-sm text-[#414651] tracking-[-0.14px]">
-                  No ritmo atual, a meta do dia deve ser atingida por volta das <strong className="text-[#016810]">{Math.floor(projectedHitHour)}h</strong>.
-                </p>
-              )}
               {hourlyCumulativeTip != null && chartHourlyCumulativeData[hourlyCumulativeTip.idx] && (
                 <SmartTooltip x={hourlyCumulativeTip.screenX} y={hourlyCumulativeTip.screenY} containerRef={hourlyCumulativeChartContainerRef}>
                   <HourlyCumulativeTooltipContent data={chartHourlyCumulativeData[hourlyCumulativeTip.idx]} />
@@ -2299,14 +2388,42 @@ export const BudgetReportModal: React.FC<BudgetReportModalProps> = ({ campaign, 
           <div className="h-8" aria-hidden />
         </div>
         </div>
-        <aside className={`min-w-0 overflow-hidden border-l border-[#e0e0e0] bg-white transition-opacity duration-300 ${isInsightsOpen ? 'opacity-100' : 'opacity-0'}`}>
-          <div className={`flex h-full min-h-0 flex-col overflow-y-auto bg-white custom-scrollbar transition-all duration-300 ease-out ${isInsightsOpen ? 'translate-x-0' : 'translate-x-4'}`}>
+        {isInsightsOpen && (
+          <div
+            role="separator"
+            aria-orientation="vertical"
+            aria-label="Redimensionar painel de oportunidades"
+            aria-valuemin={INSIGHTS_SIDEBAR_MIN_W}
+            aria-valuemax={2000}
+            aria-valuenow={Math.round(insightsSidebarWidth)}
+            tabIndex={0}
+            className={`relative z-[1] shrink-0 border-r border-[#e0e0e0] bg-white touch-none select-none outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#0366dd]/35 ${
+              isInsightsResizeDragging ? 'bg-[#f0f6ff]' : 'hover:bg-[#f8fafc]'
+            } cursor-col-resize`}
+            style={{ width: INSIGHTS_SIDEBAR_HANDLE_PX }}
+            onPointerDown={onInsightsResizePointerDown}
+            onPointerMove={onInsightsResizePointerMove}
+            onPointerUp={endInsightsResize}
+            onPointerCancel={endInsightsResize}
+            onLostPointerCapture={() => {
+              insightsResizeDragRef.current = null;
+              setIsInsightsResizeDragging(false);
+            }}
+            onKeyDown={onInsightsResizeKeyDown}
+          />
+        )}
+        <aside
+          className={`min-w-0 overflow-hidden bg-white transition-opacity duration-[520ms] ${INSIGHTS_SIDEBAR_EASE_CLASS} ${isInsightsOpen ? 'opacity-100' : 'opacity-0'}`}
+        >
+          <div
+            className={`flex h-full min-h-0 flex-col overflow-y-auto bg-white custom-scrollbar transition-transform duration-[520ms] ${INSIGHTS_SIDEBAR_EASE_CLASS} ${isInsightsOpen ? 'translate-x-0' : 'translate-x-3'}`}
+          >
             <div
               aria-hidden={!isInsightsContentVisible}
-              className={`transition-opacity duration-200 ease-out ${isInsightsContentVisible ? 'opacity-100' : 'pointer-events-none opacity-0'}`}
+              className={`transition-opacity duration-[380ms] ${INSIGHTS_SIDEBAR_EASE_CLASS} ${isInsightsContentVisible ? 'opacity-100' : 'pointer-events-none opacity-0'}`}
             >
               <div className="px-5 pt-6 pb-0 bg-white">
-                <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-[#f1f5f9] text-[#414651] text-[11px] font-medium tracking-[-0.11px]">
+                <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-[#f1f5f9] text-[#414651] text-[12px] font-medium tracking-[-0.11px]">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#0366dd]" aria-hidden />
                   {insightCards.length} insights
                 </div>
@@ -2320,9 +2437,9 @@ export const BudgetReportModal: React.FC<BudgetReportModalProps> = ({ campaign, 
                   {insightCards.map((card) => (
                       <div
                         key={card.id}
-                        className="rounded-[14px] border border-[#e0e0e0] bg-white p-5 shadow-[0_1px_2px_rgba(16,24,40,0.05)] transition-all duration-200 hover:shadow-[0_12px_24px_rgba(16,24,40,0.08)] hover:border-[#d4d4d4]"
+                        className="rounded-[14px] border border-[#e0e0e0] bg-white p-5 shadow-[0_1px_2px_rgba(16,24,40,0.05)] transition-all duration-200 hover:border-[#d4d4d4]"
                       >
-                        <p className="text-[11px] font-medium leading-4 tracking-[-0.11px] text-[#414651]">
+                        <p className="text-[12px] font-medium leading-4 tracking-[-0.11px] text-[#414651]">
                           {card.eyebrow}
                         </p>
                         <h3 className="mt-3 text-[16px] leading-6 tracking-[-0.32px] font-semibold text-[#1f1f1f]">{card.title}</h3>
