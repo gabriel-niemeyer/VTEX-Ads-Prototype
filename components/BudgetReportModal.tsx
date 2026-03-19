@@ -2450,7 +2450,7 @@ export const BudgetReportModal: React.FC<BudgetReportModalProps> = ({ campaign, 
                         key={card.id}
                         className="rounded-[14px] border border-[#e0e0e0] bg-white p-5 shadow-[0_1px_2px_rgba(16,24,40,0.05)] transition-all duration-200 hover:border-[#d4d4d4]"
                       >
-                        <p className="text-[12px] font-medium leading-4 tracking-[-0.11px] text-[color:var(--sl-fg-base)]">
+                        <p className="text-[12px] font-medium leading-4 tracking-[-0.11px] text-[color:var(--sl-fg-base-soft)]">
                           {card.eyebrow}
                         </p>
                         <h3 className="mt-3 text-[16px] leading-6 tracking-[-0.32px] font-semibold text-[color:var(--sl-fg-base)]">{card.title}</h3>
