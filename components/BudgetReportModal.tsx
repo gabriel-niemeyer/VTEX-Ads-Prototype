@@ -219,13 +219,13 @@ function TotalTooltipContent({ data }: { data: TotalDataPoint }) {
   const hasDeviation = hasForecast && typeof forecastLow === 'number' && typeof forecastHigh === 'number';
   return (
     <div className="rounded-xl border border-gray-200/90 bg-white px-5 py-4 shadow-[0_8px_24px_rgba(0,0,0,0.08)] min-w-[200px]">
-      <p className="text-[12px] font-normal tracking-[-0.02em] text-[color:var(--sl-color-gray-8)] mb-3">{dateTooltip}</p>
+      <p className="text-[12px] font-normal tracking-[-0.02em] text-[color:var(--sl-fg-base-soft)] mb-3">{dateTooltip}</p>
       <div className="space-y-3">
         {typeof goal === 'number' && (
           <div className="flex items-start gap-2">
             <span className="w-2 h-2 rounded-sm bg-[#1f1f1f] shrink-0 mt-1.5" />
             <div>
-              <p className="text-[11px] font-medium text-[color:var(--sl-color-gray-8)] leading-tight">Meta de consumo total</p>
+              <p className="text-[11px] font-medium text-[color:var(--sl-fg-base-soft)] leading-tight">Meta de consumo total</p>
               <p className="text-[13px] font-semibold text-[color:var(--sl-fg-base)] tabular-nums mt-0.5">{formatCurrencyFull(goal)}</p>
             </div>
           </div>
@@ -234,7 +234,7 @@ function TotalTooltipContent({ data }: { data: TotalDataPoint }) {
           <div className="flex items-start gap-2">
             <span className="w-2 h-2 rounded-sm bg-[#0366dd] shrink-0 mt-1.5" />
             <div>
-              <p className="text-[11px] font-medium text-[color:var(--sl-color-gray-8)] leading-tight">Realizado</p>
+              <p className="text-[11px] font-medium text-[color:var(--sl-fg-base-soft)] leading-tight">Realizado</p>
               <p className="text-[13px] font-semibold text-[color:var(--sl-fg-base)] tabular-nums mt-0.5">{formatCurrencyFull(cumulative)}</p>
             </div>
           </div>
@@ -244,16 +244,16 @@ function TotalTooltipContent({ data }: { data: TotalDataPoint }) {
             <div className="flex items-start gap-2">
               <svg width="12" height="4" className="shrink-0 mt-2" aria-hidden><line x1="0" y1="2" x2="12" y2="2" stroke="#0366dd" strokeWidth={1.5} strokeDasharray="3 2" /></svg>
               <div>
-                <p className="text-[11px] font-medium text-[color:var(--sl-color-gray-8)] leading-tight">Previsão</p>
+                <p className="text-[11px] font-medium text-[color:var(--sl-fg-base-soft)] leading-tight">Previsão</p>
                 <p className="text-[13px] font-semibold text-[color:var(--sl-fg-base)] tabular-nums mt-0.5">{formatCurrencyFull(forecast!)}</p>
               </div>
             </div>
             {hasDeviation && (
               <div className="rounded-lg bg-gray-50/80 border border-gray-100 px-3 py-2 mt-2">
-                <p className="text-[11px] font-medium text-[color:var(--sl-color-gray-8)] mb-1.5">Faixa de desvio</p>
+                <p className="text-[11px] font-medium text-[color:var(--sl-fg-base-soft)] mb-1.5">Faixa de desvio</p>
                 <div className="flex items-baseline justify-between gap-4 text-[12px] tabular-nums text-[color:var(--sl-fg-base)]">
                   <span>{formatCurrencyFull(forecastLow!)}</span>
-                  <span className="text-[color:var(--sl-color-gray-5)] font-light">→</span>
+                  <span className="text-[color:var(--sl-fg-base-muted)] font-light">→</span>
                   <span>{formatCurrencyFull(forecastHigh!)}</span>
                 </div>
               </div>
@@ -269,13 +269,13 @@ function DailyTooltipContent({ data, showImpressionShare }: { data: DailyDataPoi
   const { dateTooltip, dailySpend, dailyBudget, impressionShare } = data;
   return (
     <div className="rounded-xl border border-gray-200/90 bg-white px-5 py-4 shadow-[0_8px_24px_rgba(0,0,0,0.08)] min-w-[200px]">
-      <p className="text-[12px] font-normal tracking-[-0.02em] text-[color:var(--sl-color-gray-8)] mb-3">{dateTooltip}</p>
+      <p className="text-[12px] font-normal tracking-[-0.02em] text-[color:var(--sl-fg-base-soft)] mb-3">{dateTooltip}</p>
       <div className="space-y-3">
         {typeof dailySpend === 'number' && (
           <div className="flex items-start gap-2">
             <span className="w-2 h-2 rounded-sm bg-[#0366dd] shrink-0 mt-1.5" />
             <div>
-              <p className="text-[11px] font-medium text-[color:var(--sl-color-gray-8)] leading-tight">Gasto diário</p>
+              <p className="text-[11px] font-medium text-[color:var(--sl-fg-base-soft)] leading-tight">Gasto diário</p>
               <p className="text-[13px] font-semibold text-[color:var(--sl-fg-base)] tabular-nums mt-0.5">{formatCurrencyFull(dailySpend)}</p>
             </div>
           </div>
@@ -284,7 +284,7 @@ function DailyTooltipContent({ data, showImpressionShare }: { data: DailyDataPoi
           <div className="flex items-start gap-2">
             <span className="w-2 h-2 rounded-sm bg-[#eaeaea] border border-gray-200 shrink-0 mt-1.5" />
             <div>
-              <p className="text-[11px] font-medium text-[color:var(--sl-color-gray-8)] leading-tight">Orçamento médio diário</p>
+              <p className="text-[11px] font-medium text-[color:var(--sl-fg-base-soft)] leading-tight">Orçamento médio diário</p>
               <p className="text-[13px] font-semibold text-[color:var(--sl-fg-base)] tabular-nums mt-0.5">{formatCurrencyFull(dailyBudget)}</p>
             </div>
           </div>
@@ -293,7 +293,7 @@ function DailyTooltipContent({ data, showImpressionShare }: { data: DailyDataPoi
           <div className="flex items-start gap-2">
             <span className="w-2 h-2 rounded-sm bg-[#059669] shrink-0 mt-1.5" />
             <div>
-              <p className="text-[11px] font-medium text-[color:var(--sl-color-gray-8)] leading-tight">{data.isFuture ? 'Impression Share (previsão)' : 'Impression Share'}</p>
+              <p className="text-[11px] font-medium text-[color:var(--sl-fg-base-soft)] leading-tight">{data.isFuture ? 'Impression Share (previsão)' : 'Impression Share'}</p>
               <p className="text-[13px] font-semibold text-[color:var(--sl-fg-base)] tabular-nums mt-0.5">{impressionShare.toFixed(1)}%</p>
             </div>
           </div>
@@ -307,21 +307,21 @@ function HourlyTooltipContent({ data, showImpressionShare }: { data: HourlyDataP
   const { hourLabel, hourlySpend, hourlyBudget, impressionShare, isPast, isCurrentHour } = data;
   return (
     <div className="rounded-xl border border-gray-200/90 bg-white px-5 py-4 shadow-[0_8px_24px_rgba(0,0,0,0.08)] min-w-[200px]">
-      <p className="text-[12px] font-normal tracking-[-0.02em] text-[color:var(--sl-color-gray-8)] mb-3">
+      <p className="text-[12px] font-normal tracking-[-0.02em] text-[color:var(--sl-fg-base-soft)] mb-3">
         {hourLabel}{isCurrentHour ? ' (agora)' : ''}
       </p>
       <div className="space-y-3">
         <div className="flex items-start gap-2">
           <span className="w-2 h-2 rounded-sm bg-[#0366dd] shrink-0 mt-1.5" />
           <div>
-            <p className="text-[11px] font-medium text-[color:var(--sl-color-gray-8)] leading-tight">Gasto na hora</p>
+            <p className="text-[11px] font-medium text-[color:var(--sl-fg-base-soft)] leading-tight">Gasto na hora</p>
             <p className="text-[13px] font-semibold text-[color:var(--sl-fg-base)] tabular-nums mt-0.5">{formatCurrencyFull(hourlySpend)}</p>
           </div>
         </div>
         <div className="flex items-start gap-2">
           <span className="w-2 h-2 rounded-sm bg-[#eaeaea] border border-gray-200 shrink-0 mt-1.5" />
           <div>
-            <p className="text-[11px] font-medium text-[color:var(--sl-color-gray-8)] leading-tight">Meta por hora</p>
+            <p className="text-[11px] font-medium text-[color:var(--sl-fg-base-soft)] leading-tight">Meta por hora</p>
             <p className="text-[13px] font-semibold text-[color:var(--sl-fg-base)] tabular-nums mt-0.5">{formatCurrencyFull(hourlyBudget)}</p>
           </div>
         </div>
@@ -329,13 +329,13 @@ function HourlyTooltipContent({ data, showImpressionShare }: { data: HourlyDataP
           <div className="flex items-start gap-2">
             <span className="w-2 h-2 rounded-sm bg-[#059669] shrink-0 mt-1.5" />
             <div>
-              <p className="text-[11px] font-medium text-[color:var(--sl-color-gray-8)] leading-tight">{isPast || isCurrentHour ? 'Impression Share' : 'Impression Share (previsão)'}</p>
+              <p className="text-[11px] font-medium text-[color:var(--sl-fg-base-soft)] leading-tight">{isPast || isCurrentHour ? 'Impression Share' : 'Impression Share (previsão)'}</p>
               <p className="text-[13px] font-semibold text-[color:var(--sl-fg-base)] tabular-nums mt-0.5">{impressionShare.toFixed(1)}%</p>
             </div>
           </div>
         )}
         {!isPast && (
-          <p className="text-[11px] text-[color:var(--sl-color-gray-8)] italic">Próxima hora</p>
+          <p className="text-[11px] text-[color:var(--sl-fg-base-soft)] italic">Próxima hora</p>
         )}
       </div>
     </div>
@@ -348,7 +348,7 @@ function HourlyCumulativeTooltipContent({ data }: { data: HourlyCumulativeDataPo
   const hasDeviation = hasForecast && typeof forecastLow === 'number' && typeof forecastHigh === 'number';
   return (
     <div className="rounded-xl border border-gray-200/90 bg-white px-5 py-4 shadow-[0_8px_24px_rgba(0,0,0,0.08)] min-w-[200px]">
-      <p className="text-[12px] font-normal tracking-[-0.02em] text-[color:var(--sl-color-gray-8)] mb-3">
+      <p className="text-[12px] font-normal tracking-[-0.02em] text-[color:var(--sl-fg-base-soft)] mb-3">
         {hourLabel}{isCurrentHour ? ' (agora)' : ''}
       </p>
       <div className="space-y-3">
@@ -356,7 +356,7 @@ function HourlyCumulativeTooltipContent({ data }: { data: HourlyCumulativeDataPo
           <div className="flex items-start gap-2">
             <span className="w-2 h-2 rounded-sm bg-[#1f1f1f] shrink-0 mt-1.5" />
             <div>
-              <p className="text-[11px] font-medium text-[color:var(--sl-color-gray-8)] leading-tight">Meta do dia</p>
+              <p className="text-[11px] font-medium text-[color:var(--sl-fg-base-soft)] leading-tight">Meta do dia</p>
               <p className="text-[13px] font-semibold text-[color:var(--sl-fg-base)] tabular-nums mt-0.5">{formatCurrencyFull(goal)}</p>
             </div>
           </div>
@@ -365,7 +365,7 @@ function HourlyCumulativeTooltipContent({ data }: { data: HourlyCumulativeDataPo
           <div className="flex items-start gap-2">
             <span className="w-2 h-2 rounded-sm bg-[#0366dd] shrink-0 mt-1.5" />
             <div>
-              <p className="text-[11px] font-medium text-[color:var(--sl-color-gray-8)] leading-tight">Acumulado até esta hora</p>
+              <p className="text-[11px] font-medium text-[color:var(--sl-fg-base-soft)] leading-tight">Acumulado até esta hora</p>
               <p className="text-[13px] font-semibold text-[color:var(--sl-fg-base)] tabular-nums mt-0.5">{formatCurrencyFull(cumulative)}</p>
             </div>
           </div>
@@ -375,16 +375,16 @@ function HourlyCumulativeTooltipContent({ data }: { data: HourlyCumulativeDataPo
             <div className="flex items-start gap-2">
               <svg width="12" height="4" className="shrink-0 mt-2" aria-hidden><line x1="0" y1="2" x2="12" y2="2" stroke="#0366dd" strokeWidth={1.5} strokeDasharray="3 2" /></svg>
               <div>
-                <p className="text-[11px] font-medium text-[color:var(--sl-color-gray-8)] leading-tight">Previsão</p>
+                <p className="text-[11px] font-medium text-[color:var(--sl-fg-base-soft)] leading-tight">Previsão</p>
                 <p className="text-[13px] font-semibold text-[color:var(--sl-fg-base)] tabular-nums mt-0.5">{formatCurrencyFull(forecast!)}</p>
               </div>
             </div>
             {hasDeviation && (
               <div className="rounded-lg bg-gray-50/80 border border-gray-100 px-3 py-2 mt-2">
-                <p className="text-[11px] font-medium text-[color:var(--sl-color-gray-8)] mb-1.5">Faixa de desvio</p>
+                <p className="text-[11px] font-medium text-[color:var(--sl-fg-base-soft)] mb-1.5">Faixa de desvio</p>
                 <div className="flex items-baseline justify-between gap-4 text-[12px] tabular-nums text-[color:var(--sl-fg-base)]">
                   <span>{formatCurrencyFull(forecastLow!)}</span>
-                  <span className="text-[color:var(--sl-color-gray-5)] font-light">→</span>
+                  <span className="text-[color:var(--sl-fg-base-muted)] font-light">→</span>
                   <span>{formatCurrencyFull(forecastHigh!)}</span>
                 </div>
               </div>
@@ -505,8 +505,8 @@ function LegendItem({
         focus:outline-none focus:ring-2 focus:ring-[#0366dd]/30 focus:ring-offset-1
         hover:bg-black/5
         ${visible
-          ? 'text-[color:var(--sl-color-gray-8)] opacity-100 hover:opacity-80'
-          : 'text-[color:var(--sl-color-gray-6)] opacity-50 line-through hover:opacity-70'
+          ? 'text-[color:var(--sl-fg-base-soft)] opacity-100 hover:opacity-80'
+          : 'text-[color:var(--sl-fg-base-muted)] opacity-50 line-through hover:opacity-70'
         }
       `}
     >
@@ -1801,9 +1801,9 @@ export const BudgetReportModal: React.FC<BudgetReportModalProps> = ({ campaign, 
   }), [chartHourlyCumulativeData, hourlyCumulativeYMax, currentHourIndex, handleHourlyCumulativeTip]);
 
   const statusStyles = {
-    on_track: { text: 'text-[color:var(--sl-color-green-11)]', badgeBg: 'bg-[#e9fce3]', dot: 'bg-[#4fd051]', triangle: null },
-    under: { text: 'text-[color:var(--sl-color-yellow-11)]', badgeBg: 'bg-[#fbf7d4]', dot: null, triangle: 'text-[color:var(--sl-color-yellow-11)]' },
-    over: { text: 'text-[color:var(--sl-color-red-11)]', badgeBg: 'bg-[#fdf6f5]', dot: null, triangle: 'text-[color:var(--sl-color-red-11)]' },
+    on_track: { text: 'text-[color:var(--sl-fg-base)]', badgeBg: 'bg-[#e9fce3]', dot: 'bg-[#4fd051]', triangle: null },
+    under: { text: 'text-[color:var(--sl-fg-base)]', badgeBg: 'bg-[#fbf7d4]', dot: null, triangle: 'text-[color:var(--sl-fg-base)]' },
+    over: { text: 'text-[color:var(--sl-fg-base)]', badgeBg: 'bg-[#fdf6f5]', dot: null, triangle: 'text-[color:var(--sl-fg-base)]' },
   };
 
   const objectiveLabel = useMemo(() => inferCampaignObjective(campaign), [campaign]);
@@ -2049,10 +2049,10 @@ export const BudgetReportModal: React.FC<BudgetReportModalProps> = ({ campaign, 
             <span className={`text-[12px] font-medium leading-4 ${s.text}`}>{status.label}</span>
             {s.dot && <span className="w-[8px] h-[8px] rounded-full shrink-0 bg-[#4fd051]" aria-hidden />}
             {s.triangle && status.status === 'over' && (
-              <span className="material-symbols-outlined text-[12px] leading-none text-[color:var(--sl-color-red-11)]">arrow_drop_up</span>
+              <span className="material-symbols-outlined text-[12px] leading-none text-[color:var(--sl-fg-base)]">arrow_drop_up</span>
             )}
             {s.triangle && status.status === 'under' && (
-              <span className="material-symbols-outlined text-[12px] leading-none text-[color:var(--sl-color-yellow-11)] rotate-180">arrow_drop_up</span>
+              <span className="material-symbols-outlined text-[12px] leading-none text-[color:var(--sl-fg-base)] rotate-180">arrow_drop_up</span>
             )}
           </div>
         </div>
@@ -2078,7 +2078,7 @@ export const BudgetReportModal: React.FC<BudgetReportModalProps> = ({ campaign, 
                   <div className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-sm shrink-0 mt-0.5" style={{ backgroundColor: fillColor }} />
                     <div className="min-w-0">
-                      <p className="text-[11px] font-medium text-[color:var(--sl-color-gray-8)] leading-tight whitespace-nowrap">{barLabels.filled}</p>
+                      <p className="text-[11px] font-medium text-[color:var(--sl-fg-base-soft)] leading-tight whitespace-nowrap">{barLabels.filled}</p>
                       <p className="text-[13px] font-semibold text-[color:var(--sl-fg-base)] tabular-nums mt-0.5">{formatCurrencyFull(value)}</p>
                     </div>
                   </div>
@@ -2087,7 +2087,7 @@ export const BudgetReportModal: React.FC<BudgetReportModalProps> = ({ campaign, 
                   <div className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-sm bg-[#eaeaea] border border-gray-200 shrink-0 mt-0.5" />
                     <div className="min-w-0">
-                      <p className="text-[11px] font-medium text-[color:var(--sl-color-gray-8)] leading-tight whitespace-nowrap">{barLabels.total}</p>
+                      <p className="text-[11px] font-medium text-[color:var(--sl-fg-base-soft)] leading-tight whitespace-nowrap">{barLabels.total}</p>
                       <p className="text-[13px] font-semibold text-[color:var(--sl-fg-base)] tabular-nums mt-0.5">{formatCurrencyFull(totalValue)}</p>
                     </div>
                   </div>
@@ -2116,7 +2116,7 @@ export const BudgetReportModal: React.FC<BudgetReportModalProps> = ({ campaign, 
         >
         <div className="shrink-0 bg-white px-8 py-6 flex items-center justify-between z-10 border-b border-[#E1E1E1]">
           <div className="flex flex-col gap-0.5">
-            <h1 className="text-2xl font-medium text-[color:var(--sl-color-gray-13)] tracking-[-0.8px] leading-8">
+            <h1 className="text-2xl font-medium text-[color:var(--sl-fg-base)] tracking-[-0.8px] leading-8">
               Relatório de consumo de orçamento
             </h1>
             {onOpenCampaign ? (
@@ -2124,19 +2124,19 @@ export const BudgetReportModal: React.FC<BudgetReportModalProps> = ({ campaign, 
                 type="button"
                 onClick={() => onOpenCampaign(campaign)}
                 title="Abrir campanha"
-                className="text-sm text-[color:var(--sl-fg-muted)] mt-0.5 truncate max-w-md block text-left cursor-pointer underline-offset-2 hover:underline hover:text-[color:var(--sl-fg-accent)] transition-colors focus:outline-none focus:ring-2 focus:ring-[#0366dd]/30 focus:ring-offset-1 rounded"
+                className="text-sm text-[color:var(--sl-fg-base)] mt-0.5 truncate max-w-md block text-left cursor-pointer underline-offset-2 hover:underline hover:text-[color:var(--sl-fg-base-soft)] transition-colors focus:outline-none focus:ring-2 focus:ring-[#0366dd]/30 focus:ring-offset-1 rounded"
               >
                 {campaign.title}
               </button>
             ) : (
-              <p className="text-sm text-[color:var(--sl-fg-muted)] mt-0.5 truncate max-w-md">{campaign.title}</p>
+              <p className="text-sm text-[color:var(--sl-fg-base)] mt-0.5 truncate max-w-md">{campaign.title}</p>
             )}
           </div>
           <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={() => setIsInsightsOpen((open) => !open)}
-              className={`p-2 rounded-lg active:scale-95 transition-all duration-150 ease-out ${isInsightsOpen ? 'bg-[#eaf2ff] text-[color:var(--sl-fg-accent)]' : 'text-[color:var(--sl-color-gray-8)] hover:bg-gray-100 hover:text-[color:var(--sl-fg-base)]'}`}
+              className={`p-2 rounded-lg active:scale-95 transition-all duration-150 ease-out ${isInsightsOpen ? 'bg-[#eaf2ff] text-[color:var(--sl-fg-base-soft)]' : 'text-[color:var(--sl-fg-base-soft)] hover:bg-gray-100 hover:text-[color:var(--sl-fg-base)]'}`}
               aria-label="Gerar insights"
               title="Gerar insights"
             >
@@ -2145,7 +2145,7 @@ export const BudgetReportModal: React.FC<BudgetReportModalProps> = ({ campaign, 
             <button
               type="button"
               onClick={handleClose}
-              className="p-2 rounded-lg text-[color:var(--sl-color-gray-8)] hover:bg-gray-100 hover:text-[color:var(--sl-fg-base)] active:scale-95 transition-transform duration-150 ease-out"
+              className="p-2 rounded-lg text-[color:var(--sl-fg-base-soft)] hover:bg-gray-100 hover:text-[color:var(--sl-fg-base)] active:scale-95 transition-transform duration-150 ease-out"
               aria-label="Fechar relatório"
             >
               <span className="material-symbols-outlined">close</span>
@@ -2171,7 +2171,7 @@ export const BudgetReportModal: React.FC<BudgetReportModalProps> = ({ campaign, 
         <div className="p-8 flex flex-col gap-14 budget-report-content max-w-[1440px] mx-auto w-full">
           {/* 1. Visão geral (totalizer) */}
           <div className="space-y-5 budget-report-section">
-            <h2 className="text-lg font-semibold text-[color:var(--sl-color-gray-13)] tracking-[-0.8px]">Visão geral</h2>
+            <h2 className="text-lg font-semibold text-[color:var(--sl-fg-base)] tracking-[-0.8px]">Visão geral</h2>
             <div className="flex w-full flex-wrap gap-4">
             {renderTotalizerCard('Consumo do dia', consumptionDay, totalizerDay,
               expectedDay > 0 ? (consumptionDay / expectedDay) * 100 : 0,
@@ -2206,7 +2206,7 @@ export const BudgetReportModal: React.FC<BudgetReportModalProps> = ({ campaign, 
 
           {/* 2. Gasto total da campanha */}
           <div className="relative space-y-6 budget-report-section">
-            <h2 className="text-lg font-semibold text-[color:var(--sl-color-gray-13)] tracking-[-0.8px]">Gasto total da campanha</h2>
+            <h2 className="text-lg font-semibold text-[color:var(--sl-fg-base)] tracking-[-0.8px]">Gasto total da campanha</h2>
             <div className="isolate flex flex-col w-full h-[360px] border border-[#e0e0e0] rounded-xl bg-white overflow-hidden transition-shadow duration-200 hover:shadow-sm hover:border-[#d0d0d0]">
               <div className="flex-1 min-h-0 h-[400px] overflow-x-auto overflow-y-hidden py-5">
                 <div className="h-full" style={{ minWidth: chartTotalData.length * 36 }}>
@@ -2230,7 +2230,7 @@ export const BudgetReportModal: React.FC<BudgetReportModalProps> = ({ campaign, 
 
           {/* 3. Gasto diário */}
           <div className="relative space-y-6 budget-report-section">
-            <h2 className="text-lg font-semibold text-[color:var(--sl-color-gray-13)] tracking-[-0.8px]">Gasto diário</h2>
+            <h2 className="text-lg font-semibold text-[color:var(--sl-fg-base)] tracking-[-0.8px]">Gasto diário</h2>
             <div
               ref={dailyChartContainerRef}
               className="isolate flex flex-col w-full h-[360px] border border-[#e0e0e0] rounded-xl bg-white overflow-hidden transition-shadow duration-200 hover:shadow-sm hover:border-[#d0d0d0]"
@@ -2268,7 +2268,7 @@ export const BudgetReportModal: React.FC<BudgetReportModalProps> = ({ campaign, 
           {/* 4. Gasto hora a hora (hoje) */}
           {chartHourlyData.length > 0 && (
             <div className="relative space-y-6 budget-report-section">
-              <h2 className="text-lg font-semibold text-[color:var(--sl-color-gray-13)] tracking-[-0.8px]">Gasto hora a hora</h2>
+              <h2 className="text-lg font-semibold text-[color:var(--sl-fg-base)] tracking-[-0.8px]">Gasto hora a hora</h2>
               <div
                 ref={hourlyChartContainerRef}
                 className="isolate flex flex-col w-full h-[360px] border border-[#e0e0e0] rounded-xl bg-white overflow-hidden transition-shadow duration-200 hover:shadow-sm hover:border-[#d0d0d0]"
@@ -2282,7 +2282,7 @@ export const BudgetReportModal: React.FC<BudgetReportModalProps> = ({ campaign, 
                     />
                   </div>
                 </div>
-                <div className="flex items-center justify-start gap-4 flex-wrap px-4 py-3 border-t border-[#e0e0e0] bg-white rounded-b-xl text-[12px] text-[color:var(--sl-color-gray-8)]">
+                <div className="flex items-center justify-start gap-4 flex-wrap px-4 py-3 border-t border-[#e0e0e0] bg-white rounded-b-xl text-[12px] text-[color:var(--sl-fg-base-soft)]">
                   <LegendItem
                     visible={hourlyLegendVisible[0]}
                     onClick={() => setHourlyLegendVisible((v) => [!v[0], v[1], v[2], v[3], v[4]])}
@@ -2336,7 +2336,7 @@ export const BudgetReportModal: React.FC<BudgetReportModalProps> = ({ campaign, 
           {/* 5. Acumulado do dia hora a hora + projeção da meta */}
           {chartHourlyCumulativeData.length > 0 && (
             <div className="relative space-y-6 budget-report-section">
-              <h2 className="text-lg font-semibold text-[color:var(--sl-color-gray-13)] tracking-[-0.8px]">Gasto acumulado do dia</h2>
+              <h2 className="text-lg font-semibold text-[color:var(--sl-fg-base)] tracking-[-0.8px]">Gasto acumulado do dia</h2>
               <div
                 ref={hourlyCumulativeChartContainerRef}
                 className="isolate flex flex-col w-full h-[360px] border border-[#e0e0e0] rounded-xl bg-white overflow-hidden transition-shadow duration-200 hover:shadow-sm hover:border-[#d0d0d0]"
@@ -2350,7 +2350,7 @@ export const BudgetReportModal: React.FC<BudgetReportModalProps> = ({ campaign, 
                     />
                   </div>
                 </div>
-                <div className="flex items-center justify-start gap-4 flex-wrap px-4 py-3 border-t border-[#e0e0e0] bg-white rounded-b-xl text-[12px] text-[color:var(--sl-color-gray-8)]">
+                <div className="flex items-center justify-start gap-4 flex-wrap px-4 py-3 border-t border-[#e0e0e0] bg-white rounded-b-xl text-[12px] text-[color:var(--sl-fg-base-soft)]">
                   <LegendItem
                     visible={hourlyCumulativeLegendVisible[0]}
                     onClick={() => setHourlyCumulativeLegendVisible((v) => [!v[0], v[1], v[2]])}
@@ -2378,7 +2378,7 @@ export const BudgetReportModal: React.FC<BudgetReportModalProps> = ({ campaign, 
                 </div>
               </div>
               {expectedDay > 0 && consumptionDay >= expectedDay && (
-                <p className="text-sm text-[color:var(--sl-color-green-11)] tracking-[-0.14px] font-medium">
+                <p className="text-sm text-[color:var(--sl-fg-base)] tracking-[-0.14px] font-medium">
                   Meta do dia já atingida.
                 </p>
               )}
@@ -2434,7 +2434,7 @@ export const BudgetReportModal: React.FC<BudgetReportModalProps> = ({ campaign, 
               }}
             >
               <div className="px-5 pt-6 pb-0 bg-white">
-                <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-[#f1f5f9] text-[color:var(--sl-fg-muted)] text-[12px] font-medium tracking-[-0.11px]">
+                <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-[#f1f5f9] text-[color:var(--sl-fg-base)] text-[12px] font-medium tracking-[-0.11px]">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#0366dd]" aria-hidden />
                   {insightCards.length} insights
                 </div>
@@ -2450,13 +2450,13 @@ export const BudgetReportModal: React.FC<BudgetReportModalProps> = ({ campaign, 
                         key={card.id}
                         className="rounded-[14px] border border-[#e0e0e0] bg-white p-5 shadow-[0_1px_2px_rgba(16,24,40,0.05)] transition-all duration-200 hover:border-[#d4d4d4]"
                       >
-                        <p className="text-[12px] font-medium leading-4 tracking-[-0.11px] text-[color:var(--sl-fg-muted)]">
+                        <p className="text-[12px] font-medium leading-4 tracking-[-0.11px] text-[color:var(--sl-fg-base)]">
                           {card.eyebrow}
                         </p>
                         <h3 className="mt-3 text-[16px] leading-6 tracking-[-0.32px] font-semibold text-[color:var(--sl-fg-base)]">{card.title}</h3>
-                        <p className="mt-2 text-[13px] leading-5 tracking-[-0.13px] text-[color:var(--sl-color-gray-10)]">{card.description}</p>
+                        <p className="mt-2 text-[13px] leading-5 tracking-[-0.13px] text-[color:var(--sl-fg-base)]">{card.description}</p>
                         <div className="mt-4 pt-4 border-t border-[#efefef]">
-                          <p className="text-[11px] font-medium tracking-[0.02em] text-[color:var(--sl-color-gray-7)] uppercase">Próxima ação</p>
+                          <p className="text-[11px] font-medium tracking-[0.02em] text-[color:var(--sl-fg-base-muted)] uppercase">Próxima ação</p>
                           <p className="mt-1.5 text-[13px] leading-5 tracking-[-0.13px] text-[color:var(--sl-fg-base)]">{card.recommendation}</p>
                         </div>
                       </div>

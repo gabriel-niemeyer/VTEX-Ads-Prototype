@@ -70,11 +70,11 @@ interface CampaignFormProps {
 }
 
 const STRATEGY_OPTIONS: { id: CampaignStrategy; icon: string; iconBg: string; description: string }[] = [
-  { id: 'Indefinida', icon: 'tune', iconBg: 'bg-blue-100 text-blue-600', description: 'A plataforma não aplicará um foco de otimização específico.' },
-  { id: 'Alcance', icon: 'campaign', iconBg: 'bg-blue-100 text-blue-600', description: 'Maximize visibilidade e frequência para o maior número de pessoas dentro do público.' },
-  { id: 'Crescimento', icon: 'trending_up', iconBg: 'bg-blue-100 text-blue-600', description: 'Aumente vendas e participação da marca na categoria, expandindo volume com eficiência.' },
-  { id: 'Rentabilidade', icon: 'savings', iconBg: 'bg-blue-100 text-blue-600', description: 'Priorize retorno: foque em ROAS/ACOS e em conversões com melhor custo.' },
-  { id: 'Novos compradores', icon: 'person_add', iconBg: 'bg-blue-100 text-blue-600', description: 'Encontre novos públicos e aumente a base de clientes, priorizando first-time buyers.' },
+  { id: 'Indefinida', icon: 'tune', iconBg: 'bg-blue-100 text-[color:var(--sl-fg-base-soft)]', description: 'A plataforma não aplicará um foco de otimização específico.' },
+  { id: 'Alcance', icon: 'campaign', iconBg: 'bg-blue-100 text-[color:var(--sl-fg-base-soft)]', description: 'Maximize visibilidade e frequência para o maior número de pessoas dentro do público.' },
+  { id: 'Crescimento', icon: 'trending_up', iconBg: 'bg-blue-100 text-[color:var(--sl-fg-base-soft)]', description: 'Aumente vendas e participação da marca na categoria, expandindo volume com eficiência.' },
+  { id: 'Rentabilidade', icon: 'savings', iconBg: 'bg-blue-100 text-[color:var(--sl-fg-base-soft)]', description: 'Priorize retorno: foque em ROAS/ACOS e em conversões com melhor custo.' },
+  { id: 'Novos compradores', icon: 'person_add', iconBg: 'bg-blue-100 text-[color:var(--sl-fg-base-soft)]', description: 'Encontre novos públicos e aumente a base de clientes, priorizando first-time buyers.' },
 ];
 
 const SIDEBAR_SECTIONS: { key: FormStep; label: string }[] = [
@@ -1077,7 +1077,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
         return (
           <div className="bg-white border border-[#e0e0e0] rounded-xl overflow-hidden">
             <div className="flex items-center h-11 px-3 min-w-0">
-              <span className="text-sm text-[color:var(--sl-color-gray-6)] truncate min-w-0">Nenhum publisher</span>
+              <span className="text-sm text-[color:var(--sl-fg-base-muted)] truncate min-w-0">Nenhum publisher</span>
             </div>
           </div>
         );
@@ -1198,7 +1198,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
             >
               <div className="flex items-center gap-2.5 min-w-0">
                 <SectionStatusIcon status={status} />
-                <span className={`text-[15px] font-semibold tracking-[-0.32px] leading-6 transition-colors truncate min-w-0 ${isActive ? 'text-[color:var(--sl-fg-base)]' : 'text-[color:var(--sl-color-gray-10)]'}`}>{label}</span>
+                <span className={`text-[15px] font-semibold tracking-[-0.32px] leading-6 transition-colors truncate min-w-0 ${isActive ? 'text-[color:var(--sl-fg-base)]' : 'text-[color:var(--sl-fg-base)]'}`}>{label}</span>
               </div>
               {renderSectionSummary(key)}
             </div>
@@ -1372,8 +1372,8 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
               {months.map((m, i) => (
                 <div key={i} className="relative h-full shrink-0" style={{ width: m.count * COL_W }}>
                   <div className="sticky left-0 h-full flex items-center px-3 bg-white gap-1">
-                    <span className="text-[13px] font-medium text-[color:var(--sl-color-gray-10)] whitespace-nowrap">{m.name}</span>
-                    <span className="text-[13px] font-normal text-[color:var(--sl-color-gray-6)] whitespace-nowrap">{m.year}</span>
+                    <span className="text-[13px] font-medium text-[color:var(--sl-fg-base)] whitespace-nowrap">{m.name}</span>
+                    <span className="text-[13px] font-normal text-[color:var(--sl-fg-base-muted)] whitespace-nowrap">{m.year}</span>
                   </div>
                 </div>
               ))}
@@ -1386,7 +1386,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
                 return (
                   <div
                     key={i}
-                    className={`shrink-0 flex items-center justify-center text-[10px] font-medium ${isToday ? 'text-blue-700 bg-blue-50/50' : 'text-[color:var(--sl-color-gray-8)]'}`}
+                    className={`shrink-0 flex items-center justify-center text-[10px] font-medium ${isToday ? 'text-[color:var(--sl-fg-base-soft)] bg-blue-50/50' : 'text-[color:var(--sl-fg-base-soft)]'}`}
                     style={{ width: COL_W }}
                   >
                     {day.label}
@@ -1571,14 +1571,14 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
             onFocus={() => setIsFocused(true)}
             onBlur={handleBlur}
             placeholder="DD / MM / AAAA"
-            className="flex-1 h-full px-3 bg-transparent outline-none text-sm text-[color:var(--sl-fg-base)] placeholder:text-[color:var(--sl-color-gray-6)] disabled:cursor-not-allowed"
+            className="flex-1 h-full px-3 bg-transparent outline-none text-sm text-[color:var(--sl-fg-base)] placeholder:text-[color:var(--sl-fg-base-muted)] disabled:cursor-not-allowed"
           />
           {hasValue && !disabled && (
             <button
               type="button"
               tabIndex={-1}
               onClick={() => { onClear(); setLocalText(''); }}
-              className="shrink-0 w-8 h-8 flex items-center justify-center text-[color:var(--sl-fg-base-soft)] hover:text-[color:var(--sl-fg-muted)] transition-colors"
+              className="shrink-0 w-8 h-8 flex items-center justify-center text-[color:var(--sl-fg-base-soft)] hover:text-[color:var(--sl-fg-base)] transition-colors"
             >
               <span className="material-symbols-outlined text-[18px]">cancel</span>
             </button>
@@ -1602,7 +1602,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
             tabIndex={-1}
             disabled={disabled}
             onClick={() => activeHiddenRef.current?.showPicker?.()}
-            className="shrink-0 w-9 h-9 flex items-center justify-center rounded-md border border-[#e0e0e0] bg-white text-[color:var(--sl-color-gray-10)] hover:bg-[#f5f5f5] active:bg-[#ebebeb] transition-colors mr-0.5 shadow-[0_1px_2px_rgba(10,13,18,0.05)] disabled:opacity-40 disabled:cursor-not-allowed"
+            className="shrink-0 w-9 h-9 flex items-center justify-center rounded-md border border-[#e0e0e0] bg-white text-[color:var(--sl-fg-base)] hover:bg-[#f5f5f5] active:bg-[#ebebeb] transition-colors mr-0.5 shadow-[0_1px_2px_rgba(10,13,18,0.05)] disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <span className="material-symbols-outlined text-[18px]">calendar_today</span>
           </button>
@@ -1627,7 +1627,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
                 setNoEndDate(checked);
                 if (checked) setFormData(prev => ({ ...prev, endDate: new Date('') }));
               }}
-              className="w-4 h-4 rounded border-[#c2c2c2] text-[color:var(--sl-fg-accent)] focus:ring-[#0366dd]/20 accent-[#0366dd]"
+              className="w-4 h-4 rounded border-[#c2c2c2] text-[color:var(--sl-fg-base-soft)] focus:ring-[#0366dd]/20 accent-[#0366dd]"
             />
             <span className="text-sm text-[color:var(--sl-fg-base)] tracking-[-0.14px]">Sem data de fim</span>
           </label>
@@ -1735,14 +1735,14 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
                       <span className="text-sm font-medium text-[color:var(--sl-fg-base-soft)]">{pubCount} Publisher{pubCount !== 1 ? 's' : ''}</span>
                       <div className="flex items-center gap-3">
                         {pubCount > 1 && (
-                          <button type="button" onClick={() => openClearListDialog('publishers')} className="h-10 px-3 rounded-lg text-sm font-semibold text-[color:var(--sl-fg-critical)] hover:text-[color:var(--sl-fg-critical)] hover:bg-red-50 active:scale-[0.98] transition-all">
+                          <button type="button" onClick={() => openClearListDialog('publishers')} className="h-10 px-3 rounded-lg text-sm font-semibold text-[color:var(--sl-fg-base)] hover:text-[color:var(--sl-fg-base)] hover:bg-red-50 active:scale-[0.98] transition-all">
                             Limpar lista
                           </button>
                         )}
                         <button
                           type="button"
                           onClick={openPublisherPicker}
-                          className="w-10 h-10 flex items-center justify-center rounded-lg bg-white border border-[#d5d7da] text-[color:var(--sl-fg-muted)] shadow-[0_1px_2px_rgba(10,13,18,0.05)] hover:bg-[#fafafa] hover:text-[color:var(--sl-fg-muted-pressed)] active:scale-95 transition-all"
+                          className="w-10 h-10 flex items-center justify-center rounded-lg bg-white border border-[#d5d7da] text-[color:var(--sl-fg-base)] shadow-[0_1px_2px_rgba(10,13,18,0.05)] hover:bg-[#fafafa] hover:text-[color:var(--sl-fg-base)] active:scale-95 transition-all"
                         >
                           <span className="material-symbols-outlined text-[20px]">add</span>
                         </button>
@@ -1762,7 +1762,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
                         <button
                           type="button"
                           onClick={() => removePublisher(pub.id)}
-                          className="w-7 h-7 flex items-center justify-center rounded-lg opacity-0 group-hover:opacity-100 hover:bg-red-50 text-[color:var(--sl-color-gray-6)] hover:text-red-500 transition-all shrink-0"
+                          className="w-7 h-7 flex items-center justify-center rounded-lg opacity-0 group-hover:opacity-100 hover:bg-red-50 text-[color:var(--sl-fg-base-muted)] hover:text-[color:var(--sl-fg-base-soft)] transition-all shrink-0"
                         >
                           <span className="material-symbols-outlined text-[18px]">close</span>
                         </button>
@@ -1777,7 +1777,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
                     <button
                       type="button"
                       onClick={openPublisherPicker}
-                      className="w-10 h-10 flex items-center justify-center rounded-lg bg-white border border-[#d5d7da] text-[color:var(--sl-fg-muted)] shadow-[0_1px_2px_rgba(10,13,18,0.05)] hover:bg-[#fafafa] hover:text-[color:var(--sl-fg-muted-pressed)] active:scale-95 transition-all"
+                      className="w-10 h-10 flex items-center justify-center rounded-lg bg-white border border-[#d5d7da] text-[color:var(--sl-fg-base)] shadow-[0_1px_2px_rgba(10,13,18,0.05)] hover:bg-[#fafafa] hover:text-[color:var(--sl-fg-base)] active:scale-95 transition-all"
                     >
                       <span className="material-symbols-outlined text-[20px]">add</span>
                     </button>
@@ -1791,7 +1791,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
                       <button
                         type="button"
                         onClick={openPublisherPicker}
-                        className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-white border border-[#d5d7da] text-[color:var(--sl-fg-muted)] text-sm font-semibold tracking-[-0.42px] shadow-[0_1px_2px_rgba(10,13,18,0.05)] hover:bg-[#fafafa] hover:text-[color:var(--sl-fg-muted-pressed)] active:scale-[0.98] transition-all"
+                        className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-white border border-[#d5d7da] text-[color:var(--sl-fg-base)] text-sm font-semibold tracking-[-0.42px] shadow-[0_1px_2px_rgba(10,13,18,0.05)] hover:bg-[#fafafa] hover:text-[color:var(--sl-fg-base)] active:scale-[0.98] transition-all"
                       >
                         Selecionar publishers
                       </button>
@@ -2000,7 +2000,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
               onClick={closeBulkAdd}
               className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-[#f5f5f5] transition-colors shrink-0 -mr-1 -mt-4"
             >
-              <span className="material-symbols-outlined text-[20px] text-[color:var(--sl-color-gray-10)]">close</span>
+              <span className="material-symbols-outlined text-[20px] text-[color:var(--sl-fg-base)]">close</span>
             </button>
           </div>
 
@@ -2014,16 +2014,16 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
                     value={bulkText}
                     onChange={e => setBulkText(e.target.value)}
                     placeholder={"APL-IP17P-SLV-256\nAPL-IP17P-COR-512\nAPL-AWS10-GPS"}
-                    className="w-full h-[200px] px-4 py-3 bg-white border border-[#e0e0e0] rounded-xl text-[13px] text-[color:var(--sl-fg-base)] font-mono tracking-[-0.13px] placeholder:text-[color:var(--sl-color-gray-5)] focus:shadow-[0_0_0_3px_#C2C2C2,0_0_0_1px_#fff] focus:border-[#a0a0a0] outline-none transition-all resize-none"
+                    className="w-full h-[200px] px-4 py-3 bg-white border border-[#e0e0e0] rounded-xl text-[13px] text-[color:var(--sl-fg-base)] font-mono tracking-[-0.13px] placeholder:text-[color:var(--sl-fg-base-muted)] focus:shadow-[0_0_0_3px_#C2C2C2,0_0_0_1px_#fff] focus:border-[#a0a0a0] outline-none transition-all resize-none"
                   />
                   {idCount > 0 && (
-                    <span className="absolute bottom-3 right-3 text-[12px] text-[color:var(--sl-color-gray-6)] font-medium tabular-nums">
+                    <span className="absolute bottom-3 right-3 text-[12px] text-[color:var(--sl-fg-base-muted)] font-medium tabular-nums">
                       {idCount} ID{idCount !== 1 ? 's' : ''}
                     </span>
                   )}
                 </div>
                 <div className="flex items-center gap-3 px-1">
-                  <p className="text-[12px] text-[color:var(--sl-color-gray-6)] leading-4">Compatível com cópia direta de planilhas e arquivos CSV. Cada linha ou valor separado é tratado como um ID.</p>
+                  <p className="text-[12px] text-[color:var(--sl-fg-base-muted)] leading-4">Compatível com cópia direta de planilhas e arquivos CSV. Cada linha ou valor separado é tratado como um ID.</p>
                 </div>
               </>
             ) : (
@@ -2031,19 +2031,19 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
                 {/* Summary */}
                 <div className="flex items-center gap-2 flex-wrap">
                   {bulkResults.found.length > 0 && (
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#ecfdf3] text-[12px] font-semibold text-[color:var(--sl-color-green-10)]">
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#ecfdf3] text-[12px] font-semibold text-[color:var(--sl-fg-base)]">
                       <span className="material-symbols-outlined text-[14px]">check_circle</span>
                       {bulkResults.found.length} encontrado{bulkResults.found.length !== 1 ? 's' : ''}
                     </span>
                   )}
                   {bulkResults.alreadyAdded.length > 0 && (
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#f0f1f3] text-[12px] font-semibold text-[color:var(--sl-color-gray-10)]">
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#f0f1f3] text-[12px] font-semibold text-[color:var(--sl-fg-base)]">
                       <span className="material-symbols-outlined text-[14px]">playlist_add_check</span>
                       {bulkResults.alreadyAdded.length} já na lista
                     </span>
                   )}
                   {bulkResults.notFound.length > 0 && (
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#fef3f2] text-[12px] font-semibold text-[color:var(--sl-fg-critical)]">
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#fef3f2] text-[12px] font-semibold text-[color:var(--sl-fg-base)]">
                       <span className="material-symbols-outlined text-[14px]">error</span>
                       {bulkResults.notFound.length} não encontrado{bulkResults.notFound.length !== 1 ? 's' : ''}
                     </span>
@@ -2060,9 +2060,9 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
                           <img src={p.imageUrl} alt="" className="w-8 h-8 rounded-md object-cover bg-[#f5f5f5] shrink-0" />
                           <div className="flex flex-col min-w-0 flex-1">
                             <span className="text-[13px] font-medium text-[color:var(--sl-fg-base)] truncate">{p.name}</span>
-                            <span className="text-[11px] text-[color:var(--sl-color-gray-6)] font-mono">{p.sku}</span>
+                            <span className="text-[11px] text-[color:var(--sl-fg-base-muted)] font-mono">{p.sku}</span>
                           </div>
-                          <span className="material-symbols-outlined text-[16px] text-[color:var(--sl-color-green-10)] shrink-0">check</span>
+                          <span className="material-symbols-outlined text-[16px] text-[color:var(--sl-fg-base)] shrink-0">check</span>
                         </div>
                       ))}
                     </div>
@@ -2079,9 +2079,9 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
                           <img src={p.imageUrl} alt="" className="w-8 h-8 rounded-md object-cover bg-[#f5f5f5] shrink-0 opacity-50" />
                           <div className="flex flex-col min-w-0 flex-1 opacity-50">
                             <span className="text-[13px] font-medium text-[color:var(--sl-fg-base)] truncate">{p.name}</span>
-                            <span className="text-[11px] text-[color:var(--sl-color-gray-6)] font-mono">{p.sku}</span>
+                            <span className="text-[11px] text-[color:var(--sl-fg-base-muted)] font-mono">{p.sku}</span>
                           </div>
-                          <span className="material-symbols-outlined text-[16px] text-[color:var(--sl-color-gray-6)] shrink-0">playlist_add_check</span>
+                          <span className="material-symbols-outlined text-[16px] text-[color:var(--sl-fg-base-muted)] shrink-0">playlist_add_check</span>
                         </div>
                       ))}
                     </div>
@@ -2094,7 +2094,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
                     <span className="text-[12px] font-medium text-[color:var(--sl-fg-base-soft)] uppercase tracking-wide px-0.5">Não encontrados</span>
                     <div className="flex flex-wrap gap-1.5 max-h-[100px] overflow-y-auto">
                       {bulkResults.notFound.map((id, i) => (
-                        <span key={i} className="inline-flex items-center px-2.5 py-1 rounded-md bg-[#fef3f2] text-[12px] font-mono text-[color:var(--sl-fg-critical)]">
+                        <span key={i} className="inline-flex items-center px-2.5 py-1 rounded-md bg-[#fef3f2] text-[12px] font-mono text-[color:var(--sl-fg-base)]">
                           {id}
                         </span>
                       ))}
@@ -2112,7 +2112,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
                 <button
                   type="button"
                   onClick={closeBulkAdd}
-                  className="px-4 py-2.5 rounded-lg text-sm font-semibold text-[color:var(--sl-color-gray-10)] hover:bg-[#f5f5f5] transition-colors"
+                  className="px-4 py-2.5 rounded-lg text-sm font-semibold text-[color:var(--sl-fg-base)] hover:bg-[#f5f5f5] transition-colors"
                 >
                   Cancelar
                 </button>
@@ -2140,7 +2140,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
                 <button
                   type="button"
                   onClick={() => { setBulkResults(null); setBulkText(''); }}
-                  className="px-4 py-2.5 rounded-lg text-sm font-semibold text-[color:var(--sl-color-gray-10)] hover:bg-[#f5f5f5] transition-colors"
+                  className="px-4 py-2.5 rounded-lg text-sm font-semibold text-[color:var(--sl-fg-base)] hover:bg-[#f5f5f5] transition-colors"
                 >
                   Voltar
                 </button>
@@ -2192,7 +2192,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
               onClick={closeProductPicker}
               className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-[#f5f5f5] transition-colors shrink-0 -mr-2"
             >
-              <span className="material-symbols-outlined text-[20px] text-[color:var(--sl-color-gray-10)]">close</span>
+              <span className="material-symbols-outlined text-[20px] text-[color:var(--sl-fg-base)]">close</span>
             </button>
           </div>
 
@@ -2200,14 +2200,14 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
           <div className="flex flex-col flex-1 min-h-0 pt-6 pb-8 px-8">
             {/* Search */}
             <div className="relative mb-6 shrink-0">
-              <span className="material-symbols-outlined text-[18px] text-[color:var(--sl-color-gray-6)] absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none">search</span>
+              <span className="material-symbols-outlined text-[18px] text-[color:var(--sl-fg-base-muted)] absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none">search</span>
               <input
                 ref={productPickerSearchRef}
                 type="text"
                 value={productSearch}
                 onChange={(e) => handleProductSearch(e.target.value)}
                 placeholder="Buscar produtos"
-                className="w-full h-[48px] pl-11 pr-10 bg-white border border-[#e0e0e0] rounded-xl text-[14px] text-[color:var(--sl-fg-base)] tracking-[-0.14px] placeholder:text-[color:var(--sl-color-gray-6)] focus:shadow-[0_0_0_3px_#C2C2C2,0_0_0_1px_#fff] focus:border-[#a0a0a0] outline-none transition-all"
+                className="w-full h-[48px] pl-11 pr-10 bg-white border border-[#e0e0e0] rounded-xl text-[14px] text-[color:var(--sl-fg-base)] tracking-[-0.14px] placeholder:text-[color:var(--sl-fg-base-muted)] focus:shadow-[0_0_0_3px_#C2C2C2,0_0_0_1px_#fff] focus:border-[#a0a0a0] outline-none transition-all"
               />
               {productSearch && (
                 <button
@@ -2215,7 +2215,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
                   onClick={() => handleProductSearch('')}
                   className="absolute right-3 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center rounded-full hover:bg-[#f0f0f0] transition-colors"
                 >
-                  <span className="material-symbols-outlined text-[18px] text-[color:var(--sl-color-gray-6)]">cancel</span>
+                  <span className="material-symbols-outlined text-[18px] text-[color:var(--sl-fg-base-muted)]">cancel</span>
                 </button>
               )}
             </div>
@@ -2269,7 +2269,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
                         className={`w-10 h-10 flex items-center justify-center rounded-lg border shrink-0 ml-3 transition-all ${
                           alreadyAdded
                             ? 'border-transparent cursor-default'
-                            : 'border-[#e0e0e0] bg-white text-[color:var(--sl-color-gray-10)] shadow-[0_1px_2px_rgba(10,13,18,0.05)] hover:bg-[#f5f5f5] active:scale-95'
+                            : 'border-[#e0e0e0] bg-white text-[color:var(--sl-fg-base)] shadow-[0_1px_2px_rgba(10,13,18,0.05)] hover:bg-[#f5f5f5] active:scale-95'
                         }`}
                         style={justAdded ? { color: '#2b7fff' } : alreadyAdded ? { color: '#c2c2c2' } : undefined}
                       >
@@ -2289,7 +2289,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
                 <div className="flex flex-col items-center justify-center py-16 text-center">
                   <span className="material-symbols-outlined text-3xl text-[#d0d0d0] mb-2">search_off</span>
                   <p className="text-[14px] text-[color:var(--sl-fg-base-soft)]">Nenhum produto encontrado</p>
-                  <p className="text-[12px] text-[color:var(--sl-color-gray-6)] mt-1">Tente outro termo de busca</p>
+                  <p className="text-[12px] text-[color:var(--sl-fg-base-muted)] mt-1">Tente outro termo de busca</p>
                 </div>
               ) : null}
             </div>
@@ -2330,20 +2330,20 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
               onClick={closePublisherPicker}
               className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-[#f5f5f5] transition-colors shrink-0 -mr-2"
             >
-              <span className="material-symbols-outlined text-[20px] text-[color:var(--sl-color-gray-10)]">close</span>
+              <span className="material-symbols-outlined text-[20px] text-[color:var(--sl-fg-base)]">close</span>
             </button>
           </div>
 
           <div className="flex flex-col flex-1 min-h-0 pt-6 pb-8 px-8">
             <div className="relative mb-6 shrink-0">
-              <span className="material-symbols-outlined text-[18px] text-[color:var(--sl-color-gray-6)] absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none">search</span>
+              <span className="material-symbols-outlined text-[18px] text-[color:var(--sl-fg-base-muted)] absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none">search</span>
               <input
                 ref={publisherPickerSearchRef}
                 type="text"
                 value={publisherSearch}
                 onChange={(e) => handlePublisherSearch(e.target.value)}
                 placeholder="Buscar publishers"
-                className="w-full h-[48px] pl-11 pr-10 bg-white border border-[#e0e0e0] rounded-xl text-[14px] text-[color:var(--sl-fg-base)] tracking-[-0.14px] placeholder:text-[color:var(--sl-color-gray-6)] focus:shadow-[0_0_0_3px_#C2C2C2,0_0_0_1px_#fff] focus:border-[#a0a0a0] outline-none transition-all"
+                className="w-full h-[48px] pl-11 pr-10 bg-white border border-[#e0e0e0] rounded-xl text-[14px] text-[color:var(--sl-fg-base)] tracking-[-0.14px] placeholder:text-[color:var(--sl-fg-base-muted)] focus:shadow-[0_0_0_3px_#C2C2C2,0_0_0_1px_#fff] focus:border-[#a0a0a0] outline-none transition-all"
               />
               {publisherSearch && (
                 <button
@@ -2351,7 +2351,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
                   onClick={() => handlePublisherSearch('')}
                   className="absolute right-3 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center rounded-full hover:bg-[#f0f0f0] transition-colors"
                 >
-                  <span className="material-symbols-outlined text-[18px] text-[color:var(--sl-color-gray-6)]">cancel</span>
+                  <span className="material-symbols-outlined text-[18px] text-[color:var(--sl-fg-base-muted)]">cancel</span>
                 </button>
               )}
             </div>
@@ -2398,7 +2398,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
                         className={`w-10 h-10 flex items-center justify-center rounded-lg border shrink-0 ml-3 transition-all ${
                           alreadyAdded
                             ? 'border-transparent cursor-default'
-                            : 'border-[#e0e0e0] bg-white text-[color:var(--sl-color-gray-10)] shadow-[0_1px_2px_rgba(10,13,18,0.05)] hover:bg-[#f5f5f5] active:scale-95'
+                            : 'border-[#e0e0e0] bg-white text-[color:var(--sl-fg-base)] shadow-[0_1px_2px_rgba(10,13,18,0.05)] hover:bg-[#f5f5f5] active:scale-95'
                         }`}
                         style={justAdded ? { color: '#2b7fff' } : alreadyAdded ? { color: '#c2c2c2' } : undefined}
                       >
@@ -2418,7 +2418,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
                 <div className="flex flex-col items-center justify-center py-16 text-center">
                   <span className="material-symbols-outlined text-3xl text-[#d0d0d0] mb-2">search_off</span>
                   <p className="text-[14px] text-[color:var(--sl-fg-base-soft)]">Nenhum publisher encontrado</p>
-                  <p className="text-[12px] text-[color:var(--sl-color-gray-6)] mt-1">Tente outro termo de busca</p>
+                  <p className="text-[12px] text-[color:var(--sl-fg-base-muted)] mt-1">Tente outro termo de busca</p>
                 </div>
               ) : null}
             </div>
@@ -2455,23 +2455,23 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
           <div className="flex items-center justify-between h-[80px] px-8 shrink-0">
             <h2 className="text-[24px] font-semibold text-[color:var(--sl-fg-base)] tracking-[-1px] leading-8 truncate">Selecionar publishers para reserva</h2>
             <button type="button" onClick={closeReservaPublisherPicker} className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-[#f5f5f5] transition-colors shrink-0 -mr-2">
-              <span className="material-symbols-outlined text-[20px] text-[color:var(--sl-color-gray-10)]">close</span>
+              <span className="material-symbols-outlined text-[20px] text-[color:var(--sl-fg-base)]">close</span>
             </button>
           </div>
           <div className="flex flex-col flex-1 min-h-0 pt-6 pb-8 px-8">
             <div className="relative mb-6 shrink-0">
-              <span className="material-symbols-outlined text-[18px] text-[color:var(--sl-color-gray-6)] absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none">search</span>
+              <span className="material-symbols-outlined text-[18px] text-[color:var(--sl-fg-base-muted)] absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none">search</span>
               <input
                 ref={reservaPublisherPickerSearchRef}
                 type="text"
                 value={reservaPublisherSearch}
                 onChange={(e) => handleReservaPublisherSearch(e.target.value)}
                 placeholder="Buscar publishers"
-                className="w-full h-[48px] pl-11 pr-10 bg-white border border-[#e0e0e0] rounded-xl text-[14px] text-[color:var(--sl-fg-base)] tracking-[-0.14px] placeholder:text-[color:var(--sl-color-gray-6)] focus:shadow-[0_0_0_3px_#C2C2C2,0_0_0_1px_#fff] focus:border-[#a0a0a0] outline-none transition-all"
+                className="w-full h-[48px] pl-11 pr-10 bg-white border border-[#e0e0e0] rounded-xl text-[14px] text-[color:var(--sl-fg-base)] tracking-[-0.14px] placeholder:text-[color:var(--sl-fg-base-muted)] focus:shadow-[0_0_0_3px_#C2C2C2,0_0_0_1px_#fff] focus:border-[#a0a0a0] outline-none transition-all"
               />
               {reservaPublisherSearch && (
                 <button type="button" onClick={() => handleReservaPublisherSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center rounded-full hover:bg-[#f0f0f0] transition-colors">
-                  <span className="material-symbols-outlined text-[18px] text-[color:var(--sl-color-gray-6)]">cancel</span>
+                  <span className="material-symbols-outlined text-[18px] text-[color:var(--sl-fg-base-muted)]">cancel</span>
                 </button>
               )}
             </div>
@@ -2499,7 +2499,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
                     <button
                       type="button"
                       onClick={() => addPublisherToReserva(pub)}
-                      className="w-10 h-10 flex items-center justify-center rounded-lg border border-[#e0e0e0] bg-white text-[color:var(--sl-color-gray-10)] shadow-[0_1px_2px_rgba(10,13,18,0.05)] hover:bg-[#f5f5f5] active:scale-95"
+                      className="w-10 h-10 flex items-center justify-center rounded-lg border border-[#e0e0e0] bg-white text-[color:var(--sl-fg-base)] shadow-[0_1px_2px_rgba(10,13,18,0.05)] hover:bg-[#f5f5f5] active:scale-95"
                     >
                       <span className="material-symbols-outlined text-[20px]">add</span>
                     </button>
@@ -2509,7 +2509,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
                 <div className="flex flex-col items-center justify-center py-16 text-center">
                   <span className="material-symbols-outlined text-3xl text-[#d0d0d0] mb-2">search_off</span>
                   <p className="text-[14px] text-[color:var(--sl-fg-base-soft)]">Nenhum publisher encontrado</p>
-                  <p className="text-[12px] text-[color:var(--sl-color-gray-6)] mt-1">Tente outro termo de busca</p>
+                  <p className="text-[12px] text-[color:var(--sl-fg-base-muted)] mt-1">Tente outro termo de busca</p>
                 </div>
               ) : suggestedReserva.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-16 text-center">
@@ -2575,7 +2575,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
                   <button
                     type="button"
                     onClick={() => openClearListDialog('products')}
-                    className="h-10 px-3 rounded-lg text-sm font-semibold text-[color:var(--sl-fg-critical)] hover:text-[color:var(--sl-fg-critical)] hover:bg-red-50 active:scale-[0.98] transition-all"
+                    className="h-10 px-3 rounded-lg text-sm font-semibold text-[color:var(--sl-fg-base)] hover:text-[color:var(--sl-fg-base)] hover:bg-red-50 active:scale-[0.98] transition-all"
                   >
                     Limpar lista
                   </button>
@@ -2583,7 +2583,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
                 <button
                   type="button"
                   onClick={openBulkAdd}
-                  className="h-10 px-3 flex items-center gap-1.5 rounded-lg bg-transparent text-[color:var(--sl-fg-muted)] text-[13px] font-medium hover:bg-[#f5f5f5] hover:text-[color:var(--sl-fg-muted-pressed)] active:scale-[0.98] transition-all"
+                  className="h-10 px-3 flex items-center gap-1.5 rounded-lg bg-transparent text-[color:var(--sl-fg-base)] text-[13px] font-medium hover:bg-[#f5f5f5] hover:text-[color:var(--sl-fg-base)] active:scale-[0.98] transition-all"
                 >
                   <span className="material-symbols-outlined text-[18px]">view_list</span>
                   Em lote
@@ -2591,7 +2591,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
                 <button
                   type="button"
                   onClick={openProductPicker}
-                  className="w-10 h-10 flex items-center justify-center rounded-lg bg-white border border-[#d5d7da] text-[color:var(--sl-fg-muted)] shadow-[0_1px_2px_rgba(10,13,18,0.05)] hover:bg-[#fafafa] hover:text-[color:var(--sl-fg-muted-pressed)] active:scale-95 transition-all"
+                  className="w-10 h-10 flex items-center justify-center rounded-lg bg-white border border-[#d5d7da] text-[color:var(--sl-fg-base)] shadow-[0_1px_2px_rgba(10,13,18,0.05)] hover:bg-[#fafafa] hover:text-[color:var(--sl-fg-base)] active:scale-95 transition-all"
                 >
                   <span className="material-symbols-outlined text-[20px]">add</span>
                 </button>
@@ -2614,12 +2614,12 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-[color:var(--sl-fg-base)] truncate leading-5">{p.name}</p>
-                      {catalogInfo && <p className="text-xs text-[color:var(--sl-color-gray-6)] leading-4">{catalogInfo.sku}</p>}
+                      {catalogInfo && <p className="text-xs text-[color:var(--sl-fg-base-muted)] leading-4">{catalogInfo.sku}</p>}
                     </div>
                     <button
                       type="button"
                       onClick={() => removeProduct(p.id)}
-                      className="w-7 h-7 flex items-center justify-center rounded-lg opacity-0 group-hover:opacity-100 hover:bg-red-50 text-[color:var(--sl-color-gray-6)] hover:text-red-500 transition-all shrink-0"
+                      className="w-7 h-7 flex items-center justify-center rounded-lg opacity-0 group-hover:opacity-100 hover:bg-red-50 text-[color:var(--sl-fg-base-muted)] hover:text-[color:var(--sl-fg-base-soft)] transition-all shrink-0"
                     >
                       <span className="material-symbols-outlined text-[18px]">close</span>
                     </button>
@@ -2637,14 +2637,14 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
                 <button
                   type="button"
                   onClick={openProductPicker}
-                  className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-white border border-[#d5d7da] text-[color:var(--sl-fg-muted)] text-sm font-semibold tracking-[-0.42px] shadow-[0_1px_2px_rgba(10,13,18,0.05)] hover:bg-[#fafafa] hover:text-[color:var(--sl-fg-muted-pressed)] active:scale-[0.98] transition-all"
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-white border border-[#d5d7da] text-[color:var(--sl-fg-base)] text-sm font-semibold tracking-[-0.42px] shadow-[0_1px_2px_rgba(10,13,18,0.05)] hover:bg-[#fafafa] hover:text-[color:var(--sl-fg-base)] active:scale-[0.98] transition-all"
                 >
                   Adicionar SKUs
                 </button>
                 <button
                   type="button"
                   onClick={openBulkAdd}
-                  className="text-sm font-semibold text-[color:var(--sl-color-gray-10)] hover:text-[color:var(--sl-fg-muted)] transition-colors py-1.5 tracking-[-0.42px]"
+                  className="text-sm font-semibold text-[color:var(--sl-fg-base)] hover:text-[color:var(--sl-fg-base)] transition-colors py-1.5 tracking-[-0.42px]"
                 >
                   Adicionar em lote
                 </button>
@@ -2702,18 +2702,18 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
                     value={allocationAmount}
                     onChange={setAllocationAmount}
                     placeholder="5.000,00"
-                    className="flex-1 px-4 py-3 bg-white outline-none text-sm font-medium text-[color:var(--sl-fg-base)] placeholder:text-[color:var(--sl-color-gray-6)]"
+                    className="flex-1 px-4 py-3 bg-white outline-none text-sm font-medium text-[color:var(--sl-fg-base)] placeholder:text-[color:var(--sl-fg-base-muted)]"
                   />
                   <span className="pr-4 text-sm text-[color:var(--sl-fg-base-soft)] shrink-0">BRL</span>
                 </div>
                 {budgetErrors.allocation && (
-                  <p className="text-xs text-[color:var(--sl-fg-critical)] mt-0.5">{budgetErrors.allocation}</p>
+                  <p className="text-xs text-[color:var(--sl-fg-base)] mt-0.5">{budgetErrors.allocation}</p>
                 )}
               </div>
             </div>
             {allocationFrequency === 'Diária' && (
               <div className="flex gap-3 items-start p-4 rounded-xl bg-[#f1f8fd] border border-[#cbe9ff]">
-                <span className="material-symbols-outlined text-[20px] text-[color:var(--sl-fg-accent)] shrink-0 mt-0.5" aria-hidden>info</span>
+                <span className="material-symbols-outlined text-[20px] text-[color:var(--sl-fg-base-soft)] shrink-0 mt-0.5" aria-hidden>info</span>
                 <p className="text-[14px] font-medium text-[color:var(--sl-fg-base)] tracking-[-0.14px] leading-5">
                   O investimento diário pode variar ao longo da campanha e não corresponder exatamente à média definida. Ao final, o gasto se mantém dentro do orçamento planejado.
                 </p>
@@ -2789,14 +2789,14 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
                                     value={reserved}
                                     onChange={(v) => setPublisherBudgetReservations((prev) => ({ ...prev, [pub.id]: Math.max(0, v) }))}
                                     placeholder="0"
-                                    className="flex-1 px-3 py-2 bg-white outline-none text-sm font-medium text-[color:var(--sl-fg-base)] placeholder:text-[color:var(--sl-color-gray-6)] text-right min-w-0"
+                                    className="flex-1 px-3 py-2 bg-white outline-none text-sm font-medium text-[color:var(--sl-fg-base)] placeholder:text-[color:var(--sl-fg-base-muted)] text-right min-w-0"
                                   />
                                   <span className="pr-4 text-sm text-[color:var(--sl-fg-base-soft)] shrink-0">BRL</span>
                                 </div>
                                 <button
                                   type="button"
                                   onClick={() => removePublisherFromReserva(pub.id)}
-                                  className="w-8 h-8 flex items-center justify-center rounded-lg opacity-0 group-hover:opacity-100 hover:bg-red-50 text-[color:var(--sl-color-gray-6)] hover:text-red-500 transition-all shrink-0"
+                                  className="w-8 h-8 flex items-center justify-center rounded-lg opacity-0 group-hover:opacity-100 hover:bg-red-50 text-[color:var(--sl-fg-base-muted)] hover:text-[color:var(--sl-fg-base-soft)] transition-all shrink-0"
                                   title="Remover da reserva (orçamento será redistribuído)"
                                 >
                                   <span className="material-symbols-outlined text-[18px]">close</span>
@@ -2813,7 +2813,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
                         const overBudget = totalBudget > 0 && reservedTotal > totalBudget;
                         const demaisCount = reservaPool.length - publishersComReservaSelecionados.length;
                         return (
-                          <div className={`px-4 py-3 border-t border-[#e8e8e8] flex flex-wrap items-center justify-between gap-2 text-[12px] ${overBudget ? 'bg-[#fef3f2] text-[color:var(--sl-fg-critical)]' : 'bg-[#fafafa] text-[color:var(--sl-fg-base-soft)]'}`}>
+                          <div className={`px-4 py-3 border-t border-[#e8e8e8] flex flex-wrap items-center justify-between gap-2 text-[12px] ${overBudget ? 'bg-[#fef3f2] text-[color:var(--sl-fg-base)]' : 'bg-[#fafafa] text-[color:var(--sl-fg-base-soft)]'}`}>
                             <span>
                               {overBudget
                                 ? `A soma das reservas (R$ ${formatBRL(reservedTotal)}) excede o orçamento (R$ ${formatBRL(totalBudget)}).`
@@ -2943,7 +2943,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
                   <option key={d.key} value={d.key}>{d.label}</option>
                 ))}
               </select>
-              <span className="material-symbols-outlined text-[14px] text-[color:var(--sl-color-gray-6)] absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none">expand_more</span>
+              <span className="material-symbols-outlined text-[14px] text-[color:var(--sl-fg-base-muted)] absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none">expand_more</span>
             </div>
 
             <div className="w-px h-5 bg-[#e8e8e8] shrink-0" />
@@ -2959,7 +2959,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
                   <option key={op} value={op}>{OPERATOR_LABELS[op]}</option>
                 ))}
               </select>
-              <span className="material-symbols-outlined text-[14px] text-[color:var(--sl-color-gray-6)] absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none">expand_more</span>
+              <span className="material-symbols-outlined text-[14px] text-[color:var(--sl-fg-base-muted)] absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none">expand_more</span>
             </div>
 
             <div className="w-px h-5 bg-[#e8e8e8] shrink-0" />
@@ -2986,7 +2986,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
           <button
             type="button"
             onClick={() => removeCondition(group.id, cond.id)}
-            className="shrink-0 w-7 h-7 flex items-center justify-center rounded-lg text-[#c2c2c2] hover:text-[color:var(--sl-fg-critical)] hover:bg-red-50 transition-all"
+            className="shrink-0 w-7 h-7 flex items-center justify-center rounded-lg text-[#c2c2c2] hover:text-[color:var(--sl-fg-base)] hover:bg-red-50 transition-all"
           >
             <span className="material-symbols-outlined text-[16px]">close</span>
           </button>
@@ -3020,7 +3020,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
             <button
               type="button"
               onClick={() => addConditionToGroup(group.id)}
-              className="flex items-center gap-1.5 text-sm font-semibold text-[color:var(--sl-color-gray-10)] hover:text-[color:var(--sl-fg-muted)] transition-colors"
+              className="flex items-center gap-1.5 text-sm font-semibold text-[color:var(--sl-fg-base)] hover:text-[color:var(--sl-fg-base)] transition-colors"
             >
               <span className="material-symbols-outlined text-[16px]">add</span>
               Condição
@@ -3029,7 +3029,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
               <button
                 type="button"
                 onClick={() => removeGroup(group.id)}
-                className="flex items-center gap-1 text-sm text-[#c2c2c2] hover:text-[color:var(--sl-fg-critical)] transition-colors"
+                className="flex items-center gap-1 text-sm text-[#c2c2c2] hover:text-[color:var(--sl-fg-base)] transition-colors"
               >
                 <span className="material-symbols-outlined text-[14px]">delete</span>
                 Remover grupo
@@ -3089,7 +3089,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
             <button
               type="button"
               onClick={() => setSegmentGroups(prev => [...prev, makeGroup()])}
-              className="flex items-center justify-center gap-2 mt-4 py-3 rounded-xl border border-dashed border-[#d0d0d0] text-sm font-semibold text-[color:var(--sl-color-gray-10)] hover:border-[#0366dd] hover:text-[color:var(--sl-fg-accent)] hover:bg-[#f9fbfe] transition-all"
+              className="flex items-center justify-center gap-2 mt-4 py-3 rounded-xl border border-dashed border-[#d0d0d0] text-sm font-semibold text-[color:var(--sl-fg-base)] hover:border-[#0366dd] hover:text-[color:var(--sl-fg-base-soft)] hover:bg-[#f9fbfe] transition-all"
             >
               <span className="material-symbols-outlined text-[18px]">add_circle_outline</span>
               Adicionar grupo de condições
@@ -3107,10 +3107,10 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
                       const dimLabel = SEGMENT_DIMENSIONS.find(d => d.key === c.dimension)?.label || c.dimension;
                       return (
                         <span key={c.id}>
-                          {ci > 0 && <span className="text-[color:var(--sl-fg-accent)] font-semibold"> {g.logic === 'AND' ? ' e ' : ' ou '}</span>}
+                          {ci > 0 && <span className="text-[color:var(--sl-fg-base-soft)] font-semibold"> {g.logic === 'AND' ? ' e ' : ' ou '}</span>}
                           <span className="font-medium">{dimLabel}</span>
                           <span className="text-[color:var(--sl-fg-base-soft)]"> {OPERATOR_LABELS[c.operator]} </span>
-                          <span className="font-semibold text-[color:var(--sl-fg-accent)]">{c.value}</span>
+                          <span className="font-semibold text-[color:var(--sl-fg-base-soft)]">{c.value}</span>
                         </span>
                       );
                     });
@@ -3432,7 +3432,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
                       <span className="text-xs text-[color:var(--sl-fg-base-soft)]">{meta.subtitle}</span>
                     </div>
                     {isSelected && (
-                      <span className="material-symbols-outlined text-[20px] text-[color:var(--sl-fg-accent)] shrink-0">check_circle</span>
+                      <span className="material-symbols-outlined text-[20px] text-[color:var(--sl-fg-base-soft)] shrink-0">check_circle</span>
                     )}
                   </button>
                 );
@@ -3495,7 +3495,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
                     <button
                       type="button"
                       onClick={discardMediaDetail}
-                      className="h-10 px-4 rounded-lg text-[14px] font-semibold text-[color:var(--sl-color-gray-10)] hover:text-[color:var(--sl-fg-muted)] hover:bg-[#f5f5f5] active:scale-[0.98] transition-colors tracking-[-0.42px]"
+                      className="h-10 px-4 rounded-lg text-[14px] font-semibold text-[color:var(--sl-fg-base)] hover:text-[color:var(--sl-fg-base)] hover:bg-[#f5f5f5] active:scale-[0.98] transition-colors tracking-[-0.42px]"
                     >
                       Descartar tudo
                     </button>
@@ -3513,7 +3513,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
                     onClick={closeMediaDetail}
                     className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-[#f5f5f5] transition-colors -mr-2"
                   >
-                    <span className="material-symbols-outlined text-[20px] text-[color:var(--sl-color-gray-10)]">close</span>
+                    <span className="material-symbols-outlined text-[20px] text-[color:var(--sl-fg-base)]">close</span>
                   </button>
                 )}
               </div>
@@ -3551,7 +3551,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
                                 </span>
                               ))
                             ) : (
-                              <span className="text-[13px] text-[color:var(--sl-color-gray-6)]">Selecione os canais</span>
+                              <span className="text-[13px] text-[color:var(--sl-fg-base-muted)]">Selecione os canais</span>
                             )}
                             <span className="material-symbols-outlined ml-auto text-[18px] text-[color:var(--sl-fg-base-soft)] shrink-0 transition-transform" style={{ transform: offsitePublishersDropdownOpen ? 'rotate(180deg)' : 'none' }}>expand_more</span>
                           </button>
@@ -3592,12 +3592,12 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
 
                         <div className="flex flex-col gap-4">
                           <div>
-                            <h4 className="text-[14px] font-medium text-[color:var(--sl-fg-muted)] leading-5 mb-3 tracking-[-0.25px]">Alocação</h4>
+                            <h4 className="text-[14px] font-medium text-[color:var(--sl-fg-base)] leading-5 mb-3 tracking-[-0.25px]">Alocação</h4>
                             <label className="flex items-center gap-3 cursor-pointer">
                               <button type="button" onClick={() => setMediaDetailDraft(prev => prev ? ({ ...prev, allocMode: prev.allocMode === 'intelligent' ? 'manual' : 'intelligent' }) : prev)} className={`relative w-[36px] h-[20px] rounded-full shrink-0 transition-colors duration-300 ease-[cubic-bezier(0.34,1.12,0.64,1)] ${mediaDetailDraft?.allocMode === 'intelligent' ? 'bg-[#32a436]' : 'bg-[#e0e0e0]'}`}>
                                 <div className="absolute top-[2px] w-[16px] h-[16px] rounded-full bg-white shadow-[0_1px_3px_rgba(0,0,0,0.2)]" style={{ left: mediaDetailDraft?.allocMode === 'intelligent' ? '18px' : '2px', transition: 'left 400ms cubic-bezier(0.34, 1.12, 0.64, 1)' }} />
                               </button>
-                              <span className="text-[14px] font-medium text-[color:var(--sl-fg-muted)] leading-5">Alocação inteligente</span>
+                              <span className="text-[14px] font-medium text-[color:var(--sl-fg-base)] leading-5">Alocação inteligente</span>
                             </label>
                           </div>
 
@@ -3611,7 +3611,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
                                 </div>
                               </div>
                               <div className="flex flex-col gap-1.5">
-                                <label className="text-[12px] font-medium text-[color:var(--sl-fg-base-soft)] leading-4">Alocação máxima diária <span className="font-normal text-[color:var(--sl-color-gray-6)]">(opcional)</span></label>
+                                <label className="text-[12px] font-medium text-[color:var(--sl-fg-base-soft)] leading-4">Alocação máxima diária <span className="font-normal text-[color:var(--sl-fg-base-muted)]">(opcional)</span></label>
                                 <div className="flex items-center border border-[#e0e0e0] rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-[#0366dd]/20 focus-within:border-[#0366dd] transition-all h-11">
                                   <CurrencyInput value={mediaDetailDraft?.dailyBudget ?? 0} onChange={(v) => setMediaDetailDraft(prev => prev ? ({ ...prev, dailyBudget: v }) : prev)} placeholder="0,00" className="flex-1 h-full min-w-0 px-3 text-[14px] font-medium text-[color:var(--sl-fg-base)] bg-transparent outline-none tracking-[-0.14px]" />
                                   <span className="pr-3 text-[12px] text-[color:var(--sl-fg-base-soft)] shrink-0">BRL</span>
@@ -3622,7 +3622,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
                         </div>
 
                         <div className="flex flex-col gap-2">
-                          <h4 className="text-[14px] font-medium text-[color:var(--sl-fg-muted)] leading-5">Lance</h4>
+                          <h4 className="text-[14px] font-medium text-[color:var(--sl-fg-base)] leading-5">Lance</h4>
                           <label className="text-[12px] font-medium text-[color:var(--sl-fg-base-soft)] leading-4 flex flex-col gap-2">
                             {pricingLabel}
                             <div className="flex items-center border border-[#e0e0e0] rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-[#0366dd]/20 focus-within:border-[#0366dd] transition-all h-11">
@@ -3693,7 +3693,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
                                     : { publisher: pubs[0] ?? '', retailer: rets[0] ?? '' };
                                   setOffsiteSelectedVariation(prev => ({ ...prev, [mt]: first }));
                                 }
-                              }} className={`w-full px-2.5 py-2 text-left text-[13px] font-medium flex items-center gap-2 transition-colors rounded-lg ${isSelected ? 'bg-[#f0f7ff] text-[color:var(--sl-fg-accent)]' : 'text-[color:var(--sl-fg-base)] hover:bg-[#f5f5f5]'}`}>
+                              }} className={`w-full px-2.5 py-2 text-left text-[13px] font-medium flex items-center gap-2 transition-colors rounded-lg ${isSelected ? 'bg-[#f0f7ff] text-[color:var(--sl-fg-base-soft)]' : 'text-[color:var(--sl-fg-base)] hover:bg-[#f5f5f5]'}`}>
                                 {isSelected && <span className="material-symbols-outlined text-[16px]">check</span>}
                                 {mode === 'none' && 'Não varia'}
                                 {mode === 'publisher' && 'Canal'}
@@ -3715,9 +3715,9 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
                         const images = bannerImages[bannerKey] || [];
                         return images.length === 0 ? (
                           <div className={`flex-1 min-h-[280px] border border-dashed rounded-xl flex flex-col gap-4 items-center justify-center cursor-pointer transition-colors pl-10 pr-10 pb-10 ${bannerDragOver ? 'border-[#1570ef] bg-[#f0f7ff]' : 'border-[#e0e0e0] bg-[rgba(29,29,29,0.02)] hover:border-[#c2c2c2]'}`} onClick={() => offsiteBannerFileInputRef.current?.click()} onDragOver={(e) => { e.preventDefault(); setBannerDragOver(true); }} onDragLeave={() => setBannerDragOver(false)} onDrop={(e) => { e.preventDefault(); setBannerDragOver(false); handleBannerFiles(e.dataTransfer.files, bannerKey); }}>
-                            <span className="material-symbols-outlined text-[32px] text-[color:var(--sl-color-gray-6)]">add_photo_alternate</span>
+                            <span className="material-symbols-outlined text-[32px] text-[color:var(--sl-fg-base-muted)]">add_photo_alternate</span>
                             <p className="text-[14px] font-medium text-[color:var(--sl-fg-base)]">Clique aqui ou solte os arquivos nessa área</p>
-                            <p className="text-[12px] text-[color:var(--sl-fg-base-disabled)] text-center">Tamanhos permitidos: {ALLOWED_OFFSITE_BANNER_SIZES}</p>
+                            <p className="text-[12px] text-[color:var(--sl-fg-base-muted)] text-center">Tamanhos permitidos: {ALLOWED_OFFSITE_BANNER_SIZES}</p>
                             <input ref={offsiteBannerFileInputRef} type="file" accept="image/*" multiple className="hidden" onChange={(e) => handleBannerFiles(e.target.files, bannerKey)} />
                           </div>
                         ) : (
@@ -3764,7 +3764,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
                         }}
                       />
                     </button>
-                    <span className="text-[14px] font-medium text-[color:var(--sl-fg-muted)] leading-5">Alocação inteligente</span>
+                    <span className="text-[14px] font-medium text-[color:var(--sl-fg-base)] leading-5">Alocação inteligente</span>
                   </label>
 
                   {isIntelligent && (
@@ -3790,7 +3790,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
                         </div>
                       </div>
                       <div className="flex flex-col gap-1.5">
-                        <label className="text-[12px] font-medium text-[color:var(--sl-fg-base-soft)] leading-4">Alocação máxima diária <span className="font-normal text-[color:var(--sl-color-gray-6)]">(opcional)</span></label>
+                        <label className="text-[12px] font-medium text-[color:var(--sl-fg-base-soft)] leading-4">Alocação máxima diária <span className="font-normal text-[color:var(--sl-fg-base-muted)]">(opcional)</span></label>
                         <div className="flex items-center border border-[#e0e0e0] rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-[#0366dd]/20 focus-within:border-[#0366dd] transition-all">
                           <CurrencyInput
                             value={mediaDetailDraft.dailyBudget}
@@ -3853,7 +3853,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
                           <span className="material-symbols-outlined text-[24px] text-[color:var(--sl-fg-base)]">add_photo_alternate</span>
                           <p className="text-[12px] text-[color:var(--sl-fg-base)] leading-4 text-center">Clique aqui ou solte os arquivos nessa área</p>
                         </div>
-                        <p className="text-[12px] text-[color:var(--sl-fg-base-disabled)] leading-4 text-center max-w-[510px]">
+                        <p className="text-[12px] text-[color:var(--sl-fg-base-muted)] leading-4 text-center max-w-[510px]">
                           Tamanhos permitidos: {ALLOWED_BANNER_SIZES}
                         </p>
                         <input
@@ -3999,7 +3999,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
                                     }}
                                     className="w-[32px] h-[32px] rounded-[8px] bg-white border border-[rgba(0,0,0,0.1)] shadow-[0px_1px_1px_0px_rgba(0,0,0,0.08)] flex items-center justify-center hover:bg-[#f5f5f5] transition-colors"
                                   >
-                                    <span className="material-symbols-outlined text-[16px] text-[color:var(--sl-color-gray-10)] leading-none">more_vert</span>
+                                    <span className="material-symbols-outlined text-[16px] text-[color:var(--sl-fg-base)] leading-none">more_vert</span>
                                   </button>
                                   {bannerThumbMenu === img.id && (
                                     <div
@@ -4038,7 +4038,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
                             ))}
                           </div>
                         </div>
-                        <p className="text-[12px] text-[color:var(--sl-fg-base-disabled)] leading-[13.5px]">
+                        <p className="text-[12px] text-[color:var(--sl-fg-base-muted)] leading-[13.5px]">
                           Tamanhos permitidos: {ALLOWED_BANNER_SIZES}
                         </p>
                       </div>
@@ -4071,7 +4071,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
                             <span className="material-symbols-outlined text-[24px] text-[color:var(--sl-fg-base)]">add_photo_alternate</span>
                             <p className="text-[12px] text-[color:var(--sl-fg-base)] leading-4 text-center">Clique aqui ou solte os arquivos nessa área</p>
                           </div>
-                          <p className="text-[12px] text-[color:var(--sl-fg-base-disabled)] leading-4 text-center">Tamanhos permitidos: 438 x 100</p>
+                          <p className="text-[12px] text-[color:var(--sl-fg-base-muted)] leading-4 text-center">Tamanhos permitidos: 438 x 100</p>
                           <input ref={showcaseLogoInputRef} type="file" accept="image/*" className="hidden" onChange={(e) => handleShowcaseFiles(e.target.files, mt, 'logoImages', 1)} />
                         </div>
                       ) : (() => {
@@ -4102,7 +4102,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
                                 </div>
                                 <div className="absolute bottom-[4px] right-[4px] z-[60] opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
                                   <button type="button" onClick={() => showcaseLogoInputRef.current?.click()} className="w-[32px] h-[32px] rounded-[8px] bg-white border border-[rgba(0,0,0,0.1)] shadow-[0px_1px_1px_0px_rgba(0,0,0,0.08)] flex items-center justify-center hover:bg-[#f5f5f5] transition-colors">
-                                    <span className="material-symbols-outlined text-[16px] text-[color:var(--sl-color-gray-10)] leading-none">swap_horiz</span>
+                                    <span className="material-symbols-outlined text-[16px] text-[color:var(--sl-fg-base)] leading-none">swap_horiz</span>
                                   </button>
                                   <button type="button" onClick={() => removeShowcaseImage(mt, 'logoImages', logoImg.id)} className="w-[32px] h-[32px] rounded-[8px] bg-white border border-[rgba(0,0,0,0.1)] shadow-[0px_1px_1px_0px_rgba(0,0,0,0.08)] flex items-center justify-center hover:bg-[#f5f5f5] transition-colors">
                                     <span className="material-symbols-outlined text-[16px] text-[#cc3d3d] leading-none">delete</span>
@@ -4111,7 +4111,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
                                 <input ref={showcaseLogoInputRef} type="file" accept="image/*" className="hidden" onChange={(e) => { updateShowcase(mt, { logoImages: [] }); handleShowcaseFiles(e.target.files, mt, 'logoImages'); }} />
                               </div>
                             </div>
-                            <p className="text-[12px] text-[color:var(--sl-fg-base-disabled)] leading-[13.5px]">Tamanhos permitidos: 438 x 100</p>
+                            <p className="text-[12px] text-[color:var(--sl-fg-base-muted)] leading-[13.5px]">Tamanhos permitidos: 438 x 100</p>
                           </div>
                         );
                       })()
@@ -4136,8 +4136,8 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
                             <p className="text-[12px] text-[color:var(--sl-fg-base)] leading-4 text-center">Clique aqui ou solte os arquivos nessa área</p>
                           </div>
                           <div className="flex flex-col items-center gap-0.5">
-                            <p className="text-[12px] text-[color:var(--sl-fg-base-disabled)] leading-4 text-center max-w-[510px]">Formatos permitidos: Video (MP4) ou Imagens (PNG, JPEG, GIF)</p>
-                            <p className="text-[12px] text-[color:var(--sl-fg-base-disabled)] leading-4 text-center">Tamanhos permitidos: 970 x 250</p>
+                            <p className="text-[12px] text-[color:var(--sl-fg-base-muted)] leading-4 text-center max-w-[510px]">Formatos permitidos: Video (MP4) ou Imagens (PNG, JPEG, GIF)</p>
+                            <p className="text-[12px] text-[color:var(--sl-fg-base-muted)] leading-4 text-center">Tamanhos permitidos: 970 x 250</p>
                           </div>
                           <input ref={showcaseMediaInputRef} type="file" accept="image/*,video/mp4" multiple className="hidden" onChange={(e) => handleShowcaseFiles(e.target.files, mt, 'mediaImages')} />
                         </div>
@@ -4244,7 +4244,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
                               </div>
                             ))}
                           </div>
-                          <p className="text-[12px] text-[color:var(--sl-fg-base-disabled)] leading-[13.5px]">Tamanhos permitidos: 970 x 250</p>
+                          <p className="text-[12px] text-[color:var(--sl-fg-base-muted)] leading-[13.5px]">Tamanhos permitidos: 970 x 250</p>
                         </div>
                       )}
                     </div>
@@ -4259,7 +4259,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
                           value={getShowcase(mt).title}
                           onChange={(e) => updateShowcase(mt, { title: e.target.value })}
                           placeholder="Ex: Conheça os novos produtos Apple"
-                          className="h-10 px-3 border border-[#e0e0e0] rounded-xl text-[14px] font-medium text-[color:var(--sl-fg-base)] tracking-[-0.14px] placeholder:text-[color:var(--sl-color-gray-6)] focus-within:ring-2 focus-within:ring-[#0366dd]/20 focus-within:border-[#0366dd] outline-none transition-all"
+                          className="h-10 px-3 border border-[#e0e0e0] rounded-xl text-[14px] font-medium text-[color:var(--sl-fg-base)] tracking-[-0.14px] placeholder:text-[color:var(--sl-fg-base-muted)] focus-within:ring-2 focus-within:ring-[#0366dd]/20 focus-within:border-[#0366dd] outline-none transition-all"
                         />
                       </div>
                       <div className="flex flex-col gap-1.5">
@@ -4269,7 +4269,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
                           onChange={(e) => updateShowcase(mt, { description: e.target.value })}
                           placeholder="Descreva brevemente a oferta ou campanha"
                           rows={3}
-                          className="px-3 py-2.5 border border-[#e0e0e0] rounded-xl text-[14px] font-medium text-[color:var(--sl-fg-base)] tracking-[-0.14px] placeholder:text-[color:var(--sl-color-gray-6)] focus-within:ring-2 focus-within:ring-[#0366dd]/20 focus-within:border-[#0366dd] outline-none transition-all resize-none"
+                          className="px-3 py-2.5 border border-[#e0e0e0] rounded-xl text-[14px] font-medium text-[color:var(--sl-fg-base)] tracking-[-0.14px] placeholder:text-[color:var(--sl-fg-base-muted)] focus-within:ring-2 focus-within:ring-[#0366dd]/20 focus-within:border-[#0366dd] outline-none transition-all resize-none"
                         />
                       </div>
                       <div className="flex flex-col gap-1.5">
@@ -4279,7 +4279,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
                           value={getShowcase(mt).brandName}
                           onChange={(e) => updateShowcase(mt, { brandName: e.target.value })}
                           placeholder="Ex: Apple"
-                          className="h-10 px-3 border border-[#e0e0e0] rounded-xl text-[14px] font-medium text-[color:var(--sl-fg-base)] tracking-[-0.14px] placeholder:text-[color:var(--sl-color-gray-6)] focus-within:ring-2 focus-within:ring-[#0366dd]/20 focus-within:border-[#0366dd] outline-none transition-all"
+                          className="h-10 px-3 border border-[#e0e0e0] rounded-xl text-[14px] font-medium text-[color:var(--sl-fg-base)] tracking-[-0.14px] placeholder:text-[color:var(--sl-fg-base-muted)] focus-within:ring-2 focus-within:ring-[#0366dd]/20 focus-within:border-[#0366dd] outline-none transition-all"
                         />
                       </div>
                     </div>
@@ -4293,7 +4293,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
                   <div className="flex-1 overflow-y-auto px-8 pb-8">
                     {formData.products.length === 0 ? (
                       <div className="flex items-center justify-center h-[200px]">
-                        <p className="text-[14px] text-[color:var(--sl-color-gray-6)]">Nenhum produto na campanha</p>
+                        <p className="text-[14px] text-[color:var(--sl-fg-base-muted)]">Nenhum produto na campanha</p>
                       </div>
                     ) : (
                       <div className="flex flex-col">
@@ -4349,7 +4349,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
             <button
               type="button"
               onClick={openMediaDrawer}
-              className="w-10 h-10 flex items-center justify-center rounded-lg bg-white border border-[#d5d7da] text-[color:var(--sl-fg-muted)] shadow-[0_1px_2px_rgba(10,13,18,0.05)] hover:bg-[#fafafa] hover:text-[color:var(--sl-fg-muted-pressed)] active:scale-95 transition-all"
+              className="w-10 h-10 flex items-center justify-center rounded-lg bg-white border border-[#d5d7da] text-[color:var(--sl-fg-base)] shadow-[0_1px_2px_rgba(10,13,18,0.05)] hover:bg-[#fafafa] hover:text-[color:var(--sl-fg-base)] active:scale-95 transition-all"
             >
               <span className="material-symbols-outlined text-[20px]">add</span>
             </button>
@@ -4384,7 +4384,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
                       {generationPhase === 1 && 'Selecionando formatos...'}
                       {generationPhase === 2 && 'Alocando orçamento...'}
                     </p>
-                    <p className="text-xs text-[color:var(--sl-color-gray-6)] tracking-[-0.1px]">
+                    <p className="text-xs text-[color:var(--sl-fg-base-muted)] tracking-[-0.1px]">
                       Gerando plano com base nos atributos da campanha
                     </p>
                   </div>
@@ -4413,7 +4413,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
                     <button
                       type="button"
                       onClick={generateAutoPlan}
-                      className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-white border border-[#d5d7da] text-[color:var(--sl-fg-muted)] text-sm font-semibold tracking-[-0.42px] shadow-[0_1px_2px_rgba(10,13,18,0.05)] hover:bg-[#fafafa] hover:text-[color:var(--sl-fg-muted-pressed)] active:scale-[0.98] transition-all"
+                      className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-white border border-[#d5d7da] text-[color:var(--sl-fg-base)] text-sm font-semibold tracking-[-0.42px] shadow-[0_1px_2px_rgba(10,13,18,0.05)] hover:bg-[#fafafa] hover:text-[color:var(--sl-fg-base)] active:scale-[0.98] transition-all"
                     >
                       Gerar plano automático
                       <span className="material-symbols-outlined text-[20px]">auto_awesome</span>
@@ -4421,7 +4421,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
                     <button
                       type="button"
                       onClick={openMediaDrawer}
-                      className="text-sm font-semibold text-[color:var(--sl-color-gray-10)] hover:text-[color:var(--sl-fg-muted)] transition-colors py-1.5 tracking-[-0.42px]"
+                      className="text-sm font-semibold text-[color:var(--sl-fg-base)] hover:text-[color:var(--sl-fg-base)] transition-colors py-1.5 tracking-[-0.42px]"
                     >
                       Adicionar mídia manualmente
                     </button>
@@ -4512,7 +4512,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
                           <button
                             type="button"
                             onClick={(e) => { e.stopPropagation(); setMediaMenuOpen(null); openMediaDetail(mt); }}
-                            className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-[color:var(--sl-fg-muted)] text-left hover:bg-[#f5f5f5] transition-colors"
+                            className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-[color:var(--sl-fg-base)] text-left hover:bg-[#f5f5f5] transition-colors"
                           >
                             <span className="material-symbols-outlined text-[16px] text-[color:var(--sl-fg-base-soft)]">edit</span>
                             Editar
@@ -4520,7 +4520,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
                           <button
                             type="button"
                             onClick={(e) => { e.stopPropagation(); setMediaMenuOpen(null); removeMediaType(mt); }}
-                            className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-[color:var(--sl-fg-critical)] text-left hover:bg-red-50 transition-colors"
+                            className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-[color:var(--sl-fg-base)] text-left hover:bg-red-50 transition-colors"
                           >
                             <span className="material-symbols-outlined text-[16px]">delete</span>
                             Apagar
@@ -4563,7 +4563,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
           <button
             type="button"
             onClick={handleClose}
-            className="w-9 h-9 flex items-center justify-center rounded-lg text-[color:var(--sl-color-gray-10)] hover:bg-[#f0f0f0] hover:text-[color:var(--sl-fg-base)] active:scale-[0.95] transition-all shrink-0"
+            className="w-9 h-9 flex items-center justify-center rounded-lg text-[color:var(--sl-fg-base)] hover:bg-[#f0f0f0] hover:text-[color:var(--sl-fg-base)] active:scale-[0.95] transition-all shrink-0"
           >
             <span className="material-symbols-outlined text-[20px]">arrow_back</span>
           </button>
@@ -4587,7 +4587,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
                 formData.status === CampaignStatus.ACTIVE ? 'bg-green-500' :
                 formData.status === CampaignStatus.COMPLETED ? 'bg-blue-500' : 'bg-gray-400'
               }`} />
-              <span className="text-[color:var(--sl-fg-muted)] tracking-[-0.2px]">{formData.status}</span>
+              <span className="text-[color:var(--sl-fg-base)] tracking-[-0.2px]">{formData.status}</span>
               <span className="material-symbols-outlined text-[16px] text-[#98a1b2] -mr-0.5">expand_more</span>
             </button>
             {statusDropdownOpen && (
@@ -4601,7 +4601,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
                       setStatusDropdownOpen(false);
                     }}
                     className={`w-full flex items-center gap-2.5 px-3.5 py-2 text-sm text-left transition-colors ${
-                      formData.status === s ? 'bg-[#f5f5f5] font-medium text-[color:var(--sl-fg-base)]' : 'text-[color:var(--sl-color-gray-10)] hover:bg-[#ebebeb]'
+                      formData.status === s ? 'bg-[#f5f5f5] font-medium text-[color:var(--sl-fg-base)]' : 'text-[color:var(--sl-fg-base)] hover:bg-[#ebebeb]'
                     }`}
                   >
                     <div className={`w-2 h-2 rounded-full shrink-0 ${
@@ -4610,7 +4610,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
                     }`} />
                     {s}
                     {formData.status === s && (
-                      <span className="material-symbols-outlined text-[16px] text-[color:var(--sl-fg-muted)] ml-auto">check</span>
+                      <span className="material-symbols-outlined text-[16px] text-[color:var(--sl-fg-base)] ml-auto">check</span>
                     )}
                   </button>
                 ))}
@@ -4620,7 +4620,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
           <button
             type="button"
             onClick={handleSubmit}
-            className="h-10 px-4 bg-white text-[color:var(--sl-fg-muted)] text-sm font-semibold rounded-lg border border-[#d5d7da] shadow-[0_1px_2px_rgba(10,13,18,0.05)] hover:bg-[#fafafa] hover:text-[color:var(--sl-fg-muted-pressed)] active:scale-[0.98] transition-all tracking-[-0.42px]"
+            className="h-10 px-4 bg-white text-[color:var(--sl-fg-base)] text-sm font-semibold rounded-lg border border-[#d5d7da] shadow-[0_1px_2px_rgba(10,13,18,0.05)] hover:bg-[#fafafa] hover:text-[color:var(--sl-fg-base)] active:scale-[0.98] transition-all tracking-[-0.42px]"
           >
             {isNewCampaign ? 'Criar campanha' : 'Salvar alterações'}
           </button>
@@ -4720,7 +4720,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
                 <button
                   type="button"
                   onClick={closeClearListDialog}
-                  className="px-4 py-2 rounded-lg text-sm font-semibold text-[color:var(--sl-color-gray-10)] hover:bg-[#f5f5f5] transition-colors"
+                  className="px-4 py-2 rounded-lg text-sm font-semibold text-[color:var(--sl-fg-base)] hover:bg-[#f5f5f5] transition-colors"
                 >
                   Cancelar
                 </button>
@@ -4758,7 +4758,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
             >
               <div className="flex items-start gap-3">
                 <div className="w-10 h-10 rounded-full bg-[#fef3f2] flex items-center justify-center shrink-0 mt-0.5">
-                  <span className="material-symbols-outlined text-[20px] text-[color:var(--sl-fg-critical)]">warning</span>
+                  <span className="material-symbols-outlined text-[20px] text-[color:var(--sl-fg-base)]">warning</span>
                 </div>
                 <div className="flex flex-col gap-1.5 min-w-0">
                   <h3 className="text-[16px] font-semibold text-[color:var(--sl-fg-base)] tracking-[-0.2px]">Não é possível criar a campanha</h3>
@@ -4767,8 +4767,8 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
               </div>
               <ul className="flex flex-col gap-2 pl-[52px]">
                 {submitErrors.map((err, i) => (
-                  <li key={i} className="flex items-start gap-2 text-sm text-[color:var(--sl-fg-muted)] leading-5">
-                    <span className="material-symbols-outlined text-[16px] text-[color:var(--sl-fg-critical)] mt-0.5 shrink-0">close</span>
+                  <li key={i} className="flex items-start gap-2 text-sm text-[color:var(--sl-fg-base)] leading-5">
+                    <span className="material-symbols-outlined text-[16px] text-[color:var(--sl-fg-base)] mt-0.5 shrink-0">close</span>
                     {err}
                   </li>
                 ))}
