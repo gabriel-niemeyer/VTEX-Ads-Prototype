@@ -32,7 +32,7 @@ export const ClassicToolbar: React.FC<ClassicToolbarProps> = ({
   onNewCampaign,
 }) => {
   return (
-    <div className="shrink-0 flex items-center justify-between px-4 sm:px-6 md:px-8 h-14 sm:h-[72px] md:h-[80px] bg-white relative">
+    <div className="shrink-0 flex items-center justify-end gap-0 py-4 px-4 sm:px-6 md:px-8 h-fit bg-white relative">
       {/* 1. Título — mesmo tamanho e posicionamento do Header antigo */}
       <div className="flex items-center gap-2 sm:gap-4 relative z-10 min-w-0">
         <h1 className="text-lg sm:text-xl md:text-[1.5rem] leading-tight font-semibold tracking-tight truncate text-[color:var(--sl-fg-base)]">

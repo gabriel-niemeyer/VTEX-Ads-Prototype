@@ -2130,11 +2130,12 @@ export const BudgetReportModal: React.FC<BudgetReportModalProps> = ({ campaign, 
             <button
               type="button"
               onClick={() => setIsInsightsOpen((open) => !open)}
-              className={`p-2 rounded-lg active:scale-95 transition-all duration-150 ease-out ${isInsightsOpen ? 'bg-[#eaf2ff] text-[color:var(--sl-fg-base-soft)]' : 'text-[color:var(--sl-fg-base-soft)] hover:bg-gray-100 hover:text-[color:var(--sl-fg-base)]'}`}
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg active:scale-95 transition-all duration-150 ease-out text-sm font-medium ${isInsightsOpen ? 'bg-[#eaf2ff] text-[color:var(--sl-fg-base-soft)]' : 'text-[color:var(--sl-fg-base-soft)] hover:bg-gray-100 hover:text-[color:var(--sl-fg-base)]'}`}
               aria-label="Gerar insights"
               title="Gerar insights"
             >
-              <span className="material-symbols-outlined">lightbulb</span>
+              <span className="material-symbols-outlined text-[18px]">lightbulb</span>
+              Gerar insights
             </button>
             <button
               type="button"
