@@ -1,0 +1,113 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#ffffff" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <title>Campaign Timeline</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Inter: swap = mostra texto e troca quando a fonte carregar -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <!-- Material Symbols: block = espera a fonte carregar antes de exibir (evita texto no lugar dos ícones no refresh) -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block" as="style" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block" rel="stylesheet" />
+    <style>
+      html {
+        touch-action: manipulation;
+      }
+      body {
+        font-family: 'Inter', sans-serif;
+        background-color: #fcfcfc;
+        margin: 0;
+        padding: 0;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        display: inline-block;
+        width: 1em;
+        height: 1em;
+        min-width: 1em;
+        min-height: 1em;
+        vertical-align: -0.15em;
+        /* Evita que o nome do ícone apareça se a fonte atrasar: esconde texto e usa fonte de ícones */
+        font-family: 'Material Symbols Outlined', sans-serif;
+        font-weight: 300;
+        overflow: hidden;
+      }
+      /* Skeleton: shimmer sutil para estados de carregamento (sem layout shift) */
+      @keyframes skeleton-shimmer {
+        0% { background-position: -200% 0; }
+        100% { background-position: 200% 0; }
+      }
+      .skeleton-shimmer {
+        background-image: linear-gradient(90deg, #f3f4f6 0%, #e5e7eb 50%, #f3f4f6 100%);
+        background-size: 200% 100%;
+        animation: skeleton-shimmer 1.5s ease-in-out infinite;
+      }
+      /* Custom scrollbar for a cleaner look */
+      ::-webkit-scrollbar {
+        height: 6px;
+        width: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #e2e8f0;
+        border-radius: 10px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #cbd5e1;
+      }
+      /* Safe area para notch e gesture bars (iOS/Android) */
+      .safe-top { padding-top: env(safe-area-inset-top, 0); }
+      .safe-bottom { padding-bottom: env(safe-area-inset-bottom, 0); }
+      .safe-left { padding-left: env(safe-area-inset-left, 0); }
+      .safe-right { padding-right: env(safe-area-inset-right, 0); }
+      /* Scroll suave em toque (iOS) */
+      .scroll-touch {
+        -webkit-overflow-scrolling: touch;
+      }
+      /* Evitar zoom em inputs no iOS (fonte >= 16px) */
+      @media screen and (max-width: 768px) {
+        input, select, textarea { font-size: 16px !important; }
+      }
+      @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(3px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+      @keyframes sparkleBreath {
+        0%, 100% { opacity: 0.4; transform: scale(0.95); }
+        50% { opacity: 1; transform: scale(1.05); }
+      }
+      @keyframes mediaFadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+      @keyframes modalSlideUp {
+        from { opacity: 0; transform: translate(-50%, 24px); }
+        to   { opacity: 1; transform: translate(-50%, 0); }
+      }
+      
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react": "https://esm.sh/react@^19.2.3"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body>
+    <div id="root"></div>
+  <script type="module" src="/index.tsx"></script>
+</body>
+</html>

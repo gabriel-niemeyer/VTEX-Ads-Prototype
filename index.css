@@ -1,0 +1,102 @@
+/* Estilos globais – fallbacks para mobile */
+.app-root {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+/* Remove atraso de 300ms no toque (iOS/Android) */
+html {
+  touch-action: manipulation;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Evita highlight azul no toque (opcional) */
+button, a, [role="button"] {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Modal em mobile: altura máxima com fallback para Safari antigo */
+.modal-max-height-mobile {
+  max-height: 100vh;
+  max-height: 100dvh;
+}
+
+/* Scrollbar: hidden by default, visible on hover */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+  transition: scrollbar-color 0.3s ease;
+}
+
+*:hover {
+  scrollbar-color: rgba(0, 0, 0, 0.1) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 3px;
+  transition: background 0.3s ease;
+}
+
+*:hover::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+*:hover::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.15);
+}
+
+/* Recharts: altura fixa para labels do eixo (evita corte de texto) */
+.recharts-cartesian-axis-tick-value tspan {
+  height: 37px;
+}
+
+/* Recharts XAxis TickItem rect: layout e espaçamento */
+.recharts-xAxis rect {
+  display: flex;
+  padding-top: 39px;
+}
+
+/* Recharts: SVG do gráfico usa altura fit-content em vez de 100% */
+.recharts-surface {
+  height: fit-content !important;
+}
+
+/* Budget report delight: entrada em sequência (respeita prefers-reduced-motion) */
+@keyframes budget-report-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.budget-report-content > .budget-report-section {
+  animation: budget-report-fade-in 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+.budget-report-content > .budget-report-section:nth-child(1) { animation-delay: 0.05s; }
+.budget-report-content > .budget-report-section:nth-child(2) { animation-delay: 0.12s; }
+.budget-report-content > .budget-report-section:nth-child(3) { animation-delay: 0.19s; }
+.budget-report-content > .budget-report-section:nth-child(4) { animation-delay: 0.26s; }
+.budget-report-content > .budget-report-section:nth-child(5) { animation-delay: 0.33s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .budget-report-content > .budget-report-section {
+    animation: none;
+  }
+}
