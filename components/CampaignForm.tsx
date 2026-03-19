@@ -4335,7 +4335,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
     const isEmpty = count === 0;
 
     return (
-      <div className="flex flex-col gap-10 w-full max-w-[740px]">
+      <div className="flex flex-col gap-10 w-full min-w-0 max-w-[740px]">
         <div className="flex flex-col gap-1">
           <h2 className="text-[24px] font-semibold text-[color:var(--sl-fg-base)] tracking-[-1px] leading-8">Plano de mídia</h2>
           <p className="text-sm text-[color:var(--sl-fg-base-soft)] tracking-[-0.14px]">Defina onde seus anúncios vão aparecer e como cada mídia será configurada.</p>
@@ -4430,22 +4430,21 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
               )}
             </div>
           ) : (
-            <div className="flex flex-col gap-3" style={{ animation: 'mediaFadeInUp 400ms ease-out both' }}>
+            <div className="flex flex-col gap-3 w-full min-w-0" style={{ animation: 'mediaFadeInUp 400ms ease-out both' }}>
               {formData.mediaTypes.map(mt => {
                 const meta = MEDIA_TYPE_META[mt] || { color: '#e0e0e0', icon: 'help', subtitle: '' };
                 const allocMode = mediaAllocMode[mt] || 'manual';
                 const isIntelligent = allocMode === 'intelligent';
                 const budget = mediaBudgets[mt] || 0;
-
                 return (
-                  <div key={mt} className="bg-white border border-[#e0e0e0] rounded-xl px-5 py-4 flex items-center gap-4 cursor-pointer hover:border-[#c2c2c2] hover:shadow-[0_1px_3px_rgba(0,0,0,0.06)] transition-all" onClick={() => openMediaDetail(mt)}>
+                  <div key={mt} className="bg-white border border-[#e0e0e0] rounded-xl px-5 py-4 w-full min-w-0 max-w-full flex items-center gap-3 sm:gap-4 cursor-pointer hover:border-[#c2c2c2] hover:shadow-[0_1px_3px_rgba(0,0,0,0.06)] transition-all box-border" onClick={() => openMediaDetail(mt)}>
                     {/* Icon */}
                     <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style={{ backgroundColor: meta.color }}>
                       <span className="material-symbols-outlined text-[20px] text-[color:var(--sl-fg-base)] opacity-60">{meta.icon}</span>
                     </div>
 
                     {/* Name + count */}
-                    <div className="flex flex-col min-w-0 w-[160px] shrink-0">
+                    <div className="flex flex-col min-w-0 w-[140px] sm:w-[160px] shrink-0">
                       <span className="text-sm font-medium text-[color:var(--sl-fg-base)] tracking-[-0.42px] truncate">{mt}</span>
                       <span className="text-xs text-[color:var(--sl-fg-base-soft)]">
                         {isBannerMedia(mt)
@@ -4457,43 +4456,41 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
                       </span>
                     </div>
 
-                    {/* Allocation */}
+                    {/* Allocation + lances: flex-1 min-w-0 evita o card ultrapassar a largura da coluna */}
                     <div className="flex flex-col min-w-0 flex-1">
                       <span className="text-xs text-[color:var(--sl-fg-base-soft)] mb-0.5">Investimento total</span>
                       {isIntelligent ? (
-                        <span className="text-sm font-medium text-[color:var(--sl-fg-base)]">Inteligente</span>
+                        <span className="text-sm font-medium text-[color:var(--sl-fg-base)] truncate">Inteligente</span>
                       ) : (
                         <CurrencyInput
                           value={budget}
                           onChange={(v) => setMediaBudgets(prev => ({ ...prev, [mt]: v }))}
                           placeholder="0,00"
-                          className="w-[100px] text-sm font-medium text-[color:var(--sl-fg-base)] bg-transparent outline-none border-b border-transparent hover:border-[#e0e0e0] focus:border-[#0366dd] transition-colors py-0.5"
+                          className="w-[100px] max-w-full text-sm font-medium text-[color:var(--sl-fg-base)] bg-transparent outline-none border-b border-transparent hover:border-[#e0e0e0] focus:border-[#0366dd] transition-colors py-0.5"
                         />
                       )}
                     </div>
 
-                    {/* CPC */}
                     {(meta.pricing === 'CPC' || mediaCpc[mt] !== undefined) && (
-                      <div className="flex flex-col min-w-0 shrink-0">
+                      <div className="flex flex-col min-w-0 shrink-0 w-[4.5rem]">
                         <span className="text-xs text-[color:var(--sl-fg-base-soft)] mb-0.5">CPC (BRL)</span>
                         <CurrencyInput
                           value={mediaCpc[mt] || 0}
                           onChange={(v) => setMediaCpc(prev => ({ ...prev, [mt]: v }))}
                           placeholder="0,00"
-                          className="w-[60px] text-sm font-medium text-[color:var(--sl-fg-base)] bg-transparent outline-none border-b border-transparent hover:border-[#e0e0e0] focus:border-[#0366dd] transition-colors py-0.5"
+                          className="w-full min-w-0 text-sm font-medium text-[color:var(--sl-fg-base)] bg-transparent outline-none border-b border-transparent hover:border-[#e0e0e0] focus:border-[#0366dd] transition-colors py-0.5"
                         />
                       </div>
                     )}
 
-                    {/* CPM */}
                     {(meta.pricing === 'CPM' || mediaCpm[mt] !== undefined) && (
-                      <div className="flex flex-col min-w-0 shrink-0">
+                      <div className="flex flex-col min-w-0 shrink-0 w-[4.5rem]">
                         <span className="text-xs text-[color:var(--sl-fg-base-soft)] mb-0.5">CPM (BRL)</span>
                         <CurrencyInput
                           value={mediaCpm[mt] || 0}
                           onChange={(v) => setMediaCpm(prev => ({ ...prev, [mt]: v }))}
                           placeholder="0,00"
-                          className="w-[60px] text-sm font-medium text-[color:var(--sl-fg-base)] bg-transparent outline-none border-b border-transparent hover:border-[#e0e0e0] focus:border-[#0366dd] transition-colors py-0.5"
+                          className="w-full min-w-0 text-sm font-medium text-[color:var(--sl-fg-base)] bg-transparent outline-none border-b border-transparent hover:border-[#e0e0e0] focus:border-[#0366dd] transition-colors py-0.5"
                         />
                       </div>
                     )}
@@ -4645,7 +4642,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
         {/* RIGHT PANEL */}
         <div className="flex-1 relative overflow-hidden">
           <div className="absolute inset-0 overflow-y-auto overflow-x-hidden pt-8 px-8" style={{ scrollbarGutter: 'stable' }}>
-            <div key={activeStep} className="w-full flex justify-center animate-[fadeInUp_400ms_ease-out]">
+            <div key={activeStep} className="w-full min-w-0 flex justify-center animate-[fadeInUp_400ms_ease-out]">
               {renderStepContent()}
             </div>
           </div>
