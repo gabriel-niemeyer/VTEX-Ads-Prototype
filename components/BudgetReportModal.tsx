@@ -636,11 +636,12 @@ interface BudgetReportModalProps {
 }
 
 const FADE_MS = 200;
-/** Duração da expansão/colapso do painel de insights (alinhar com `duration-[520ms]` nas classes abaixo). */
-const INSIGHTS_SIDEBAR_MS = 520;
+/** Duração da expansão/colapso do painel de insights (grid + painel). */
+const INSIGHTS_SIDEBAR_MS = 620;
+/** Curva suave, sem “salto” no fim — empurra o conteúdo principal de forma contínua. */
+const INSIGHTS_SIDEBAR_EASING = 'cubic-bezier(0.22, 1, 0.28, 1)';
 /** Conteúdo entra um pouco antes do fim do layout para a abertura parecer contínua, não em dois passos. */
 const INSIGHTS_SIDEBAR_CONTENT_DELAY_MS = Math.round(INSIGHTS_SIDEBAR_MS * 0.34);
-const INSIGHTS_SIDEBAR_EASE_CLASS = 'ease-[cubic-bezier(0.22,1,0.36,1)]';
 const INSIGHTS_SIDEBAR_DEFAULT_W = 400;
 const INSIGHTS_SIDEBAR_MIN_W = 280;
 const INSIGHTS_SIDEBAR_HANDLE_PX = 6;
@@ -720,9 +721,12 @@ export const BudgetReportModal: React.FC<BudgetReportModalProps> = ({ campaign, 
     setInsightsSidebarWidth(INSIGHTS_SIDEBAR_DEFAULT_W);
   }, [campaign.id]);
 
+  /** Sempre 3 trilhas (principal | handle | sidebar) para o navegador interpolar `grid-template-columns` sem troca de número de colunas. */
   const insightsGridTemplateColumns = useMemo(() => {
-    if (!isInsightsOpen) return 'minmax(0,1fr) 0px';
-    return `minmax(0,1fr) ${INSIGHTS_SIDEBAR_HANDLE_PX}px ${insightsSidebarWidth}px`;
+    if (!isInsightsOpen) {
+      return `minmax(0, 1fr) 0px 0px`;
+    }
+    return `minmax(0, 1fr) ${INSIGHTS_SIDEBAR_HANDLE_PX}px ${insightsSidebarWidth}px`;
   }, [isInsightsOpen, insightsSidebarWidth]);
 
   const clampInsightsSidebarWidth = useCallback((w: number) => {
@@ -2151,12 +2155,13 @@ export const BudgetReportModal: React.FC<BudgetReportModalProps> = ({ campaign, 
 
         <div
           ref={insightsLayoutRef}
-          className={`min-h-0 flex-1 grid overflow-hidden ${
-            isInsightsResizeDragging
-              ? ''
-              : `transition-[grid-template-columns] duration-[520ms] ${INSIGHTS_SIDEBAR_EASE_CLASS}`
-          }`}
-          style={{ gridTemplateColumns: insightsGridTemplateColumns }}
+          className="min-h-0 flex-1 grid overflow-hidden"
+          style={{
+            gridTemplateColumns: insightsGridTemplateColumns,
+            transition: isInsightsResizeDragging
+              ? undefined
+              : `grid-template-columns ${INSIGHTS_SIDEBAR_MS}ms ${INSIGHTS_SIDEBAR_EASING}`,
+          }}
         >
         <div
           ref={scrollRef}
@@ -2388,39 +2393,45 @@ export const BudgetReportModal: React.FC<BudgetReportModalProps> = ({ campaign, 
           <div className="h-8" aria-hidden />
         </div>
         </div>
-        {isInsightsOpen && (
-          <div
-            role="separator"
-            aria-orientation="vertical"
-            aria-label="Redimensionar painel de oportunidades"
-            aria-valuemin={INSIGHTS_SIDEBAR_MIN_W}
-            aria-valuemax={2000}
-            aria-valuenow={Math.round(insightsSidebarWidth)}
-            tabIndex={0}
-            className={`relative z-[1] shrink-0 border-r border-[#e0e0e0] bg-white touch-none select-none outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#0366dd]/35 ${
-              isInsightsResizeDragging ? 'bg-[#f0f6ff]' : 'hover:bg-[#f8fafc]'
-            } cursor-col-resize`}
-            style={{ width: INSIGHTS_SIDEBAR_HANDLE_PX }}
-            onPointerDown={onInsightsResizePointerDown}
-            onPointerMove={onInsightsResizePointerMove}
-            onPointerUp={endInsightsResize}
-            onPointerCancel={endInsightsResize}
-            onLostPointerCapture={() => {
-              insightsResizeDragRef.current = null;
-              setIsInsightsResizeDragging(false);
-            }}
-            onKeyDown={onInsightsResizeKeyDown}
-          />
-        )}
+        <div
+          role="separator"
+          aria-hidden={!isInsightsOpen}
+          aria-orientation="vertical"
+          aria-label="Redimensionar painel de oportunidades"
+          aria-valuemin={INSIGHTS_SIDEBAR_MIN_W}
+          aria-valuemax={2000}
+          aria-valuenow={Math.round(insightsSidebarWidth)}
+          tabIndex={isInsightsOpen ? 0 : -1}
+          className={`relative z-[1] shrink-0 bg-white touch-none select-none outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#0366dd]/35 ${
+            isInsightsOpen ? 'border-r border-[#e0e0e0]' : 'border-0 pointer-events-none'
+          } ${isInsightsResizeDragging ? 'bg-[#f0f6ff]' : isInsightsOpen ? 'hover:bg-[#f8fafc] cursor-col-resize' : 'cursor-default'}`}
+          style={{ width: INSIGHTS_SIDEBAR_HANDLE_PX }}
+          onPointerDown={onInsightsResizePointerDown}
+          onPointerMove={onInsightsResizePointerMove}
+          onPointerUp={endInsightsResize}
+          onPointerCancel={endInsightsResize}
+          onLostPointerCapture={() => {
+            insightsResizeDragRef.current = null;
+            setIsInsightsResizeDragging(false);
+          }}
+          onKeyDown={onInsightsResizeKeyDown}
+        />
         <aside
-          className={`min-w-0 overflow-hidden bg-white transition-opacity duration-[520ms] ${INSIGHTS_SIDEBAR_EASE_CLASS} ${isInsightsOpen ? 'opacity-100' : 'opacity-0'}`}
+          className={`min-w-0 overflow-hidden bg-white ${isInsightsOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+          style={{
+            transitionProperty: 'opacity, transform',
+            transitionDuration: `${INSIGHTS_SIDEBAR_MS}ms`,
+            transitionTimingFunction: INSIGHTS_SIDEBAR_EASING,
+            transform: isInsightsOpen ? 'translateX(0)' : 'translateX(10px)',
+          }}
         >
-          <div
-            className={`flex h-full min-h-0 flex-col overflow-y-auto bg-white custom-scrollbar transition-transform duration-[520ms] ${INSIGHTS_SIDEBAR_EASE_CLASS} ${isInsightsOpen ? 'translate-x-0' : 'translate-x-3'}`}
-          >
+          <div className="flex h-full min-h-0 flex-col overflow-y-auto bg-white custom-scrollbar">
             <div
               aria-hidden={!isInsightsContentVisible}
-              className={`transition-opacity duration-[380ms] ${INSIGHTS_SIDEBAR_EASE_CLASS} ${isInsightsContentVisible ? 'opacity-100' : 'pointer-events-none opacity-0'}`}
+              className={isInsightsContentVisible ? 'opacity-100' : 'pointer-events-none opacity-0'}
+              style={{
+                transition: `opacity ${Math.round(INSIGHTS_SIDEBAR_MS * 0.62)}ms ${INSIGHTS_SIDEBAR_EASING}`,
+              }}
             >
               <div className="px-5 pt-6 pb-0 bg-white">
                 <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-[#f1f5f9] text-[#414651] text-[12px] font-medium tracking-[-0.11px]">
