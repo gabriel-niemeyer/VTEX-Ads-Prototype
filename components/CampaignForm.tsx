@@ -2715,7 +2715,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({ campaign, allCampaig
               <div className="flex gap-3 items-start p-4 rounded-xl bg-[#f1f8fd] border border-[#cbe9ff]">
                 <span className="material-symbols-outlined text-[20px] text-[#0366dd] shrink-0 mt-0.5" aria-hidden>info</span>
                 <p className="text-[14px] font-medium text-[#1f1f1f] tracking-[-0.14px] leading-5">
-                  O investimento diário pode variar ao longo da campanha para otimizar os resultados, podendo não corresponder exatamente à média definida. Ao final, o sistema busca manter o gasto dentro do orçamento planejado.
+                  O investimento diário pode variar ao longo da campanha e não corresponder exatamente à média definida. Ao final, o gasto se mantém dentro do orçamento planejado.
                 </p>
               </div>
             )}
