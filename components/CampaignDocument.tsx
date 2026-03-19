@@ -614,7 +614,7 @@ export const CampaignDocument: React.FC<CampaignDocumentProps> = ({
                       />
                     </div>
                   ) : (
-                    <span className="text-sm leading-5 tracking-[-0.14px] text-[color:var(--sl-fg-base)] font-medium">{products.length} SKU{products.length !== 1 ? 's' : ''}</span>
+                    <span className="text-sm leading-5 tracking-[-0.14px] text-[color:var(--sl-fg-base-soft)] font-normal">{products.length} SKU{products.length !== 1 ? 's' : ''}</span>
                   )}
                 </div>
                 <div className="flex items-center gap-1 relative shrink-0">
@@ -877,11 +877,11 @@ export const CampaignDocument: React.FC<CampaignDocumentProps> = ({
           </div>
 
           {/* ── Plano de mídia ── */}
-          <div id="doc-section-plano-midia" className="flex flex-col px-10 py-10">
-            <div className="w-full max-w-[800px] mx-auto pl-[106px]">
+          <div id="doc-section-plano-midia" className="flex flex-col px-10 py-10 min-w-0">
+            <div className="w-full min-w-0 max-w-[800px] mx-auto pl-[106px]">
               <h2 className="font-semibold text-[20px] leading-7 tracking-[-0.8px] text-[color:var(--sl-fg-base)] mb-[24px]">Plano de mídia</h2>
               <div className="flex items-center justify-between h-12 mb-1">
-                <span className="text-sm leading-5 tracking-[-0.14px] text-[color:var(--sl-fg-base)] font-medium">Mídias</span>
+                <span className="text-sm leading-5 tracking-[-0.14px] text-[color:var(--sl-fg-base-soft)] font-normal">Mídias</span>
                 <div className="relative">
                   <SmallIconBtn icon="add" size={15} onClick={() => setShowMediaMenu(!showMediaMenu)} />
                   {showMediaMenu && (
@@ -924,7 +924,7 @@ export const CampaignDocument: React.FC<CampaignDocumentProps> = ({
                   )}
                 </div>
               </div>
-              <div className="flex flex-col gap-0">
+              <div className="flex flex-col gap-0 w-full min-w-0">
                 {mediaTypes.map((mt) => (
                   <MediaRow
                     key={mt}
@@ -1473,7 +1473,7 @@ const EditableMoneyCell: React.FC<{
   onChange: (v: number) => void;
   suffix?: string;
   decimals?: number;
-  size?: 'sm' | 'md';
+  size?: 'sm' | 'md' | 'compact' | 'compactAllocation';
   ariaLabel?: string;
 }> = ({ value, onChange, suffix = '', decimals = 2, size = 'sm', ariaLabel = 'Valor monetário' }) => {
   const [editing, setEditing] = useState(false);
@@ -1483,6 +1483,10 @@ const EditableMoneyCell: React.FC<{
   const cellShape =
     size === 'md'
       ? 'min-w-[12rem] rounded-md px-1.5 py-0.5 whitespace-nowrap tabular-nums w-max max-w-full [field-sizing:content]'
+      : size === 'compactAllocation'
+      ? 'min-w-0 w-full max-w-[5.25rem] rounded-md px-1 py-0.5 whitespace-nowrap tabular-nums text-xs leading-4 [field-sizing:content]'
+      : size === 'compact'
+      ? 'min-w-0 w-full max-w-[4.75rem] rounded-md px-1 py-0.5 whitespace-nowrap tabular-nums text-xs leading-4 [field-sizing:content]'
       : 'min-w-[6.5rem] rounded-md px-1.5 py-0.5 whitespace-nowrap tabular-nums w-max max-w-full [field-sizing:content]';
 
   const commit = () => {
@@ -1545,7 +1549,13 @@ const EditableMoneyCell: React.FC<{
   };
 
   return (
-    <div className="flex flex-col justify-center w-max max-w-full shrink-0">
+    <div
+      className={`flex flex-col justify-center shrink-0 ${
+        size === 'compact' || size === 'compactAllocation'
+          ? `w-full min-w-0 ${size === 'compactAllocation' ? 'max-w-[5.25rem]' : 'max-w-[4.75rem]'}`
+          : 'w-max max-w-full'
+      }`}
+    >
       {editing ? (
         <input
           ref={inputRef}
@@ -1618,14 +1628,14 @@ const MediaRow: React.FC<{
   const stop = (e: React.MouseEvent) => e.stopPropagation();
 
   return (
-    <div className="flex items-center justify-center py-1">
+    <div className="flex items-center justify-center py-1 w-full min-w-0">
       <div
         onClick={onOpenDetail}
-        className={`flex items-center gap-3 flex-1 rounded-xl border pl-4 pr-2.5 py-4 group transition-colors ${onOpenDetail ? 'cursor-pointer hover:bg-black/[0.02]' : ''}`}
+        className={`flex items-center gap-3 flex-1 min-w-0 max-w-full rounded-xl border pl-4 pr-2.5 py-4 group transition-colors box-border ${onOpenDetail ? 'cursor-pointer hover:bg-black/[0.02]' : ''}`}
         style={{ borderColor: 'rgba(0,0,0,0.1)', boxShadow: '0 1px 1px rgba(0,0,0,0.08)' }}
       >
-        <div className="flex items-center gap-3 flex-1 min-w-0">
-          <div className="flex items-center gap-3 w-[240px] shrink-0">
+        <div className="flex items-center gap-3 flex-1 min-w-0 max-w-full">
+          <div className="flex items-center gap-3 w-[240px] shrink-0 min-w-0">
             <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style={{ background: style.bg }}>
               <span className="material-symbols-outlined text-[20px] text-[color:var(--sl-fg-base)]/60">{style.icon}</span>
             </div>
@@ -1634,51 +1644,77 @@ const MediaRow: React.FC<{
               <span className="text-xs leading-4 text-[color:var(--sl-fg-base-soft)]">{descText}</span>
             </div>
           </div>
-          <div className="flex items-center gap-10 shrink-0 min-w-0" onClick={stop}>
-            <div className="flex flex-col justify-center shrink-0 whitespace-nowrap">
+          {/* Grid fixo: alocação alinhada à esquerda em todas as linhas; CPC/CPM com mesma largura */}
+          <div
+            className="grid flex-1 min-w-0 grid-cols-[minmax(0,1fr)_4.75rem_4.75rem] gap-x-2 sm:gap-x-3 items-start"
+            onClick={stop}
+          >
+            <div className="flex flex-col justify-center min-w-0 items-start text-left">
               <span className="text-xs leading-4 text-[color:var(--sl-fg-base-soft)]">Alocação total</span>
               {canEdit && onAllocationChange ? (
                 <EditableMoneyCell
                   value={allocation}
                   onChange={onAllocationChange}
                   suffix="BRL"
-                  size="md"
+                  size="compactAllocation"
                   ariaLabel={`Alocação total em reais, ${labels.name}`}
                 />
               ) : (
-                <span className="text-sm leading-5 tracking-[-0.14px] text-[color:var(--sl-fg-base)] tabular-nums">{fmtMoney(allocation)}</span>
+                <span className="text-xs leading-4 tracking-[-0.14px] text-[color:var(--sl-fg-base)] tabular-nums max-w-[5.25rem] truncate">
+                  {fmtMoney(allocation)}
+                </span>
               )}
             </div>
-            {bid && labels.bidLabel && (
-              <div className="flex flex-col justify-center shrink-0 whitespace-nowrap">
-                <span className="text-xs leading-4 text-[color:var(--sl-fg-base-soft)]">{labels.bidLabel}</span>
-                {canEdit && onBidChange ? (
-                  <EditableMoneyCell
-                    value={bid.currentBid}
-                    onChange={(v) => onBidChange({ currentBid: v })}
-                    suffix="BRL"
-                    ariaLabel={`${labels.bidLabel} em reais, ${labels.name}`}
-                  />
-                ) : (
-                  <span className="text-sm leading-5 tracking-[-0.14px] text-[color:var(--sl-fg-base)] tabular-nums">{formatBr(bid.currentBid)} BRL</span>
-                )}
-              </div>
-            )}
-            {bid && showSecondBid && (
-              <div className="flex flex-col justify-center shrink-0 whitespace-nowrap">
-                <span className="text-xs leading-4 text-[color:var(--sl-fg-base-soft)]">CPM</span>
-                {canEdit && onBidChange ? (
-                  <EditableMoneyCell
-                    value={bid.suggestedBid}
-                    onChange={(v) => onBidChange({ suggestedBid: v })}
-                    suffix="BRL"
-                    ariaLabel={`CPM em reais, ${labels.name}`}
-                  />
-                ) : (
-                  <span className="text-sm leading-5 tracking-[-0.14px] text-[color:var(--sl-fg-base)] tabular-nums">{formatBr(bid.suggestedBid)} BRL</span>
-                )}
-              </div>
-            )}
+            <div className="w-[4.75rem] min-w-[4.75rem] max-w-[4.75rem] flex flex-col justify-center items-start">
+              {bid && labels.bidLabel ? (
+                <>
+                  <span className="text-xs leading-4 text-[color:var(--sl-fg-base-soft)] truncate w-full">{labels.bidLabel}</span>
+                  {canEdit && onBidChange ? (
+                    <EditableMoneyCell
+                      value={bid.currentBid}
+                      onChange={(v) => onBidChange({ currentBid: v })}
+                      suffix="BRL"
+                      size="compact"
+                      ariaLabel={`${labels.bidLabel} em reais, ${labels.name}`}
+                    />
+                  ) : (
+                    <span className="text-xs leading-4 tracking-[-0.14px] text-[color:var(--sl-fg-base)] tabular-nums max-w-[4.75rem] truncate">
+                      {formatBr(bid.currentBid)} BRL
+                    </span>
+                  )}
+                </>
+              ) : (
+                <div className="min-h-[2.75rem] w-full flex flex-col justify-end" aria-hidden>
+                  <span className="invisible text-xs leading-4 select-none">CPM</span>
+                  <span className="invisible text-xs tabular-nums">0</span>
+                </div>
+              )}
+            </div>
+            <div className="w-[4.75rem] min-w-[4.75rem] max-w-[4.75rem] flex flex-col justify-center items-start">
+              {bid && showSecondBid ? (
+                <>
+                  <span className="text-xs leading-4 text-[color:var(--sl-fg-base-soft)]">CPM</span>
+                  {canEdit && onBidChange ? (
+                    <EditableMoneyCell
+                      value={bid.suggestedBid}
+                      onChange={(v) => onBidChange({ suggestedBid: v })}
+                      suffix="BRL"
+                      size="compact"
+                      ariaLabel={`CPM em reais, ${labels.name}`}
+                    />
+                  ) : (
+                    <span className="text-xs leading-4 tracking-[-0.14px] text-[color:var(--sl-fg-base)] tabular-nums max-w-[4.75rem] truncate">
+                      {formatBr(bid.suggestedBid)} BRL
+                    </span>
+                  )}
+                </>
+              ) : (
+                <div className="min-h-[2.75rem] w-full flex flex-col justify-end" aria-hidden>
+                  <span className="invisible text-xs leading-4 select-none">CPM</span>
+                  <span className="invisible text-xs tabular-nums">0</span>
+                </div>
+              )}
+            </div>
           </div>
         </div>
         <div className="relative shrink-0" onClick={stop} ref={menuRef}>
