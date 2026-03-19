@@ -47,14 +47,14 @@ const FilterSection: React.FC<FilterSectionProps> = ({
         onClick={onToggle}
         className="w-full flex items-center justify-between px-4 sm:px-8 py-4 min-h-[48px] hover:bg-gray-50 active:bg-gray-100 transition-colors group select-none outline-none touch-manipulation"
       >
-        <h3 className="text-base font-medium text-gray-900 transition-colors">
+        <h3 className="text-base font-medium text-[color:var(--sl-fg-base)] transition-colors">
           {title}
         </h3>
         <div className="flex items-center gap-3">
-          <span className="text-sm font-normal text-[#707070] max-w-[120px] truncate">
+          <span className="text-sm font-normal text-[color:var(--sl-fg-base-soft)] max-w-[120px] truncate">
             {selectedValue}
           </span>
-          <span className={`material-symbols-outlined text-gray-400 transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${isExpanded ? 'rotate-180' : ''}`}>
+          <span className={`material-symbols-outlined text-[color:var(--sl-fg-base-muted)] transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${isExpanded ? 'rotate-180' : ''}`}>
             expand_more
           </span>
         </div>
@@ -165,27 +165,27 @@ export const FilterDrawer: React.FC<FilterDrawerProps> = ({
       case 'Ativo':
         return {
           icon: 'play_circle',
-          selectedClasses: 'bg-green-50 border-green-200 text-green-700',
-          iconColor: 'text-green-600'
+          selectedClasses: 'bg-green-50 border-green-200 text-[color:var(--sl-fg-base)]',
+          iconColor: 'text-[color:var(--sl-fg-base-soft)]'
         };
       case 'Concluído':
         return {
           icon: 'check_circle',
-          selectedClasses: 'bg-blue-50 border-blue-200 text-blue-700',
-          iconColor: 'text-blue-600'
+          selectedClasses: 'bg-blue-50 border-blue-200 text-[color:var(--sl-fg-base-soft)]',
+          iconColor: 'text-[color:var(--sl-fg-base-soft)]'
         };
       case 'Rascunho':
         return {
           icon: 'edit_document',
-          selectedClasses: 'bg-gray-100 border-gray-300 text-gray-700',
-          iconColor: 'text-gray-500'
+          selectedClasses: 'bg-gray-100 border-gray-300 text-[color:var(--sl-fg-base)]',
+          iconColor: 'text-[color:var(--sl-fg-base-soft)]'
         };
       case 'Todos':
       default:
         return {
           icon: 'apps',
-          selectedClasses: 'bg-gray-100 border-gray-300 text-gray-900',
-          iconColor: 'text-gray-900'
+          selectedClasses: 'bg-gray-100 border-gray-300 text-[color:var(--sl-fg-base)]',
+          iconColor: 'text-[color:var(--sl-fg-base)]'
         };
     }
   };
@@ -214,8 +214,8 @@ export const FilterDrawer: React.FC<FilterDrawerProps> = ({
       default:
         return {
           icon: 'tune',
-          selectedClasses: 'bg-gray-100 border-gray-300 text-gray-900',
-          iconColor: 'text-gray-900'
+          selectedClasses: 'bg-gray-100 border-gray-300 text-[color:var(--sl-fg-base)]',
+          iconColor: 'text-[color:var(--sl-fg-base)]'
         };
     }
   };
@@ -225,27 +225,27 @@ export const FilterDrawer: React.FC<FilterDrawerProps> = ({
       case 'Forte':
         return {
           icon: 'trending_up',
-          selectedClasses: 'bg-green-50 border-green-200 text-green-700',
-          iconColor: 'text-green-600'
+          selectedClasses: 'bg-green-50 border-green-200 text-[color:var(--sl-fg-base)]',
+          iconColor: 'text-[color:var(--sl-fg-base-soft)]'
         };
       case 'Intermediário':
         return {
           icon: 'remove',
-          selectedClasses: 'bg-yellow-50 border-yellow-200 text-yellow-700',
-          iconColor: 'text-yellow-600'
+          selectedClasses: 'bg-yellow-50 border-yellow-200 text-[color:var(--sl-fg-base)]',
+          iconColor: 'text-[color:var(--sl-fg-base-soft)]'
         };
       case 'Fraco':
         return {
           icon: 'trending_down',
-          selectedClasses: 'bg-red-50 border-red-200 text-red-700',
-          iconColor: 'text-red-600'
+          selectedClasses: 'bg-red-50 border-red-200 text-[color:var(--sl-fg-base)]',
+          iconColor: 'text-[color:var(--sl-fg-base-soft)]'
         };
       case 'Todas':
       default:
         return {
           icon: 'apps',
-          selectedClasses: 'bg-gray-100 border-gray-300 text-gray-900',
-          iconColor: 'text-gray-900'
+          selectedClasses: 'bg-gray-100 border-gray-300 text-[color:var(--sl-fg-base)]',
+          iconColor: 'text-[color:var(--sl-fg-base)]'
         };
     }
   };
@@ -269,11 +269,11 @@ export const FilterDrawer: React.FC<FilterDrawerProps> = ({
         <div className={`flex items-center justify-between px-4 sm:pl-8 sm:pr-5 py-4 h-14 sm:h-16 border-b shrink-0 bg-white transition-colors duration-200 ${
           isScrolled ? 'border-gray-100' : 'border-transparent'
         }`}>
-          <h2 className="text-[24px] leading-tight font-semibold tracking-[-0.875px] text-[#1f1f1f]" style={{ fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, sans-serif' }}>Filtros</h2>
+          <h2 className="text-[24px] leading-tight font-semibold tracking-[-0.875px] text-[color:var(--sl-fg-base)]" style={{ fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, sans-serif' }}>Filtros</h2>
           <button 
             type="button"
             onClick={onClose}
-            className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors touch-manipulation -mr-1"
+            className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl hover:bg-gray-100 text-[color:var(--sl-fg-base-muted)] hover:text-[color:var(--sl-fg-base-soft)] transition-colors touch-manipulation -mr-1"
             aria-label="Fechar filtros"
           >
             <span className="material-symbols-outlined text-[24px]">close</span>
@@ -307,11 +307,11 @@ export const FilterDrawer: React.FC<FilterDrawerProps> = ({
                       flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium border transition-all duration-200 outline-none select-none
                       ${isSelected 
                         ? config.selectedClasses 
-                        : 'bg-white border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50'
+                        : 'bg-white border-gray-200 text-[color:var(--sl-fg-base-soft)] hover:border-gray-300 hover:bg-gray-50'
                       }
                     `}
                   >
-                    <span className={`material-symbols-outlined text-[18px] ${isSelected ? config.iconColor : 'text-gray-400'}`}>
+                    <span className={`material-symbols-outlined text-[18px] ${isSelected ? config.iconColor : 'text-[color:var(--sl-fg-base-muted)]'}`}>
                       {config.icon}
                     </span>
                     <span>{status}</span>
@@ -341,11 +341,11 @@ export const FilterDrawer: React.FC<FilterDrawerProps> = ({
                       flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium border transition-all duration-200 outline-none select-none
                       ${isSelected 
                         ? config.selectedClasses 
-                        : 'bg-white border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50'
+                        : 'bg-white border-gray-200 text-[color:var(--sl-fg-base-soft)] hover:border-gray-300 hover:bg-gray-50'
                       }
                     `}
                   >
-                    <span className={`material-symbols-outlined text-[18px] ${isSelected ? config.iconColor : 'text-gray-400'}`}>
+                    <span className={`material-symbols-outlined text-[18px] ${isSelected ? config.iconColor : 'text-[color:var(--sl-fg-base-muted)]'}`}>
                       {config.icon}
                     </span>
                     <span>{strength}</span>
@@ -374,11 +374,11 @@ export const FilterDrawer: React.FC<FilterDrawerProps> = ({
                       flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium border transition-all duration-200 outline-none select-none
                       ${isSelected
                         ? config.selectedClasses
-                        : 'bg-white border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50'
+                        : 'bg-white border-gray-200 text-[color:var(--sl-fg-base-soft)] hover:border-gray-300 hover:bg-gray-50'
                       }
                     `}
                   >
-                    <span className={`material-symbols-outlined text-[18px] ${isSelected ? config.iconColor : 'text-gray-400'}`}>
+                    <span className={`material-symbols-outlined text-[18px] ${isSelected ? config.iconColor : 'text-[color:var(--sl-fg-base-muted)]'}`}>
                       {config.icon}
                     </span>
                     <span>{pace}</span>
@@ -398,13 +398,13 @@ export const FilterDrawer: React.FC<FilterDrawerProps> = ({
             {/* Publisher Search - Added mx-3 to align edges with title text and radio circle */}
             <div className="relative mb-3 mx-3">
               {/* Changed left-3 to left-2.5 to optically align icon center with radio button center */}
-              <span className="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 text-[20px]">search</span>
+              <span className="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-[color:var(--sl-fg-base-muted)] text-[20px]">search</span>
               <input 
                 type="text" 
                 placeholder="Buscar publisher..." 
                 value={publisherSearch}
                 onChange={(e) => setPublisherSearch(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all placeholder:text-gray-400"
+                className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all placeholder:text-[color:var(--sl-fg-base-muted)]"
               />
             </div>
 
@@ -427,13 +427,13 @@ export const FilterDrawer: React.FC<FilterDrawerProps> = ({
                     }`}>
                       {selectedPublisher === pub && <div className="w-2 h-2 rounded-full bg-blue-600" />}
                     </div>
-                    <span className="text-[14px] text-gray-700">
+                    <span className="text-[14px] text-[color:var(--sl-fg-base)]">
                       {pub}
                     </span>
                   </label>
                 ))
               ) : (
-                <div className="text-center py-4 text-gray-400 text-sm">
+                <div className="text-center py-4 text-[color:var(--sl-fg-base-muted)] text-sm">
                   Nenhum publisher encontrado
                 </div>
               )}
@@ -458,12 +458,12 @@ export const FilterDrawer: React.FC<FilterDrawerProps> = ({
                     className={`
                       flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium border transition-all duration-200 outline-none select-none
                       ${isSelected 
-                        ? 'bg-blue-50 border-blue-200 text-blue-700' 
-                        : 'bg-white border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50'
+                        ? 'bg-blue-50 border-blue-200 text-[color:var(--sl-fg-base-soft)]' 
+                        : 'bg-white border-gray-200 text-[color:var(--sl-fg-base-soft)] hover:border-gray-300 hover:bg-gray-50'
                       }
                     `}
                   >
-                    <span className={`material-symbols-outlined text-[18px] ${isSelected ? 'text-blue-600' : 'text-gray-400'}`}>
+                    <span className={`material-symbols-outlined text-[18px] ${isSelected ? 'text-[color:var(--sl-fg-base-soft)]' : 'text-[color:var(--sl-fg-base-muted)]'}`}>
                       {getMediaIcon(type)}
                     </span>
                     <span>{type}</span>
@@ -482,7 +482,7 @@ export const FilterDrawer: React.FC<FilterDrawerProps> = ({
               onReset();
               setPublisherSearch('');
             }}
-            className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-800 transition-colors flex items-center gap-2"
+            className="px-4 py-2 text-sm font-medium text-[color:var(--sl-fg-base-soft)] hover:text-[color:var(--sl-fg-base)] transition-colors flex items-center gap-2"
           >
             <span className="material-symbols-outlined text-[18px]">restart_alt</span>
             Limpar filtros

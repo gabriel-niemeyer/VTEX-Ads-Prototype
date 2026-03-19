@@ -507,10 +507,10 @@ export const Timeline: React.FC<TimelineProps> = ({
                   <div
                     className={`sticky left-0 top-0 h-full flex items-center px-4 bg-white gap-1 ${isCurrentMonth ? 'z-20' : 'z-10'}`}
                   >
-                     <span className={`text-[13px] font-normal whitespace-nowrap ${isCurrentMonth ? 'text-gray-900 font-medium' : 'text-gray-700'}`}>
+                     <span className={`text-[13px] font-normal whitespace-nowrap ${isCurrentMonth ? 'text-[color:var(--sl-fg-base)] font-medium' : 'text-[color:var(--sl-fg-base)]'}`}>
                         {columnWidth < 24 ? month.name.substring(0, 3) : month.name}
                      </span>
-                     <span className="text-[13px] font-normal text-gray-400 whitespace-nowrap">
+                     <span className="text-[13px] font-normal text-[color:var(--sl-fg-base-muted)] whitespace-nowrap">
                         {month.year}
                      </span>
                   </div>
@@ -526,7 +526,7 @@ export const Timeline: React.FC<TimelineProps> = ({
               return (
                 <div 
                   key={`day-${idx}`} 
-                  className={`flex items-center justify-center text-[10px] font-medium relative ${isToday ? 'text-blue-700 bg-blue-50/50' : 'text-gray-500'}`} 
+                  className={`flex items-center justify-center text-[10px] font-medium relative ${isToday ? 'text-[color:var(--sl-fg-base-soft)] bg-blue-50/50' : 'text-[color:var(--sl-fg-base-soft)]'}`} 
                   style={{ width: `${columnWidth}px` }}
                 >
                   {day.dayNumber}
@@ -611,15 +611,15 @@ export const Timeline: React.FC<TimelineProps> = ({
                             <LazyImage src={c.products?.[0]?.imageUrl || c.imageUrl} className="w-full h-full object-contain" alt={c.title} />
                           </div>
                           {showTitle && <div className="ml-3 flex-1 min-w-0 pointer-events-none">
-                            <h3 className="text-sm font-medium text-gray-900 truncate leading-tight">{c.title || 'Nova Campanha'}</h3>
-                            <p className="text-xs text-gray-500 mt-0.5 truncate">{c.publisher || 'Sem publisher'}</p>
+                            <h3 className="text-sm font-medium text-[color:var(--sl-fg-base)] truncate leading-tight">{c.title || 'Nova Campanha'}</h3>
+                            <p className="text-xs text-[color:var(--sl-fg-base-soft)] mt-0.5 truncate">{c.publisher || 'Sem publisher'}</p>
                           </div>}
                         </div>
                       </div>
                     </div>
                   </React.Fragment>
                 );
-              }) : <div className="absolute top-20 left-10 text-gray-400 italic text-sm">Nenhuma campanha encontrada com esse nome.</div>}
+              }) : <div className="absolute top-20 left-10 text-[color:var(--sl-fg-base-muted)] italic text-sm">Nenhuma campanha encontrada com esse nome.</div>}
             </div>
           </div>
         </div>
@@ -649,7 +649,7 @@ export const Timeline: React.FC<TimelineProps> = ({
             <button
               onClick={handleZoomOut}
               disabled={columnWidth <= zoomLevels[0]}
-              className="min-w-[40px] min-h-[40px] sm:w-8 sm:h-8 flex items-center justify-center text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all disabled:opacity-30 touch-manipulation"
+              className="min-w-[40px] min-h-[40px] sm:w-8 sm:h-8 flex items-center justify-center text-[color:var(--sl-fg-base-soft)] hover:text-[color:var(--sl-fg-base)] hover:bg-gray-100 rounded-lg transition-all disabled:opacity-30 touch-manipulation"
               title="Diminuir Zoom"
             >
               <span className="material-symbols-outlined text-[20px]">remove</span>
@@ -660,13 +660,13 @@ export const Timeline: React.FC<TimelineProps> = ({
               className="min-w-[40px] min-h-[40px] sm:min-w-0 sm:min-h-0 sm:h-8 px-2 flex items-center justify-center hover:bg-gray-100 rounded-lg transition-all touch-manipulation"
               title="Resetar"
             >
-              <span className="text-xs font-medium text-gray-700 tabular-nums">{zoomPercentage}%</span>
+              <span className="text-xs font-medium text-[color:var(--sl-fg-base)] tabular-nums">{zoomPercentage}%</span>
             </button>
             <div className="w-px h-4 bg-gray-200 mx-0.5" />
             <button
               onClick={handleZoomIn}
               disabled={columnWidth >= zoomLevels[zoomLevels.length - 1]}
-              className="min-w-[40px] min-h-[40px] sm:w-8 sm:h-8 flex items-center justify-center text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all disabled:opacity-30 touch-manipulation"
+              className="min-w-[40px] min-h-[40px] sm:w-8 sm:h-8 flex items-center justify-center text-[color:var(--sl-fg-base-soft)] hover:text-[color:var(--sl-fg-base)] hover:bg-gray-100 rounded-lg transition-all disabled:opacity-30 touch-manipulation"
               title="Aumentar Zoom"
             >
               <span className="material-symbols-outlined text-[20px]">add</span>
@@ -682,7 +682,7 @@ export const Timeline: React.FC<TimelineProps> = ({
             <button
               type="button"
               onClick={() => scrollToCard('left')}
-              className="absolute top-1/2 -translate-y-1/2 left-2 sm:left-5 z-[60] min-w-[44px] min-h-[44px] w-11 h-11 flex items-center justify-center rounded-full bg-white/90 backdrop-blur-sm border border-gray-200/80 text-gray-500 shadow-md hover:bg-white hover:text-gray-700 active:scale-95 transition-colors touch-manipulation"
+              className="absolute top-1/2 -translate-y-1/2 left-2 sm:left-5 z-[60] min-w-[44px] min-h-[44px] w-11 h-11 flex items-center justify-center rounded-full bg-white/90 backdrop-blur-sm border border-gray-200/80 text-[color:var(--sl-fg-base-soft)] shadow-md hover:bg-white hover:text-[color:var(--sl-fg-base)] active:scale-95 transition-colors touch-manipulation"
               title="Ir para o card à esquerda"
             >
               <span className="material-symbols-outlined text-[22px]">arrow_back</span>
@@ -692,7 +692,7 @@ export const Timeline: React.FC<TimelineProps> = ({
             <button
               type="button"
               onClick={() => scrollToCard('right')}
-              className="absolute top-1/2 -translate-y-1/2 right-2 sm:right-5 z-[60] min-w-[44px] min-h-[44px] w-11 h-11 flex items-center justify-center rounded-full bg-white/90 backdrop-blur-sm border border-gray-200/80 text-gray-500 shadow-md hover:bg-white hover:text-gray-700 active:scale-95 transition-colors touch-manipulation"
+              className="absolute top-1/2 -translate-y-1/2 right-2 sm:right-5 z-[60] min-w-[44px] min-h-[44px] w-11 h-11 flex items-center justify-center rounded-full bg-white/90 backdrop-blur-sm border border-gray-200/80 text-[color:var(--sl-fg-base-soft)] shadow-md hover:bg-white hover:text-[color:var(--sl-fg-base)] active:scale-95 transition-colors touch-manipulation"
               title="Ir para o card à direita"
             >
               <span className="material-symbols-outlined text-[22px]">arrow_forward</span>

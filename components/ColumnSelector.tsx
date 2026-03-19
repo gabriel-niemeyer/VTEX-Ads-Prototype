@@ -130,7 +130,7 @@ export const ColumnSelector: React.FC<ColumnSelectorProps> = ({
     >
           {/* Header aligned with padding of list items */}
           <div className="px-4 py-3 border-b border-gray-50 bg-white">
-            <h3 className="text-[13px] font-medium text-gray-700">Organizar colunas</h3>
+            <h3 className="text-[13px] font-medium text-[color:var(--sl-fg-base)]">Organizar colunas</h3>
           </div>
           
           <div className="p-1 space-y-0.5 max-h-[320px] overflow-y-auto flex-1 custom-scrollbar">
@@ -182,18 +182,18 @@ export const ColumnSelector: React.FC<ColumnSelectorProps> = ({
                   </div>
 
                   {/* 2. Label - Middle - Font size 13px */}
-                  <span className={`text-[13px] flex-1 truncate ${isVisible ? 'text-gray-900 font-medium' : 'text-gray-500'}`}>
+                  <span className={`text-[13px] flex-1 truncate ${isVisible ? 'text-[color:var(--sl-fg-base)] font-medium' : 'text-[color:var(--sl-fg-base-soft)]'}`}>
                     {col.label}
                   </span>
 
                   {/* 3. Lock or Drag Handle - RIGHT side */}
                   {isLocked ? (
-                    <span className="text-gray-300 shrink-0" title="Coluna fixa">
+                    <span className="text-[color:var(--sl-fg-base-muted)] shrink-0" title="Coluna fixa">
                       <span className="material-symbols-outlined text-[16px]">lock</span>
                     </span>
                   ) : (
                     // Added cursor-grab and darken text color
-                    <span className={`text-gray-400 shrink-0 transition-opacity duration-200 cursor-grab active:cursor-grabbing ${isDragging ? 'opacity-0' : 'opacity-0 group-hover:opacity-100'}`}>
+                    <span className={`text-[color:var(--sl-fg-base-muted)] shrink-0 transition-opacity duration-200 cursor-grab active:cursor-grabbing ${isDragging ? 'opacity-0' : 'opacity-0 group-hover:opacity-100'}`}>
                       <span className="material-symbols-outlined text-[20px]">drag_indicator</span>
                     </span>
                   )}
@@ -208,7 +208,7 @@ export const ColumnSelector: React.FC<ColumnSelectorProps> = ({
                 onReset();
                 setIsMenuOpen(false);
               }}
-              className="w-full flex items-center justify-center gap-2 px-3 py-2 text-[12px] font-medium text-gray-500 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors"
+              className="w-full flex items-center justify-center gap-2 px-3 py-2 text-[12px] font-medium text-[color:var(--sl-fg-base-soft)] hover:text-[color:var(--sl-fg-base)] hover:bg-gray-50 rounded-lg transition-colors"
             >
               <span className="material-symbols-outlined text-[16px]">restart_alt</span>
               Restaurar padrão
@@ -224,7 +224,7 @@ export const ColumnSelector: React.FC<ColumnSelectorProps> = ({
           <button
             ref={triggerRef}
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className={`min-w-[44px] min-h-[44px] w-11 h-11 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center transition-all active:scale-95 touch-manipulation ${isMenuOpen ? 'bg-blue-50 text-blue-600' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'}`}
+            className={`min-w-[44px] min-h-[44px] w-11 h-11 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center transition-all active:scale-95 touch-manipulation ${isMenuOpen ? 'bg-blue-50 text-[color:var(--sl-fg-base-soft)]' : 'text-[color:var(--sl-fg-base-soft)] hover:text-[color:var(--sl-fg-base)] hover:bg-gray-100'}`}
           >
             <span className="material-symbols-outlined">view_column</span>
           </button>

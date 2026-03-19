@@ -43,7 +43,7 @@ export const GlobalTopbar: React.FC<GlobalTopbarProps> = ({
       <div className="flex flex-1 min-w-0 gap-2 items-center">
         <button
           type="button"
-          className="shrink-0 w-9 h-9 flex items-center justify-center rounded-lg text-gray-600 hover:bg-black/5 hover:text-gray-900 transition-colors"
+          className="shrink-0 w-9 h-9 flex items-center justify-center rounded-lg text-[color:var(--sl-fg-base-soft)] hover:bg-black/5 hover:text-[color:var(--sl-fg-base)] transition-colors"
           aria-label="Abrir menu"
         >
           <span className="material-symbols-outlined text-[20px]">menu</span>
@@ -51,7 +51,7 @@ export const GlobalTopbar: React.FC<GlobalTopbarProps> = ({
         <div className="shrink-0 w-9 h-9 rounded-lg flex items-center justify-center overflow-hidden" aria-hidden>
           <img src="/LogoVTEX.svg" alt="VTEX" className="w-9 h-9 object-contain" width={36} height={36} />
         </div>
-        <span className="text-sm font-medium text-[#1f1f1f] tracking-[-0.14px] truncate">
+        <span className="text-sm font-medium text-[color:var(--sl-fg-base)] tracking-[-0.14px] truncate">
           {accountName}
         </span>
       </div>
@@ -67,7 +67,7 @@ export const GlobalTopbar: React.FC<GlobalTopbarProps> = ({
           placeholder="Buscar no Apple Brasil"
           value={searchTerm}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="flex-1 min-w-0 bg-transparent border-none outline-none text-sm font-medium text-[#1f1f1f] placeholder:text-[#3d3d3d] tracking-[-0.14px]"
+          className="flex-1 min-w-0 bg-transparent border-none outline-none text-sm font-medium text-[color:var(--sl-fg-base)] placeholder:text-[#3d3d3d] tracking-[-0.14px]"
         />
       </div>
 
@@ -75,7 +75,7 @@ export const GlobalTopbar: React.FC<GlobalTopbarProps> = ({
         {rightSlot}
         <div className="shrink-0 w-9 h-9 flex items-center justify-center rounded-lg" aria-hidden>
           <div className="w-6 h-6 rounded-full bg-[#cbe9ff] flex items-center justify-center">
-            <span className="text-sm font-semibold text-[#0366dd]">N</span>
+            <span className="text-sm font-semibold text-[color:var(--sl-fg-base-soft)]">N</span>
           </div>
         </div>
       </div>

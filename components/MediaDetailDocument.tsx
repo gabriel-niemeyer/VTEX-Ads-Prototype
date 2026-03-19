@@ -128,17 +128,17 @@ function EditableMoneyField({
           onKeyDown={handleKeyDown}
           onPaste={handlePaste}
           onBlur={commit}
-          className="font-medium text-[14px] leading-5 text-[#1f1f1f] tracking-[-0.14px] bg-blue-50/60 border border-blue-200 rounded-lg px-2 py-1 outline-none w-full max-w-[160px]"
+          className="font-medium text-[14px] leading-5 text-[color:var(--sl-fg-base)] tracking-[-0.14px] bg-blue-50/60 border border-blue-200 rounded-lg px-2 py-1 outline-none w-full max-w-[160px]"
           autoFocus
         />
       ) : (
         <button
           type="button"
           onClick={startEditing}
-          className="font-medium text-[14px] leading-5 text-[#1f1f1f] tracking-[-0.14px] hover:bg-black/[0.04] rounded px-1 py-0.5 -ml-1 transition-colors cursor-text text-left"
+          className="font-medium text-[14px] leading-5 text-[color:var(--sl-fg-base)] tracking-[-0.14px] hover:bg-black/[0.04] rounded px-1 py-0.5 -ml-1 transition-colors cursor-text text-left"
         >
-          <span className="text-[#1f1f1f]">{formatBr(value)}</span>
-          <span className="text-[#707070]"> BRL</span>
+          <span className="text-[color:var(--sl-fg-base)]">{formatBr(value)}</span>
+          <span className="text-[color:var(--sl-fg-base-soft)]"> BRL</span>
         </button>
       )}
     </div>
@@ -193,20 +193,20 @@ export const MediaDetailDocument: React.FC<MediaDetailDocumentProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="w-11 h-11 flex items-center justify-center rounded-lg hover:bg-black/5 text-gray-600 shrink-0"
+            className="w-11 h-11 flex items-center justify-center rounded-lg hover:bg-black/5 text-[color:var(--sl-fg-base-soft)] shrink-0"
           >
             <span className="material-symbols-outlined text-[20px]">arrow_back</span>
           </button>
         </div>
         <div className="flex flex-1 gap-2 items-center justify-end min-w-0">
-          <p className="text-[11px] text-[#707070] tracking-[-0.33px] whitespace-nowrap shrink-0 px-2">
+          <p className="text-[11px] text-[color:var(--sl-fg-base-soft)] tracking-[-0.33px] whitespace-nowrap shrink-0 px-2">
             Salvo agora há pouco
           </p>
           <div className="w-6 h-6 rounded-full bg-gray-300 shrink-0" />
-          <button type="button" className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-black/5 text-gray-500 shrink-0">
+          <button type="button" className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-black/5 text-[color:var(--sl-fg-base-soft)] shrink-0">
             <span className="material-symbols-outlined text-[18px]">history</span>
           </button>
-          <button type="button" className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-black/5 text-gray-500 shrink-0 -rotate-90">
+          <button type="button" className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-black/5 text-[color:var(--sl-fg-base-soft)] shrink-0 -rotate-90">
             <span className="material-symbols-outlined text-[18px]">more_vert</span>
           </button>
         </div>
@@ -221,7 +221,7 @@ export const MediaDetailDocument: React.FC<MediaDetailDocumentProps> = ({
               className="w-14 h-14 rounded-xl shrink-0"
               style={{ background: style.bg }}
             />
-            <h1 className="font-semibold text-[32px] leading-8 tracking-[-1.28px] text-[#1f1f1f]">
+            <h1 className="font-semibold text-[32px] leading-8 tracking-[-1.28px] text-[color:var(--sl-fg-base)]">
               {labels.name}
             </h1>
           </div>
@@ -229,7 +229,7 @@ export const MediaDetailDocument: React.FC<MediaDetailDocumentProps> = ({
             {/* Alocação — label 14px #707070, value inline edit + BRL */}
             <div className="flex gap-1 h-8 items-center w-full">
               <div className="flex gap-2 h-full items-center w-40 shrink-0">
-                <p className="text-[14px] leading-5 tracking-[-0.14px] text-[#707070]">Alocação</p>
+                <p className="text-[14px] leading-5 tracking-[-0.14px] text-[color:var(--sl-fg-base-soft)]">Alocação</p>
               </div>
               <div className="flex flex-1 items-center min-w-0">
                 <EditableMoneyField value={allocation} onChange={onAllocationChange} />
@@ -239,8 +239,8 @@ export const MediaDetailDocument: React.FC<MediaDetailDocumentProps> = ({
             {labels.bidLabel === 'CPM' && bid && (
               <div className="flex gap-1 h-8 items-center w-full">
                 <div className="flex gap-2 h-full items-center w-40 shrink-0">
-                  <span className="material-symbols-outlined text-[20px] text-[#707070]">gavel</span>
-                  <p className="text-[14px] leading-5 tracking-[-0.14px] text-[#707070]">CPM</p>
+                  <span className="material-symbols-outlined text-[20px] text-[color:var(--sl-fg-base-soft)]">gavel</span>
+                  <p className="text-[14px] leading-5 tracking-[-0.14px] text-[color:var(--sl-fg-base-soft)]">CPM</p>
                 </div>
                 <div className="flex flex-1 items-center min-w-0">
                   <EditableMoneyField
@@ -254,8 +254,8 @@ export const MediaDetailDocument: React.FC<MediaDetailDocumentProps> = ({
             {labels.bidLabel === 'CPC' && bid && (
               <div className="flex gap-1 h-8 items-center w-full">
                 <div className="flex gap-2 h-full items-center w-40 shrink-0">
-                  <span className="material-symbols-outlined text-[20px] text-[#707070]">gavel</span>
-                  <p className="text-[14px] leading-5 tracking-[-0.14px] text-[#707070]">CPC</p>
+                  <span className="material-symbols-outlined text-[20px] text-[color:var(--sl-fg-base-soft)]">gavel</span>
+                  <p className="text-[14px] leading-5 tracking-[-0.14px] text-[color:var(--sl-fg-base-soft)]">CPC</p>
                 </div>
                 <div className="flex flex-1 items-center min-w-0">
                   <EditableMoneyField
@@ -268,8 +268,8 @@ export const MediaDetailDocument: React.FC<MediaDetailDocumentProps> = ({
             {showSecondBid && bid && (
               <div className="flex gap-1 h-8 items-center w-full">
                 <div className="flex gap-2 h-full items-center w-40 shrink-0">
-                  <span className="material-symbols-outlined text-[20px] text-[#707070]">gavel</span>
-                  <p className="text-[14px] leading-5 tracking-[-0.14px] text-[#707070]">CPM</p>
+                  <span className="material-symbols-outlined text-[20px] text-[color:var(--sl-fg-base-soft)]">gavel</span>
+                  <p className="text-[14px] leading-5 tracking-[-0.14px] text-[color:var(--sl-fg-base-soft)]">CPM</p>
                 </div>
                 <div className="flex flex-1 items-center min-w-0">
                   <EditableMoneyField
@@ -285,7 +285,7 @@ export const MediaDetailDocument: React.FC<MediaDetailDocumentProps> = ({
         {/* Section — pt-7, título "Banner", cards gap 8px */}
         <div className="pt-6 pb-4 max-w-[800px] w-full flex flex-col gap-4">
           <div className="pb-2">
-            <h2 className="font-semibold text-[20px] leading-7 tracking-[-0.8px] text-[#1f1f1f]">
+            <h2 className="font-semibold text-[20px] leading-7 tracking-[-0.8px] text-[color:var(--sl-fg-base)]">
               {sectionTitle}
             </h2>
           </div>
@@ -298,19 +298,19 @@ export const MediaDetailDocument: React.FC<MediaDetailDocumentProps> = ({
                   className="border border-black/[0.06] rounded-xl p-4 flex flex-col gap-2.5"
                 >
                   <div className="flex font-medium text-[12px] leading-normal tracking-[-0.36px] justify-between w-full items-center">
-                    <p className="text-black">{slot.label}</p>
+                    <p className="text-[color:var(--sl-fg-base)]">{slot.label}</p>
                     <div className="flex items-center gap-2">
                       {uploaded && (
                         <button
                           type="button"
                           onClick={() => removeUpload(i)}
-                          className="text-[#707070] hover:text-red-500 transition-colors flex items-center gap-0.5"
+                          className="text-[color:var(--sl-fg-base-soft)] hover:text-[color:var(--sl-fg-base-soft)] transition-colors flex items-center gap-0.5"
                         >
                           <span className="material-symbols-outlined text-[14px]">delete</span>
                           <span className="text-[11px]">Remover</span>
                         </button>
                       )}
-                      <p className="text-[#707070] text-right">{slot.dimensions}</p>
+                      <p className="text-[color:var(--sl-fg-base-soft)] text-right">{slot.dimensions}</p>
                     </div>
                   </div>
                   {uploaded ? (
@@ -335,8 +335,8 @@ export const MediaDetailDocument: React.FC<MediaDetailDocumentProps> = ({
                     </label>
                   ) : (
                     <label className="bg-[#fafafa] h-[120px] rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-gray-100/80 transition-colors gap-1.5 border border-dashed border-transparent hover:border-gray-300">
-                      <span className="material-symbols-outlined text-[24px] text-[#b0b0b0]">cloud_upload</span>
-                      <span className="text-[12px] text-[#999]">Clique para enviar</span>
+                      <span className="material-symbols-outlined text-[24px] text-[color:var(--sl-fg-base-muted)]">cloud_upload</span>
+                      <span className="text-[12px] text-[color:var(--sl-fg-base-muted)]">Clique para enviar</span>
                       <input
                         type="file"
                         accept="image/*,video/*"

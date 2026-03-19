@@ -101,7 +101,7 @@ export const Header: React.FC<HeaderProps> = ({
       
       {/* 1. Title */}
       <div className="flex items-center gap-2 sm:gap-4 relative z-10 min-w-0">
-        <h1 className="text-lg sm:text-xl md:text-[1.5rem] leading-tight font-semibold tracking-tight truncate text-gray-900">
+        <h1 className="text-lg sm:text-xl md:text-[1.5rem] leading-tight font-semibold tracking-tight truncate text-[color:var(--sl-fg-base)]">
           Campanhas
         </h1>
       </div>
@@ -120,7 +120,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               onClick={() => onViewModeChange('list')}
               className={`relative z-10 w-10 h-10 min-w-[40px] min-h-[40px] rounded-lg sm:rounded-[10px] flex items-center justify-center transition-colors duration-200 touch-manipulation ${
-                viewMode === 'list' ? 'text-gray-900' : 'text-gray-400 hover:text-gray-600 active:bg-gray-200/70'
+                viewMode === 'list' ? 'text-[color:var(--sl-fg-base)]' : 'text-[color:var(--sl-fg-base-muted)] hover:text-[color:var(--sl-fg-base-soft)] active:bg-gray-200/70'
               }`}
             >
               <span className="material-symbols-outlined text-[22px] sm:text-[20px]">format_list_bulleted</span>
@@ -130,7 +130,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               onClick={() => onViewModeChange('timeline')}
               className={`relative z-10 w-10 h-10 min-w-[40px] min-h-[40px] rounded-lg sm:rounded-[10px] flex items-center justify-center transition-colors duration-200 touch-manipulation ${
-                viewMode === 'timeline' ? 'text-gray-900' : 'text-gray-400 hover:text-gray-600 active:bg-gray-200/70'
+                viewMode === 'timeline' ? 'text-[color:var(--sl-fg-base)]' : 'text-[color:var(--sl-fg-base-muted)] hover:text-[color:var(--sl-fg-base-soft)] active:bg-gray-200/70'
               }`}
             >
               <span className="material-symbols-outlined text-[22px] sm:text-[20px]">view_timeline</span>
@@ -140,7 +140,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               onClick={() => onViewModeChange('performance')}
               className={`relative z-10 w-10 h-10 min-w-[40px] min-h-[40px] rounded-lg sm:rounded-[10px] flex items-center justify-center transition-colors duration-200 touch-manipulation ${
-                viewMode === 'performance' ? 'text-gray-900' : 'text-gray-400 hover:text-gray-600 active:bg-gray-200/70'
+                viewMode === 'performance' ? 'text-[color:var(--sl-fg-base)]' : 'text-[color:var(--sl-fg-base-muted)] hover:text-[color:var(--sl-fg-base-soft)] active:bg-gray-200/70'
               }`}
             >
               <span className="material-symbols-outlined text-[22px] sm:text-[20px]">analytics</span>
@@ -160,7 +160,7 @@ export const Header: React.FC<HeaderProps> = ({
               : 'min-w-[44px] min-h-[44px] w-11 h-11 bg-transparent hover:bg-gray-100 active:scale-95 cursor-pointer'
           }`}
         >
-          <div className={`absolute left-0 top-0 h-full flex items-center justify-center shrink-0 z-10 pointer-events-none transition-all duration-300 ${isSearching ? 'w-11 text-blue-600' : 'w-11 text-gray-500 group-hover:text-gray-900'}`}>
+          <div className={`absolute left-0 top-0 h-full flex items-center justify-center shrink-0 z-10 pointer-events-none transition-all duration-300 ${isSearching ? 'w-11 text-[color:var(--sl-fg-base-soft)]' : 'w-11 text-[color:var(--sl-fg-base-soft)] group-hover:text-[color:var(--sl-fg-base)]'}`}>
              <span className="material-symbols-outlined text-[22px] sm:text-[24px]">search</span>
           </div>
           <input
@@ -169,7 +169,7 @@ export const Header: React.FC<HeaderProps> = ({
             placeholder="Buscar campanhas..."
             value={searchTerm}
             onChange={(e) => onSearchChange(e.target.value)}
-            className={`w-full h-full bg-transparent border-none outline-none text-base sm:text-[14px] text-gray-900 placeholder-gray-400 pl-11 pr-12 ${springTransition} ${
+            className={`w-full h-full bg-transparent border-none outline-none text-base sm:text-[14px] text-[color:var(--sl-fg-base)] placeholder-gray-400 pl-11 pr-12 ${springTransition} ${
               isSearching ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4 pointer-events-none'
             }`}
           />
@@ -178,7 +178,7 @@ export const Header: React.FC<HeaderProps> = ({
           {isSearching && hasResults && (
             <div className="absolute right-10 top-1/2 -translate-y-1/2 pointer-events-none hidden sm:flex items-center">
               <span className={`text-[11px] font-semibold tabular-nums px-1.5 py-0.5 rounded-md ${
-                resultCount === 0 ? 'text-red-500 bg-red-50' : 'text-[#707070] bg-gray-100'
+                resultCount === 0 ? 'text-[color:var(--sl-fg-base-soft)] bg-red-50' : 'text-[color:var(--sl-fg-base-soft)] bg-gray-100'
               }`}>
                 {resultCount === 0 ? 'Sem resultados' : `${resultCount} de ${totalCount}`}
               </span>
@@ -188,7 +188,7 @@ export const Header: React.FC<HeaderProps> = ({
           {/* Keyboard hint */}
           {isSearching && !searchTerm && (
             <div className="absolute right-10 top-1/2 -translate-y-1/2 pointer-events-none transition-opacity duration-300 hidden sm:block opacity-100">
-               <span className="flex items-center justify-center w-5 h-5 text-[10px] font-bold text-gray-400 bg-gray-50 border border-gray-200 rounded-[4px]">/</span>
+               <span className="flex items-center justify-center w-5 h-5 text-[10px] font-bold text-[color:var(--sl-fg-base-muted)] bg-gray-50 border border-gray-200 rounded-[4px]">/</span>
             </div>
           )}
 
@@ -196,7 +196,7 @@ export const Header: React.FC<HeaderProps> = ({
           {isSearching && searchTerm && (
             <button 
               onClick={clearSearch}
-              className="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 min-w-8 min-h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-all duration-200 z-20 touch-manipulation"
+              className="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 min-w-8 min-h-8 flex items-center justify-center rounded-lg text-[color:var(--sl-fg-base-muted)] hover:text-[color:var(--sl-fg-base-soft)] hover:bg-gray-100 transition-all duration-200 z-20 touch-manipulation"
             >
               <span className="material-symbols-outlined text-[18px]">close</span>
             </button>
@@ -204,7 +204,7 @@ export const Header: React.FC<HeaderProps> = ({
           {isSearching && !searchTerm && (
             <button 
               onClick={closeSearch}
-              className="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 min-w-8 min-h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-all duration-200 z-20 touch-manipulation"
+              className="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 min-w-8 min-h-8 flex items-center justify-center rounded-lg text-[color:var(--sl-fg-base-muted)] hover:text-[color:var(--sl-fg-base-soft)] hover:bg-gray-100 transition-all duration-200 z-20 touch-manipulation"
             >
               <span className="material-symbols-outlined text-[18px]">close</span>
             </button>
@@ -227,7 +227,7 @@ export const Header: React.FC<HeaderProps> = ({
         <Tooltip text="Nova Campanha (N)" position="bottom">
           <button 
             onClick={onNewCampaign}
-            className="min-w-[44px] min-h-[44px] w-11 h-11 sm:w-10 sm:h-10 flex items-center justify-center bg-gray-100 text-gray-900 rounded-xl hover:bg-gray-200 active:scale-95 transition-all touch-manipulation ml-0.5 sm:ml-2"
+            className="min-w-[44px] min-h-[44px] w-11 h-11 sm:w-10 sm:h-10 flex items-center justify-center bg-gray-100 text-[color:var(--sl-fg-base)] rounded-xl hover:bg-gray-200 active:scale-95 transition-all touch-manipulation ml-0.5 sm:ml-2"
           >
             <span className="material-symbols-outlined font-normal text-[22px] sm:text-[24px]">add</span>
           </button>

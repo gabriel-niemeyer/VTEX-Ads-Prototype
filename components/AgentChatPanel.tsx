@@ -37,7 +37,7 @@ export const AgentChatPanel: React.FC<AgentChatPanelProps> = ({ messages, isThin
               className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
             >
               <div
-                className={`max-w-[520px] px-4 py-2 rounded-2xl text-sm text-gray-900 leading-[1.56] ${
+                className={`max-w-[520px] px-4 py-2 rounded-2xl text-sm text-[color:var(--sl-fg-base)] leading-[1.56] ${
                   msg.role === 'user' ? 'bg-[#ecf0f5]' : 'bg-gray-100'
                 }`}
               >
@@ -52,14 +52,14 @@ export const AgentChatPanel: React.FC<AgentChatPanelProps> = ({ messages, isThin
                 <span className="w-2 h-2 rounded-full bg-gray-400 animate-bounce [animation-delay:150ms]" />
                 <span className="w-2 h-2 rounded-full bg-gray-400 animate-bounce [animation-delay:300ms]" />
               </div>
-              <span className="text-base text-gray-500">Pensando...</span>
+              <span className="text-base text-[color:var(--sl-fg-base-soft)]">Pensando...</span>
             </div>
           )}
         </div>
       </div>
       <div className="shrink-0 px-6 pb-4">
         <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-full pl-3 pr-2 py-2 shadow-sm max-w-[620px] mx-auto">
-          <button type="button" className="w-7 h-7 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors" aria-label="Anexar">
+          <button type="button" className="w-7 h-7 rounded-full flex items-center justify-center text-[color:var(--sl-fg-base-soft)] hover:bg-gray-100 transition-colors" aria-label="Anexar">
             <span className="material-symbols-outlined text-[18px]">add</span>
           </button>
           <input
@@ -73,7 +73,7 @@ export const AgentChatPanel: React.FC<AgentChatPanelProps> = ({ messages, isThin
               }
             }}
             placeholder="Fale com o agente"
-            className="flex-1 min-w-0 bg-transparent text-[15px] text-gray-900 placeholder:text-gray-500 outline-none px-2 py-2.5"
+            className="flex-1 min-w-0 bg-transparent text-[15px] text-[color:var(--sl-fg-base)] placeholder:text-[color:var(--sl-fg-base-soft)] outline-none px-2 py-2.5"
           />
           <button
             type="button"

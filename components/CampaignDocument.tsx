@@ -452,30 +452,30 @@ export const CampaignDocument: React.FC<CampaignDocumentProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-black/5 text-[#707070] transition-colors shrink-0"
+            className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-black/5 text-[color:var(--sl-fg-base-soft)] transition-colors shrink-0"
           >
             <span className="material-symbols-outlined text-[18px]">arrow_back</span>
           </button>
-          <span className="font-semibold text-[20px] tracking-[-0.45px] text-[#171717] truncate">{title}</span>
+          <span className="font-semibold text-[20px] tracking-[-0.45px] text-[color:var(--sl-fg-base)] truncate">{title}</span>
         </div>
         <div className="flex items-center gap-2 shrink-0">
           <div className="flex items-center justify-center px-2">
-            <span className="text-[11px] tracking-[-0.33px] text-[#707070] whitespace-nowrap">Salvo agora há pouco</span>
+            <span className="text-[11px] tracking-[-0.33px] text-[color:var(--sl-fg-base-soft)] whitespace-nowrap">Salvo agora há pouco</span>
           </div>
           <div className="w-6 h-6 rounded-full bg-gradient-to-br from-blue-300 to-blue-500 shrink-0" />
-          <button type="button" className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-black/5 text-[#707070] transition-colors">
+          <button type="button" className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-black/5 text-[color:var(--sl-fg-base-soft)] transition-colors">
             <span className="material-symbols-outlined text-[16px]">history</span>
           </button>
           <button
             type="button"
-            className="inline-flex items-center gap-0.5 h-7 min-w-[56px] px-2 rounded-lg text-[11px] font-semibold tracking-[-0.22px] text-[#171717] border border-[#e5e5e5] bg-[#f5f5f5] hover:bg-[#ebebeb] transition-colors shadow-[0_1px_1px_rgba(0,0,0,0.11)]"
+            className="inline-flex items-center gap-0.5 h-7 min-w-[56px] px-2 rounded-lg text-[11px] font-semibold tracking-[-0.22px] text-[color:var(--sl-fg-base)] border border-[#e5e5e5] bg-[#f5f5f5] hover:bg-[#ebebeb] transition-colors shadow-[0_1px_1px_rgba(0,0,0,0.11)]"
           >
             {status.label}
             <span className="material-symbols-outlined text-[12px]">expand_more</span>
           </button>
           <button
             type="button"
-            className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-black/5 text-[#707070] transition-colors"
+            className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-black/5 text-[color:var(--sl-fg-base-soft)] transition-colors"
           >
             <span className="material-symbols-outlined text-[16px]">more_horiz</span>
           </button>
@@ -492,14 +492,14 @@ export const CampaignDocument: React.FC<CampaignDocumentProps> = ({
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full font-semibold text-[32px] leading-8 tracking-[-1.28px] text-[#1f1f1f] bg-transparent border-none outline-none placeholder:text-gray-300 cursor-text rounded-lg px-3 -mx-3 py-1 -my-1 transition-colors hover:bg-gray-100"
+                className="w-full font-semibold text-[32px] leading-8 tracking-[-1.28px] text-[color:var(--sl-fg-base)] bg-transparent border-none outline-none placeholder:text-[color:var(--sl-fg-base-muted)] cursor-text rounded-lg px-3 -mx-3 py-1 -my-1 transition-colors hover:bg-gray-100"
                 placeholder="Nome da campanha"
               />
             </div>
             <div className="w-full max-w-[800px] mx-auto pl-[106px] flex flex-col gap-[8px]">
               {/* PI */}
               <PropertyRow label="PI">
-                <span className="text-sm leading-5 tracking-[-0.14px] text-[#1f1f1f]">↗ {piLabel}</span>
+                <span className="text-sm leading-5 tracking-[-0.14px] text-[color:var(--sl-fg-base)]">↗ {piLabel}</span>
               </PropertyRow>
 
               {/* Alocação (funil) */}
@@ -520,7 +520,7 @@ export const CampaignDocument: React.FC<CampaignDocumentProps> = ({
                   <div className="w-5 h-5 rounded-full bg-black flex items-center justify-center shrink-0">
                     <span className="text-white text-[10px] font-bold"></span>
                   </div>
-                  <span className="text-sm leading-5 tracking-[-0.14px] text-[#1f1f1f]">Apple</span>
+                  <span className="text-sm leading-5 tracking-[-0.14px] text-[color:var(--sl-fg-base)]">Apple</span>
                 </div>
               </PropertyRow>
 
@@ -534,15 +534,15 @@ export const CampaignDocument: React.FC<CampaignDocumentProps> = ({
                       onClick={() => setPublishers((prev) => prev.filter((p) => p !== pub))}
                       className="inline-flex items-center gap-1.5 pl-2 pr-2.5 py-1 rounded-lg bg-[#f8f8f8] hover:bg-[#efefef] transition-colors"
                     >
-                      <span className="text-sm leading-5 tracking-[-0.14px] text-[#1f1f1f] whitespace-nowrap">{pub}</span>
-                      <span className="material-symbols-outlined text-[12px] text-gray-400">close</span>
+                      <span className="text-sm leading-5 tracking-[-0.14px] text-[color:var(--sl-fg-base)] whitespace-nowrap">{pub}</span>
+                      <span className="material-symbols-outlined text-[12px] text-[color:var(--sl-fg-base-muted)]">close</span>
                     </button>
                   ))}
                   <div className="relative">
                     <button
                       type="button"
                       onClick={() => setShowPublisherMenu(!showPublisherMenu)}
-                      className="w-6 h-6 flex items-center justify-center rounded-md hover:bg-black/5 text-[#707070] transition-colors border border-dashed border-gray-300"
+                      className="w-6 h-6 flex items-center justify-center rounded-md hover:bg-black/5 text-[color:var(--sl-fg-base-soft)] transition-colors border border-dashed border-gray-300"
                     >
                       <span className="material-symbols-outlined text-[14px]">add</span>
                     </button>
@@ -553,7 +553,7 @@ export const CampaignDocument: React.FC<CampaignDocumentProps> = ({
                             key={pub}
                             type="button"
                             onClick={() => { setPublishers((prev) => [...prev, pub]); setShowPublisherMenu(false); }}
-                            className="w-full text-left px-3 py-2 text-sm text-[#1f1f1f] hover:bg-black/[0.04] transition-colors"
+                            className="w-full text-left px-3 py-2 text-sm text-[color:var(--sl-fg-base)] hover:bg-black/[0.04] transition-colors"
                           >
                             {pub}
                           </button>
@@ -591,12 +591,12 @@ export const CampaignDocument: React.FC<CampaignDocumentProps> = ({
           {/* ── Produtos ── */}
           <div id="doc-section-produtos" className="flex flex-col px-10 py-10">
             <div className="w-full max-w-[800px] mx-auto pl-[106px]">
-              <h2 className="font-semibold text-[20px] leading-7 tracking-[-0.8px] text-[#1f1f1f] pb-2">Produtos</h2>
+              <h2 className="font-semibold text-[20px] leading-7 tracking-[-0.8px] text-[color:var(--sl-fg-base)] pb-2">Produtos</h2>
               <div className="flex items-center justify-between h-10 mb-1 gap-2">
                 <div className="flex items-center gap-2 flex-1 min-w-0">
                   {showProductSearch ? (
                     <div className="flex items-center gap-2 flex-1 min-w-0">
-                      <span className="material-symbols-outlined text-[16px] text-[#999] shrink-0">search</span>
+                      <span className="material-symbols-outlined text-[16px] text-[color:var(--sl-fg-base-muted)] shrink-0">search</span>
                       <input
                         ref={productSearchRef}
                         type="text"
@@ -610,11 +610,11 @@ export const CampaignDocument: React.FC<CampaignDocumentProps> = ({
                           }
                         }}
                         placeholder="Buscar por nome ou SKU..."
-                        className="flex-1 min-w-0 text-sm bg-transparent border-none outline-none text-[#1f1f1f] placeholder:text-[#bbb]"
+                        className="flex-1 min-w-0 text-sm bg-transparent border-none outline-none text-[color:var(--sl-fg-base)] placeholder:text-[color:var(--sl-fg-base-muted)]"
                       />
                     </div>
                   ) : (
-                    <span className="text-sm leading-5 tracking-[-0.14px] text-[#1f1f1f] font-medium">{products.length} SKU{products.length !== 1 ? 's' : ''}</span>
+                    <span className="text-sm leading-5 tracking-[-0.14px] text-[color:var(--sl-fg-base)] font-medium">{products.length} SKU{products.length !== 1 ? 's' : ''}</span>
                   )}
                 </div>
                 <div className="flex items-center gap-1 relative shrink-0">
@@ -630,7 +630,7 @@ export const CampaignDocument: React.FC<CampaignDocumentProps> = ({
                         setTimeout(() => productSearchRef.current?.focus(), 50);
                       }
                     }}
-                    className="min-w-8 min-h-8 w-8 h-8 flex items-center justify-center rounded-lg text-[#707070] hover:text-[#1f1f1f] hover:bg-[#f0f0f0] transition-colors"
+                    className="min-w-8 min-h-8 w-8 h-8 flex items-center justify-center rounded-lg text-[color:var(--sl-fg-base-soft)] hover:text-[color:var(--sl-fg-base)] hover:bg-[#f0f0f0] transition-colors"
                     aria-label={showProductSearch ? 'Fechar busca' : 'Buscar'}
                   >
                     <span className="material-symbols-outlined text-[15px]">
@@ -640,7 +640,7 @@ export const CampaignDocument: React.FC<CampaignDocumentProps> = ({
                   <button
                     type="button"
                     onClick={() => setShowProductPicker(!showProductPicker)}
-                    className="min-w-8 min-h-8 w-8 h-8 flex items-center justify-center rounded-lg text-[#707070] hover:text-[#1f1f1f] hover:bg-[#f0f0f0] transition-colors"
+                    className="min-w-8 min-h-8 w-8 h-8 flex items-center justify-center rounded-lg text-[color:var(--sl-fg-base-soft)] hover:text-[color:var(--sl-fg-base)] hover:bg-[#f0f0f0] transition-colors"
                     aria-label="Adicionar produto"
                   >
                     <span className="material-symbols-outlined text-[15px]">add</span>
@@ -649,20 +649,20 @@ export const CampaignDocument: React.FC<CampaignDocumentProps> = ({
                     <DropdownMenu onClose={() => { setShowProductPicker(false); setPickerProductSearch(''); }} width={360} alignRight>
                       <div className="p-2 border-b border-gray-100">
                         <div className="flex items-center gap-2 px-2 py-1.5 bg-gray-50 rounded-lg">
-                          <span className="material-symbols-outlined text-[18px] text-gray-400">search</span>
+                          <span className="material-symbols-outlined text-[18px] text-[color:var(--sl-fg-base-muted)]">search</span>
                           <input
                             type="text"
                             value={pickerProductSearch}
                             onChange={(e) => setPickerProductSearch(e.target.value)}
                             placeholder="Buscar produto..."
-                            className="flex-1 min-w-0 text-sm bg-transparent border-none outline-none text-[#1f1f1f] placeholder:text-gray-400"
+                            className="flex-1 min-w-0 text-sm bg-transparent border-none outline-none text-[color:var(--sl-fg-base)] placeholder:text-[color:var(--sl-fg-base-muted)]"
                             autoFocus
                           />
                           {pickerProductSearch && (
                             <button
                               type="button"
                               onClick={() => setPickerProductSearch('')}
-                              className="w-5 h-5 flex items-center justify-center rounded text-gray-400 hover:text-[#1f1f1f] transition-colors"
+                              className="w-5 h-5 flex items-center justify-center rounded text-[color:var(--sl-fg-base-muted)] hover:text-[color:var(--sl-fg-base)] transition-colors"
                             >
                               <span className="material-symbols-outlined text-[14px]">close</span>
                             </button>
@@ -671,7 +671,7 @@ export const CampaignDocument: React.FC<CampaignDocumentProps> = ({
                       </div>
                       <div className="max-h-[240px] overflow-y-auto py-1">
                         {pickerFilteredProducts.length === 0 && (
-                          <p className="px-3 py-3 text-sm text-[#707070]">
+                          <p className="px-3 py-3 text-sm text-[color:var(--sl-fg-base-soft)]">
                             {pickerProductSearch ? 'Nenhum produto encontrado' : 'Nenhum produto disponível'}
                           </p>
                         )}
@@ -686,12 +686,12 @@ export const CampaignDocument: React.FC<CampaignDocumentProps> = ({
                               {p.imageUrl ? (
                                 <LazyImage src={p.imageUrl} alt={p.name} className="w-full h-full object-cover" />
                               ) : (
-                                <span className="material-symbols-outlined text-gray-300 text-[16px]">inventory_2</span>
+                                <span className="material-symbols-outlined text-[color:var(--sl-fg-base-muted)] text-[16px]">inventory_2</span>
                               )}
                             </div>
                             <div className="flex-1 min-w-0">
-                              <span className="text-sm text-[#1f1f1f] truncate block">{p.name}</span>
-                              <span className="text-xs text-[#999] truncate block">{p.id}</span>
+                              <span className="text-sm text-[color:var(--sl-fg-base)] truncate block">{p.name}</span>
+                              <span className="text-xs text-[color:var(--sl-fg-base-muted)] truncate block">{p.id}</span>
                             </div>
                           </button>
                         ))}
@@ -727,7 +727,7 @@ export const CampaignDocument: React.FC<CampaignDocumentProps> = ({
                     {productSearch && (
                       <div className="flex items-center gap-1.5 mb-2">
                         <span className={`text-xs font-medium tabular-nums px-1.5 py-0.5 rounded-md ${
-                          filtered.length === 0 ? 'text-red-500 bg-red-50' : 'text-[#707070] bg-[#f5f5f5]'
+                          filtered.length === 0 ? 'text-[color:var(--sl-fg-base-soft)] bg-red-50' : 'text-[color:var(--sl-fg-base-soft)] bg-[#f5f5f5]'
                         }`}>
                           {filtered.length === 0 ? 'Sem resultados' : `${filtered.length} encontrado${filtered.length !== 1 ? 's' : ''}`}
                         </span>
@@ -741,17 +741,17 @@ export const CampaignDocument: React.FC<CampaignDocumentProps> = ({
                               {p.imageUrl ? (
                                 <LazyImage src={p.imageUrl} alt={p.name} className="w-full h-full object-cover" />
                               ) : (
-                                <span className="material-symbols-outlined text-gray-300 text-[20px]">inventory_2</span>
+                                <span className="material-symbols-outlined text-[color:var(--sl-fg-base-muted)] text-[20px]">inventory_2</span>
                               )}
                             </div>
                             <div className="flex-1 min-w-0 flex flex-col justify-center">
-                              <p className="text-sm leading-5 tracking-[-0.14px] text-[#1f1f1f] truncate">{highlightMatch(p.name)}</p>
-                              <p className="text-xs leading-4 text-[#707070]">{highlightMatch(p.id)}</p>
+                              <p className="text-sm leading-5 tracking-[-0.14px] text-[color:var(--sl-fg-base)] truncate">{highlightMatch(p.name)}</p>
+                              <p className="text-xs leading-4 text-[color:var(--sl-fg-base-soft)]">{highlightMatch(p.id)}</p>
                             </div>
                             <button
                               type="button"
                               onClick={() => removeProduct(p.id)}
-                              className="w-7 h-7 flex items-center justify-center rounded-lg text-gray-300 hover:text-red-400 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-all shrink-0"
+                              className="w-7 h-7 flex items-center justify-center rounded-lg text-[color:var(--sl-fg-base-muted)] hover:text-[color:var(--sl-fg-base-muted)] hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-all shrink-0"
                             >
                               <span className="material-symbols-outlined text-[16px]">close</span>
                             </button>
@@ -761,7 +761,7 @@ export const CampaignDocument: React.FC<CampaignDocumentProps> = ({
                     </div>
                     {filtered.length > 0 && (
                       <div className="flex items-center justify-between h-12 px-2">
-                        <div className="flex items-center gap-1 text-xs leading-4 text-[#707070]">
+                        <div className="flex items-center gap-1 text-xs leading-4 text-[color:var(--sl-fg-base-soft)]">
                           <span>{productPage * PAGE_SIZE + 1}</span>
                           <span>—</span>
                           <span>{Math.min((productPage + 1) * PAGE_SIZE, filtered.length)}</span>
@@ -773,7 +773,7 @@ export const CampaignDocument: React.FC<CampaignDocumentProps> = ({
                             type="button"
                             onClick={() => setProductPage((p) => Math.max(0, p - 1))}
                             disabled={productPage === 0}
-                            className="w-4 h-4 flex items-center justify-center text-[#707070] hover:text-[#1f1f1f] disabled:opacity-30 transition-colors"
+                            className="w-4 h-4 flex items-center justify-center text-[color:var(--sl-fg-base-soft)] hover:text-[color:var(--sl-fg-base)] disabled:opacity-30 transition-colors"
                           >
                             <span className="material-symbols-outlined text-[16px]">chevron_left</span>
                           </button>
@@ -781,7 +781,7 @@ export const CampaignDocument: React.FC<CampaignDocumentProps> = ({
                             type="button"
                             onClick={() => setProductPage((p) => Math.min(filteredTotalPages - 1, p + 1))}
                             disabled={productPage >= filteredTotalPages - 1}
-                            className="w-4 h-4 flex items-center justify-center text-[#707070] hover:text-[#1f1f1f] disabled:opacity-30 transition-colors"
+                            className="w-4 h-4 flex items-center justify-center text-[color:var(--sl-fg-base-soft)] hover:text-[color:var(--sl-fg-base)] disabled:opacity-30 transition-colors"
                           >
                             <span className="material-symbols-outlined text-[16px]">chevron_right</span>
                           </button>
@@ -791,7 +791,7 @@ export const CampaignDocument: React.FC<CampaignDocumentProps> = ({
                     {filtered.length === 0 && (
                       <div className="flex flex-col items-center justify-center py-10 gap-2">
                         <span className="material-symbols-outlined text-[32px] text-[#d0d0d0]">search_off</span>
-                        <p className="text-sm text-[#999]">
+                        <p className="text-sm text-[color:var(--sl-fg-base-muted)]">
                           {productSearch ? `Nenhum produto com "${productSearch}"` : 'Nenhum produto adicionado'}
                         </p>
                       </div>
@@ -805,7 +805,7 @@ export const CampaignDocument: React.FC<CampaignDocumentProps> = ({
           {/* ── Investimento ── */}
           <div id="doc-section-investimento" className="flex flex-col px-10 py-10">
             <div className="w-full max-w-[800px] mx-auto pl-[106px]">
-              <h2 className="font-semibold text-[20px] leading-7 tracking-[-0.8px] text-[#1f1f1f] pb-2">Investimento</h2>
+              <h2 className="font-semibold text-[20px] leading-7 tracking-[-0.8px] text-[color:var(--sl-fg-base)] pb-2">Investimento</h2>
               <div className="flex flex-col">
                 <EditableMoneyRow
                   label="Alocação total"
@@ -819,7 +819,7 @@ export const CampaignDocument: React.FC<CampaignDocumentProps> = ({
                 />
                 <div className="flex items-center gap-5 py-3 border-b" style={{ borderColor: '#e0e0e0' }}>
                   <div className="w-[240px] shrink-0">
-                    <span className="font-medium text-sm leading-5 tracking-[-0.14px] text-[#1f1f1f]">Ritmo de gasto</span>
+                    <span className="font-medium text-sm leading-5 tracking-[-0.14px] text-[color:var(--sl-fg-base)]">Ritmo de gasto</span>
                   </div>
                   <div className="flex-1 min-w-0">
                     <DropdownPill
@@ -839,10 +839,10 @@ export const CampaignDocument: React.FC<CampaignDocumentProps> = ({
           {/* ── Segmentação ── */}
           <div id="doc-section-segmentacao" className="flex flex-col px-10 py-10">
             <div className="w-full max-w-[800px] mx-auto pl-[106px]">
-              <h2 className="font-semibold text-[20px] leading-7 tracking-[-0.8px] text-[#1f1f1f] pb-4">Segmentação</h2>
+              <h2 className="font-semibold text-[20px] leading-7 tracking-[-0.8px] text-[color:var(--sl-fg-base)] pb-4">Segmentação</h2>
               <div className="flex items-center gap-5 py-3 border-b" style={{ borderColor: '#e0e0e0' }}>
                 <div className="w-[240px] shrink-0">
-                  <span className="font-medium text-sm leading-5 tracking-[-0.14px] text-[#1f1f1f]">Segmentar por</span>
+                  <span className="font-medium text-sm leading-5 tracking-[-0.14px] text-[color:var(--sl-fg-base)]">Segmentar por</span>
                 </div>
                 <div className="flex-1 min-w-0">
                   {(() => {
@@ -861,13 +861,13 @@ export const CampaignDocument: React.FC<CampaignDocumentProps> = ({
                         className="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-[#f8f8f8] hover:bg-[#ebebeb] transition-colors cursor-pointer"
                       >
                         {seg && (
-                          <span className="material-symbols-outlined text-[16px] text-[#707070]">{seg.icon}</span>
+                          <span className="material-symbols-outlined text-[16px] text-[color:var(--sl-fg-base-soft)]">{seg.icon}</span>
                         )}
-                        <span className="text-sm leading-5 tracking-[-0.14px] text-[#1f1f1f]">{segment}</span>
+                        <span className="text-sm leading-5 tracking-[-0.14px] text-[color:var(--sl-fg-base)]">{segment}</span>
                         {seg && (
-                          <span className="text-xs text-[#999] tabular-nums">{fmtBase}</span>
+                          <span className="text-xs text-[color:var(--sl-fg-base-muted)] tabular-nums">{fmtBase}</span>
                         )}
-                        <span className="material-symbols-outlined text-[14px] text-[#707070]">chevron_right</span>
+                        <span className="material-symbols-outlined text-[14px] text-[color:var(--sl-fg-base-soft)]">chevron_right</span>
                       </button>
                     );
                   })()}
@@ -879,15 +879,15 @@ export const CampaignDocument: React.FC<CampaignDocumentProps> = ({
           {/* ── Plano de mídia ── */}
           <div id="doc-section-plano-midia" className="flex flex-col px-10 py-10">
             <div className="w-full max-w-[800px] mx-auto pl-[106px]">
-              <h2 className="font-semibold text-[20px] leading-7 tracking-[-0.8px] text-[#1f1f1f] mb-[24px]">Plano de mídia</h2>
+              <h2 className="font-semibold text-[20px] leading-7 tracking-[-0.8px] text-[color:var(--sl-fg-base)] mb-[24px]">Plano de mídia</h2>
               <div className="flex items-center justify-between h-12 mb-1">
-                <span className="text-sm leading-5 tracking-[-0.14px] text-[#1f1f1f] font-medium">Mídias</span>
+                <span className="text-sm leading-5 tracking-[-0.14px] text-[color:var(--sl-fg-base)] font-medium">Mídias</span>
                 <div className="relative">
                   <SmallIconBtn icon="add" size={15} onClick={() => setShowMediaMenu(!showMediaMenu)} />
                   {showMediaMenu && (
                     <DropdownMenu onClose={() => setShowMediaMenu(false)} width={320} alignRight>
                       <div className="px-3 py-2 border-b border-gray-100">
-                        <p className="text-xs text-[#707070]">Adicionar tipo de mídia</p>
+                        <p className="text-xs text-[color:var(--sl-fg-base-soft)]">Adicionar tipo de mídia</p>
                       </div>
                       <div className="py-1">
                         {ALL_MEDIA_TYPES.map((type) => {
@@ -905,16 +905,16 @@ export const CampaignDocument: React.FC<CampaignDocumentProps> = ({
                               }`}
                             >
                               <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: style.bg }}>
-                                <span className="material-symbols-outlined text-[18px] text-[#1f1f1f]/70">{style.icon}</span>
+                                <span className="material-symbols-outlined text-[18px] text-[color:var(--sl-fg-base)]/70">{style.icon}</span>
                               </div>
                               <div className="flex flex-col min-w-0 flex-1">
-                                <span className="text-sm font-medium text-[#1f1f1f]">{labels.name}</span>
+                                <span className="text-sm font-medium text-[color:var(--sl-fg-base)]">{labels.name}</span>
                                 {labels.bidLabel && (
-                                  <span className="text-xs text-[#707070]">{labels.bidLabel}</span>
+                                  <span className="text-xs text-[color:var(--sl-fg-base-soft)]">{labels.bidLabel}</span>
                                 )}
                               </div>
                               {isAdded && (
-                                <span className="material-symbols-outlined text-[18px] text-[#0366dd] shrink-0">check_circle</span>
+                                <span className="material-symbols-outlined text-[18px] text-[color:var(--sl-fg-base-soft)] shrink-0">check_circle</span>
                               )}
                             </button>
                           );
@@ -991,15 +991,15 @@ export const CampaignDocument: React.FC<CampaignDocumentProps> = ({
                 <button
                   type="button"
                   onClick={handleCloseSegmentDrawer}
-                  className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-black/5 text-[#707070] transition-colors"
+                  className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-black/5 text-[color:var(--sl-fg-base-soft)] transition-colors"
                 >
                   <span className="material-symbols-outlined text-[18px]">arrow_back</span>
                 </button>
-                <span className="font-semibold text-[20px] tracking-[-0.45px] text-[#171717]">Segmentação</span>
+                <span className="font-semibold text-[20px] tracking-[-0.45px] text-[color:var(--sl-fg-base)]">Segmentação</span>
               </div>
             </div>
             <div className="flex-1 overflow-y-auto px-6 py-5">
-              <p className="text-xs uppercase tracking-[0.5px] text-[#999] font-medium mb-3">Selecione um segmento</p>
+              <p className="text-xs uppercase tracking-[0.5px] text-[color:var(--sl-fg-base-muted)] font-medium mb-3">Selecione um segmento</p>
               <div className="flex flex-col gap-2">
                 {SEGMENTS.map((seg) => {
                   const isSelected = segment === seg.label;
@@ -1028,17 +1028,17 @@ export const CampaignDocument: React.FC<CampaignDocumentProps> = ({
                       />
                       <div className="relative flex items-center gap-3 flex-1 min-w-0 z-[1]">
                         <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
-                          isSelected ? 'bg-[#1f1f1f] text-white' : 'bg-[#f0f0f0] text-[#707070]'
+                          isSelected ? 'bg-[#1f1f1f] text-white' : 'bg-[#f0f0f0] text-[color:var(--sl-fg-base-soft)]'
                         }`}>
                           <span className="material-symbols-outlined text-[18px]">{seg.icon}</span>
                         </div>
                         <div className="flex flex-col min-w-0 flex-1">
-                          <span className={`text-sm font-medium tracking-[-0.14px] ${isSelected ? 'text-[#1f1f1f]' : 'text-[#444]'}`}>{seg.label}</span>
-                          <span className="text-xs text-[#999] truncate">{seg.desc}</span>
+                          <span className={`text-sm font-medium tracking-[-0.14px] ${isSelected ? 'text-[color:var(--sl-fg-base)]' : 'text-[#444]'}`}>{seg.label}</span>
+                          <span className="text-xs text-[color:var(--sl-fg-base-muted)] truncate">{seg.desc}</span>
                         </div>
                         <div className="flex flex-col items-end shrink-0">
-                          <span className={`text-sm font-semibold tabular-nums tracking-[-0.14px] ${isSelected ? 'text-[#1f1f1f]' : 'text-[#555]'}`}>{fmtBase}</span>
-                          <span className="text-[11px] text-[#999]">pessoas</span>
+                          <span className={`text-sm font-semibold tabular-nums tracking-[-0.14px] ${isSelected ? 'text-[color:var(--sl-fg-base)]' : 'text-[#555]'}`}>{fmtBase}</span>
+                          <span className="text-[11px] text-[color:var(--sl-fg-base-muted)]">pessoas</span>
                         </div>
                       </div>
                     </button>
@@ -1058,7 +1058,7 @@ export const CampaignDocument: React.FC<CampaignDocumentProps> = ({
 const PropertyRow: React.FC<{ label: string; children: React.ReactNode }> = ({ label, children }) => (
   <div className="flex items-center gap-1 py-1.5">
     <div className="w-[160px] shrink-0">
-      <span className="text-sm font-semibold leading-5 tracking-[-0.14px] text-[#1f1f1f]">{label}</span>
+      <span className="text-sm font-semibold leading-5 tracking-[-0.14px] text-[color:var(--sl-fg-base)]">{label}</span>
     </div>
     <div className="flex-1 min-w-0">{children}</div>
   </div>
@@ -1068,7 +1068,7 @@ const SmallIconBtn: React.FC<{ icon: string; size?: number; onClick?: () => void
   <button
     type="button"
     onClick={onClick}
-    className="min-w-8 min-h-8 w-8 h-8 flex items-center justify-center rounded-lg text-[#707070] hover:text-[#1f1f1f] hover:bg-[#f0f0f0] transition-colors"
+    className="min-w-8 min-h-8 w-8 h-8 flex items-center justify-center rounded-lg text-[color:var(--sl-fg-base-soft)] hover:text-[color:var(--sl-fg-base)] hover:bg-[#f0f0f0] transition-colors"
   >
     <span className="material-symbols-outlined" style={{ fontSize: size }}>{icon}</span>
   </button>
@@ -1182,10 +1182,10 @@ const DateRangePicker: React.FC<{
 
     if (isStart || isEnd) return 'bg-[#1f1f1f] text-white font-medium';
     if (isHoverEnd) return 'bg-[#1f1f1f]/80 text-white font-medium';
-    if (inRange) return 'bg-[#f0f0f0] text-[#1f1f1f]';
-    if (inHoverRange) return 'bg-[#f5f5f5] text-[#1f1f1f]';
-    if (!current) return 'text-[#c0c0c0]';
-    return 'text-[#1f1f1f] hover:bg-[#f0f0f0]';
+    if (inRange) return 'bg-[#f0f0f0] text-[color:var(--sl-fg-base)]';
+    if (inHoverRange) return 'bg-[#f5f5f5] text-[color:var(--sl-fg-base)]';
+    if (!current) return 'text-[color:var(--sl-fg-base-muted)]';
+    return 'text-[color:var(--sl-fg-base)] hover:bg-[#f0f0f0]';
   };
 
   const getRound = (date: Date) => {
@@ -1213,8 +1213,8 @@ const DateRangePicker: React.FC<{
         onClick={() => setOpen(!open)}
         className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[#f8f8f8] hover:bg-[#ebebeb] transition-colors cursor-pointer"
       >
-        <span className="text-sm leading-5 tracking-[-0.14px] text-[#1f1f1f]">{pillLabel}</span>
-        <span className="material-symbols-outlined text-[14px] text-[#707070]">expand_more</span>
+        <span className="text-sm leading-5 tracking-[-0.14px] text-[color:var(--sl-fg-base)]">{pillLabel}</span>
+        <span className="material-symbols-outlined text-[14px] text-[color:var(--sl-fg-base-soft)]">expand_more</span>
       </button>
       {open && (
         <div className="absolute left-0 top-full mt-1.5 bg-white rounded-2xl border shadow-xl z-50 w-[320px] overflow-hidden" style={{ borderColor: '#e0e0e0' }}>
@@ -1224,33 +1224,33 @@ const DateRangePicker: React.FC<{
               type="button"
               onClick={() => setSelecting('start')}
               className={`flex-1 py-3 text-center text-xs font-medium transition-colors ${
-                selecting === 'start' ? 'text-[#1f1f1f] border-b-2 border-[#1f1f1f]' : 'text-[#999] hover:text-[#666]'
+                selecting === 'start' ? 'text-[color:var(--sl-fg-base)] border-b-2 border-[#1f1f1f]' : 'text-[color:var(--sl-fg-base-muted)] hover:text-[color:var(--sl-fg-base-soft)]'
               }`}
             >
-              <span className="block text-[10px] uppercase tracking-[0.5px] text-[#999] mb-0.5">Início</span>
+              <span className="block text-[10px] uppercase tracking-[0.5px] text-[color:var(--sl-fg-base-muted)] mb-0.5">Início</span>
               {fmtShortDate(startDate)}
             </button>
             <button
               type="button"
               onClick={() => { if (!noEndDate) setSelecting('end'); }}
               className={`flex-1 py-3 text-center text-xs font-medium transition-colors ${
-                noEndDate ? 'opacity-40 cursor-not-allowed' : selecting === 'end' ? 'text-[#1f1f1f] border-b-2 border-[#1f1f1f]' : 'text-[#999] hover:text-[#666]'
+                noEndDate ? 'opacity-40 cursor-not-allowed' : selecting === 'end' ? 'text-[color:var(--sl-fg-base)] border-b-2 border-[#1f1f1f]' : 'text-[color:var(--sl-fg-base-muted)] hover:text-[color:var(--sl-fg-base-soft)]'
               }`}
             >
-              <span className="block text-[10px] uppercase tracking-[0.5px] text-[#999] mb-0.5">Fim</span>
+              <span className="block text-[10px] uppercase tracking-[0.5px] text-[color:var(--sl-fg-base-muted)] mb-0.5">Fim</span>
               {noEndDate ? 'Sem fim' : fmtShortDate(endDate)}
             </button>
           </div>
 
           {/* Month nav */}
           <div className="flex items-center justify-between px-4 pt-4 pb-2">
-            <button type="button" onClick={prevMonth} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[#f0f0f0] text-[#707070] transition-colors">
+            <button type="button" onClick={prevMonth} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[#f0f0f0] text-[color:var(--sl-fg-base-soft)] transition-colors">
               <span className="material-symbols-outlined text-[18px]">chevron_left</span>
             </button>
-            <span className="text-sm font-semibold text-[#1f1f1f] tracking-[-0.14px]">
+            <span className="text-sm font-semibold text-[color:var(--sl-fg-base)] tracking-[-0.14px]">
               {MONTHS_PT[month]} {year}
             </span>
-            <button type="button" onClick={nextMonth} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[#f0f0f0] text-[#707070] transition-colors">
+            <button type="button" onClick={nextMonth} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[#f0f0f0] text-[color:var(--sl-fg-base-soft)] transition-colors">
               <span className="material-symbols-outlined text-[18px]">chevron_right</span>
             </button>
           </div>
@@ -1258,7 +1258,7 @@ const DateRangePicker: React.FC<{
           {/* Weekday headers */}
           <div className="grid grid-cols-7 px-3">
             {WEEKDAYS_PT.map((d, i) => (
-              <div key={i} className="h-8 flex items-center justify-center text-[11px] font-medium text-[#999]">{d}</div>
+              <div key={i} className="h-8 flex items-center justify-center text-[11px] font-medium text-[color:var(--sl-fg-base-muted)]">{d}</div>
             ))}
           </div>
 
@@ -1313,8 +1313,8 @@ const DropdownPill: React.FC<{
       onClick={onToggle}
       className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[#f8f8f8] hover:bg-[#ebebeb] transition-colors cursor-pointer"
     >
-      <span className="text-sm leading-5 tracking-[-0.14px] text-[#1f1f1f]">{value}</span>
-      <span className="material-symbols-outlined text-[14px] text-[#707070]">expand_more</span>
+      <span className="text-sm leading-5 tracking-[-0.14px] text-[color:var(--sl-fg-base)]">{value}</span>
+      <span className="material-symbols-outlined text-[14px] text-[color:var(--sl-fg-base-soft)]">expand_more</span>
     </button>
     {open && (
       <DropdownMenu onClose={onClose}>
@@ -1324,7 +1324,7 @@ const DropdownPill: React.FC<{
             type="button"
             onClick={() => onSelect(opt)}
             className={`w-full text-left px-3 py-2 text-sm transition-colors ${
-              opt === value ? 'bg-blue-50 text-blue-700 font-medium' : 'text-[#1f1f1f] hover:bg-black/[0.04]'
+              opt === value ? 'bg-blue-50 text-[color:var(--sl-fg-base-soft)] font-medium' : 'text-[color:var(--sl-fg-base)] hover:bg-black/[0.04]'
             }`}
           >
             {opt}
@@ -1431,7 +1431,7 @@ const EditableMoneyRow: React.FC<{
   return (
     <div className="flex items-center gap-5 py-3 border-b" style={{ borderColor: '#e0e0e0' }}>
       <div className="w-[240px] shrink-0">
-        <span className="font-medium text-sm leading-5 tracking-[-0.14px] text-[#1f1f1f]">{label}</span>
+        <span className="font-medium text-sm leading-5 tracking-[-0.14px] text-[color:var(--sl-fg-base)]">{label}</span>
       </div>
       <div className="flex-1 min-w-0">
         {editing ? (
@@ -1447,14 +1447,14 @@ const EditableMoneyRow: React.FC<{
             onChange={handleDraftChange}
             onKeyDown={handleKeyDown}
             onBlur={handleBlur}
-            className="box-border min-w-[180px] w-max max-w-full rounded-lg border border-solid px-2 py-1 outline-none focus:outline-none text-sm leading-5 tracking-[-0.14px] text-[#1f1f1f] bg-blue-50/60 border-blue-200 caret-[#0a0a0a] whitespace-nowrap tabular-nums [field-sizing:content]"
+            className="box-border min-w-[180px] w-max max-w-full rounded-lg border border-solid px-2 py-1 outline-none focus:outline-none text-sm leading-5 tracking-[-0.14px] text-[color:var(--sl-fg-base)] bg-blue-50/60 border-blue-200 caret-[color:var(--sl-fg-base)] whitespace-nowrap tabular-nums [field-sizing:content]"
             autoFocus
           />
         ) : (
           <button
             type="button"
             onClick={startEditing}
-            className="box-border min-w-[180px] w-max max-w-full rounded-lg border border-solid px-2 py-1 outline-none text-sm leading-5 tracking-[-0.14px] text-[#1f1f1f] bg-transparent border-transparent hover:bg-black/[0.03] text-left transition-colors cursor-text whitespace-nowrap tabular-nums"
+            className="box-border min-w-[180px] w-max max-w-full rounded-lg border border-solid px-2 py-1 outline-none text-sm leading-5 tracking-[-0.14px] text-[color:var(--sl-fg-base)] bg-transparent border-transparent hover:bg-black/[0.03] text-left transition-colors cursor-text whitespace-nowrap tabular-nums"
           >
             {fmtMoney(value)}
           </button>
@@ -1559,14 +1559,14 @@ const EditableMoneyCell: React.FC<{
           onChange={handleDraftChange}
           onKeyDown={handleKeyDown}
           onBlur={handleBlur}
-          className={`box-border border border-solid outline-none focus:outline-none text-sm leading-5 tracking-[-0.14px] text-[#1f1f1f] bg-blue-50/60 border-blue-200 caret-[#0a0a0a] ${cellShape}`}
+          className={`box-border border border-solid outline-none focus:outline-none text-sm leading-5 tracking-[-0.14px] text-[color:var(--sl-fg-base)] bg-blue-50/60 border-blue-200 caret-[color:var(--sl-fg-base)] ${cellShape}`}
           autoFocus
         />
       ) : (
         <button
           type="button"
           onClick={startEditing}
-          className={`box-border border border-solid outline-none text-sm leading-5 tracking-[-0.14px] text-[#1f1f1f] bg-transparent border-transparent hover:bg-black/[0.04] text-left transition-colors cursor-text ${cellShape}`}
+          className={`box-border border border-solid outline-none text-sm leading-5 tracking-[-0.14px] text-[color:var(--sl-fg-base)] bg-transparent border-transparent hover:bg-black/[0.04] text-left transition-colors cursor-text ${cellShape}`}
         >
           {formatBr(value, decimals)}
           {suffix ? ` ${suffix}` : ''}
@@ -1627,16 +1627,16 @@ const MediaRow: React.FC<{
         <div className="flex items-center gap-3 flex-1 min-w-0">
           <div className="flex items-center gap-3 w-[240px] shrink-0">
             <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style={{ background: style.bg }}>
-              <span className="material-symbols-outlined text-[20px] text-[#1f1f1f]/60">{style.icon}</span>
+              <span className="material-symbols-outlined text-[20px] text-[color:var(--sl-fg-base)]/60">{style.icon}</span>
             </div>
             <div className="flex flex-col justify-center whitespace-nowrap">
-              <span className="font-medium text-sm leading-5 tracking-[-0.14px] text-[#1f1f1f]">{labels.name}</span>
-              <span className="text-xs leading-4 text-[#707070]">{descText}</span>
+              <span className="font-medium text-sm leading-5 tracking-[-0.14px] text-[color:var(--sl-fg-base)]">{labels.name}</span>
+              <span className="text-xs leading-4 text-[color:var(--sl-fg-base-soft)]">{descText}</span>
             </div>
           </div>
           <div className="flex items-center gap-10 shrink-0 min-w-0" onClick={stop}>
             <div className="flex flex-col justify-center shrink-0 whitespace-nowrap">
-              <span className="text-xs leading-4 text-[#707070]">Alocação total</span>
+              <span className="text-xs leading-4 text-[color:var(--sl-fg-base-soft)]">Alocação total</span>
               {canEdit && onAllocationChange ? (
                 <EditableMoneyCell
                   value={allocation}
@@ -1646,12 +1646,12 @@ const MediaRow: React.FC<{
                   ariaLabel={`Alocação total em reais, ${labels.name}`}
                 />
               ) : (
-                <span className="text-sm leading-5 tracking-[-0.14px] text-[#1f1f1f] tabular-nums">{fmtMoney(allocation)}</span>
+                <span className="text-sm leading-5 tracking-[-0.14px] text-[color:var(--sl-fg-base)] tabular-nums">{fmtMoney(allocation)}</span>
               )}
             </div>
             {bid && labels.bidLabel && (
               <div className="flex flex-col justify-center shrink-0 whitespace-nowrap">
-                <span className="text-xs leading-4 text-[#707070]">{labels.bidLabel}</span>
+                <span className="text-xs leading-4 text-[color:var(--sl-fg-base-soft)]">{labels.bidLabel}</span>
                 {canEdit && onBidChange ? (
                   <EditableMoneyCell
                     value={bid.currentBid}
@@ -1660,13 +1660,13 @@ const MediaRow: React.FC<{
                     ariaLabel={`${labels.bidLabel} em reais, ${labels.name}`}
                   />
                 ) : (
-                  <span className="text-sm leading-5 tracking-[-0.14px] text-[#1f1f1f] tabular-nums">{formatBr(bid.currentBid)} BRL</span>
+                  <span className="text-sm leading-5 tracking-[-0.14px] text-[color:var(--sl-fg-base)] tabular-nums">{formatBr(bid.currentBid)} BRL</span>
                 )}
               </div>
             )}
             {bid && showSecondBid && (
               <div className="flex flex-col justify-center shrink-0 whitespace-nowrap">
-                <span className="text-xs leading-4 text-[#707070]">CPM</span>
+                <span className="text-xs leading-4 text-[color:var(--sl-fg-base-soft)]">CPM</span>
                 {canEdit && onBidChange ? (
                   <EditableMoneyCell
                     value={bid.suggestedBid}
@@ -1675,7 +1675,7 @@ const MediaRow: React.FC<{
                     ariaLabel={`CPM em reais, ${labels.name}`}
                   />
                 ) : (
-                  <span className="text-sm leading-5 tracking-[-0.14px] text-[#1f1f1f] tabular-nums">{formatBr(bid.suggestedBid)} BRL</span>
+                  <span className="text-sm leading-5 tracking-[-0.14px] text-[color:var(--sl-fg-base)] tabular-nums">{formatBr(bid.suggestedBid)} BRL</span>
                 )}
               </div>
             )}
@@ -1685,7 +1685,7 @@ const MediaRow: React.FC<{
           <button
             type="button"
             onClick={() => setShowMenu((v) => !v)}
-            className="w-7 h-7 flex items-center justify-center rounded text-[#707070] hover:text-[#1f1f1f] hover:bg-black/[0.06] opacity-0 group-hover:opacity-100 transition-all"
+            className="w-7 h-7 flex items-center justify-center rounded text-[color:var(--sl-fg-base-soft)] hover:text-[color:var(--sl-fg-base)] hover:bg-black/[0.06] opacity-0 group-hover:opacity-100 transition-all"
           >
             <span className="material-symbols-outlined text-[16px]">more_vert</span>
           </button>
@@ -1698,9 +1698,9 @@ const MediaRow: React.FC<{
                 <button
                   type="button"
                   onClick={() => { setShowMenu(false); onOpenDetail(); }}
-                  className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-[#1f1f1f] hover:bg-black/[0.04] transition-colors"
+                  className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-[color:var(--sl-fg-base)] hover:bg-black/[0.04] transition-colors"
                 >
-                  <span className="material-symbols-outlined text-[16px] text-[#707070]">edit</span>
+                  <span className="material-symbols-outlined text-[16px] text-[color:var(--sl-fg-base-soft)]">edit</span>
                   Editar
                 </button>
               )}
@@ -1708,7 +1708,7 @@ const MediaRow: React.FC<{
                 <button
                   type="button"
                   onClick={() => { setShowMenu(false); onRemove(); }}
-                  className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                  className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-[color:var(--sl-fg-base-soft)] hover:bg-red-50 transition-colors"
                 >
                   <span className="material-symbols-outlined text-[16px]">delete</span>
                   Apagar

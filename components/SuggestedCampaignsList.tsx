@@ -43,7 +43,7 @@ export const SuggestedCampaignsList: React.FC<SuggestedCampaignsListProps> = ({
                     />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-[13px] font-medium text-[#1f1f1f] tracking-[-0.13px] truncate">
+                    <p className="text-[13px] font-medium text-[color:var(--sl-fg-base)] tracking-[-0.13px] truncate">
                       {campaign.title}
                     </p>
                     <p className="text-[11px] text-[#6b7280] font-mono mt-0.5">{campaign.id}</p>

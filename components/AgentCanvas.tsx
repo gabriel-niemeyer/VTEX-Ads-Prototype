@@ -27,7 +27,7 @@ export const AgentCanvas: React.FC<AgentCanvasProps> = ({
       <div className="shrink-0 bg-white px-5 pt-3.5 pb-2">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="min-w-0">
-            <p className="text-[18px] font-semibold tracking-[-0.3px] text-[#1f1f1f]">
+            <p className="text-[18px] font-semibold tracking-[-0.3px] text-[color:var(--sl-fg-base)]">
               Campanhas sugeridas
             </p>
           </div>
@@ -43,7 +43,7 @@ export const AgentCanvas: React.FC<AgentCanvasProps> = ({
                   type="button"
                   onClick={() => setViewMode('list')}
                   className={`relative z-10 w-9 h-9 rounded-lg flex items-center justify-center transition-colors duration-200 ${
-                    viewMode === 'list' ? 'text-[#1f1f1f]' : 'text-[#6b7280] hover:text-[#374151]'
+                    viewMode === 'list' ? 'text-[color:var(--sl-fg-base)]' : 'text-[#6b7280] hover:text-[#374151]'
                   }`}
                 >
                   <span className="material-symbols-outlined text-[20px]">format_list_bulleted</span>
@@ -54,7 +54,7 @@ export const AgentCanvas: React.FC<AgentCanvasProps> = ({
                   type="button"
                   onClick={() => setViewMode('timeline')}
                   className={`relative z-10 w-9 h-9 rounded-lg flex items-center justify-center transition-colors duration-200 ${
-                    viewMode === 'timeline' ? 'text-[#1f1f1f]' : 'text-[#6b7280] hover:text-[#374151]'
+                    viewMode === 'timeline' ? 'text-[color:var(--sl-fg-base)]' : 'text-[#6b7280] hover:text-[#374151]'
                   }`}
                 >
                   <span className="material-symbols-outlined text-[20px]">view_timeline</span>
@@ -69,10 +69,10 @@ export const AgentCanvas: React.FC<AgentCanvasProps> = ({
         {campaigns.length === 0 ? (
           <div className="flex h-full items-center justify-center px-8">
             <div className="max-w-md text-center">
-              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-white text-[#707070] shadow-sm">
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-white text-[color:var(--sl-fg-base-soft)] shadow-sm">
                 <span className="material-symbols-outlined text-[22px]">calendar_view_month</span>
               </div>
-              <p className="mt-4 text-[18px] font-semibold tracking-[-0.36px] text-[#1f1f1f]">
+              <p className="mt-4 text-[18px] font-semibold tracking-[-0.36px] text-[color:var(--sl-fg-base)]">
                 Nenhuma campanha destacada ainda
               </p>
               <p className="mt-2 text-[14px] leading-6 text-[#5f5f5f]">

@@ -31,8 +31,8 @@ class FormErrorBoundary extends Component<
       return (
         <div className="fixed inset-0 z-[200] bg-white flex flex-col items-center justify-center p-8">
           <div className="max-w-xl w-full bg-red-50 border-2 border-red-200 rounded-xl p-6">
-            <h2 className="text-red-700 font-semibold text-lg mb-3">Erro ao abrir o formulário</h2>
-            <pre className="text-sm text-gray-800 whitespace-pre-wrap mb-4 font-mono">{this.state.error.message}</pre>
+            <h2 className="text-[color:var(--sl-fg-base)] font-semibold text-lg mb-3">Erro ao abrir o formulário</h2>
+            <pre className="text-sm text-[color:var(--sl-fg-base)] whitespace-pre-wrap mb-4 font-mono">{this.state.error.message}</pre>
             <button
               type="button"
               onClick={this.props.onClose}
@@ -1854,7 +1854,7 @@ impressions: 0, clicks: 0, conversions: 0, revenue: 0,
         <Tooltip text="Exportar CSV (Shift + E)" position="bottom">
           <button
             onClick={downloadCSV}
-            className="min-w-[44px] min-h-[44px] w-11 h-11 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center transition-all active:scale-95 text-gray-500 hover:text-gray-900 hover:bg-gray-100 touch-manipulation"
+            className="min-w-[44px] min-h-[44px] w-11 h-11 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center transition-all active:scale-95 text-[color:var(--sl-fg-base-soft)] hover:text-[color:var(--sl-fg-base)] hover:bg-gray-100 touch-manipulation"
           >
             <span className="material-symbols-outlined">download</span>
           </button>
@@ -1869,7 +1869,7 @@ impressions: 0, clicks: 0, conversions: 0, revenue: 0,
       <button 
         onClick={() => setIsFilterDrawerOpen(true)}
         className={`relative min-w-[44px] min-h-[44px] w-11 h-11 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center transition-all active:scale-95 touch-manipulation ${
-          hasActiveFilters ? 'bg-blue-50 text-blue-600' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'
+          hasActiveFilters ? 'bg-blue-50 text-[color:var(--sl-fg-base-soft)]' : 'text-[color:var(--sl-fg-base-soft)] hover:text-[color:var(--sl-fg-base)] hover:bg-gray-100'
         }`}
       >
         <span className="material-symbols-outlined">filter_list</span>
@@ -1884,7 +1884,7 @@ impressions: 0, clicks: 0, conversions: 0, revenue: 0,
   );
 
   return (
-    <div className="app-root relative h-screen bg-white text-gray-900 safe-top safe-bottom overflow-hidden">
+    <div className="app-root relative h-screen bg-white text-[color:var(--sl-fg-base)] safe-top safe-bottom overflow-hidden">
       <div
         className={`absolute inset-0 flex flex-col transition-all duration-500 ease-in-out ${
           appMode === 'agent'
@@ -1924,7 +1924,7 @@ impressions: 0, clicks: 0, conversions: 0, revenue: 0,
               <button
                 type="button"
                 onClick={() => setAppMode('agent')}
-                className="min-w-[44px] min-h-[44px] w-11 h-11 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-all touch-manipulation"
+                className="min-w-[44px] min-h-[44px] w-11 h-11 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center text-[color:var(--sl-fg-base-soft)] hover:text-[color:var(--sl-fg-base)] hover:bg-gray-100 transition-all touch-manipulation"
               >
                 <span className="material-symbols-outlined">smart_toy</span>
               </button>

@@ -197,23 +197,23 @@ export const AgentLayout: React.FC<AgentLayoutProps> = ({
     : { flex: 1 };
 
   return (
-    <div className="flex h-full bg-white text-gray-900">
+    <div className="flex h-full bg-white text-[color:var(--sl-fg-base)]">
       <AgentSidebar onOpenClassicView={onOpenClassicView} />
 
       <div className="flex flex-col flex-1 min-w-0">
         <header className="shrink-0 flex items-center justify-between gap-2 px-4 pr-5 py-2.5 border-b border-[#e1e1e1] h-[52px]">
           <div className="flex items-center gap-2 min-w-0">
             <div className="w-8 h-8 rounded-full bg-[#ecf0f5] flex items-center justify-center shrink-0">
-              <span className="material-symbols-outlined text-gray-600 text-[18px]">campaign</span>
+              <span className="material-symbols-outlined text-[color:var(--sl-fg-base-soft)] text-[18px]">campaign</span>
             </div>
-            <span className="material-symbols-outlined text-gray-500 text-[20px] shrink-0">chevron_right</span>
-            <span className="font-semibold text-[15px] text-[#171717] truncate">{conversationTitle}</span>
+            <span className="material-symbols-outlined text-[color:var(--sl-fg-base-soft)] text-[20px] shrink-0">chevron_right</span>
+            <span className="font-semibold text-[15px] text-[color:var(--sl-fg-base)] truncate">{conversationTitle}</span>
           </div>
           <div className="flex items-center gap-1 shrink-0">
-            <button type="button" className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-600" aria-label="Opções">
+            <button type="button" className="w-8 h-8 flex items-center justify-center text-[color:var(--sl-fg-base-muted)] hover:text-[color:var(--sl-fg-base-soft)]" aria-label="Opções">
               <span className="material-symbols-outlined text-[20px]">bookmark_border</span>
             </button>
-            <button type="button" className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-600" aria-label="Mais">
+            <button type="button" className="w-8 h-8 flex items-center justify-center text-[color:var(--sl-fg-base-muted)] hover:text-[color:var(--sl-fg-base-soft)]" aria-label="Mais">
               <span className="material-symbols-outlined text-[20px]">more_vert</span>
             </button>
           </div>

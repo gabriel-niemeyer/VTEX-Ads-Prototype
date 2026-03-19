@@ -32,7 +32,7 @@ export const StatusCell: React.FC<StatusCellProps> = ({ campaignId, status, onSt
 
   const badge = (
     <span
-      className={`inline-flex items-center px-2 py-1 rounded-lg text-xs font-medium border border-gray-200 bg-white text-gray-700 whitespace-nowrap ${
+      className={`inline-flex items-center px-2 py-1 rounded-lg text-xs font-medium border border-gray-200 bg-white text-[color:var(--sl-fg-base)] whitespace-nowrap ${
         isClickable ? 'cursor-pointer hover:bg-gray-50 hover:border-gray-300 transition-colors' : ''
       }`}
       onClick={(e) => {
@@ -68,7 +68,7 @@ export const StatusCell: React.FC<StatusCellProps> = ({ campaignId, status, onSt
           className="absolute left-0 top-full mt-1 z-50 min-w-[140px] bg-white rounded-xl shadow-lg border border-gray-100 py-1.5 animate-in fade-in zoom-in-95 duration-100"
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="px-3 py-1.5 text-[12px] font-medium text-gray-400 tracking-[-0.1px]">
+          <div className="px-3 py-1.5 text-[12px] font-medium text-[color:var(--sl-fg-base-muted)] tracking-[-0.1px]">
             Alterar status
           </div>
           {STATUS_OPTIONS.map((option) => (
@@ -82,8 +82,8 @@ export const StatusCell: React.FC<StatusCellProps> = ({ campaignId, status, onSt
               }}
               className={`w-full text-left px-4 py-2 text-[13px] flex items-center gap-2 transition-colors ${
                 option === status
-                  ? 'bg-blue-50 text-blue-700 font-medium'
-                  : 'text-gray-700 hover:bg-gray-50'
+                  ? 'bg-blue-50 text-[color:var(--sl-fg-base-soft)] font-medium'
+                  : 'text-[color:var(--sl-fg-base)] hover:bg-gray-50'
               }`}
             >
               <span

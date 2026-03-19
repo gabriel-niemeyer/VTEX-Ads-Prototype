@@ -37,7 +37,7 @@ const SortHeader: React.FC<SortHeaderProps> = ({ config, sortKey, sortDirection,
 
   return (
     <th 
-      className={`py-4 ${paddingClass} text-[12px] font-normal cursor-pointer group select-none transition-all duration-300 ${widthClass} ${alignClass} ${isActive ? 'text-gray-700' : 'text-gray-400 hover:text-gray-600'} whitespace-nowrap ${className || ''}`}
+      className={`py-4 ${paddingClass} text-[12px] font-normal cursor-pointer group select-none transition-all duration-300 ${widthClass} ${alignClass} ${isActive ? 'text-[color:var(--sl-fg-base)]' : 'text-[color:var(--sl-fg-base-muted)] hover:text-[color:var(--sl-fg-base-soft)]'} whitespace-nowrap ${className || ''}`}
       style={style}
       onClick={() => onSort(config.id)}
     >
@@ -201,7 +201,7 @@ export const ListView: React.FC<ListViewProps> = ({ campaigns, columns, visibleC
             e.stopPropagation();
             if (onClick) onClick();
           }}
-          className="inline-flex items-center px-2 py-1 rounded-lg text-xs font-medium border border-gray-200 bg-white text-gray-700 whitespace-nowrap hover:bg-gray-50 hover:border-gray-300 transition-colors"
+          className="inline-flex items-center px-2 py-1 rounded-lg text-xs font-medium border border-gray-200 bg-white text-[color:var(--sl-fg-base)] whitespace-nowrap hover:bg-gray-50 hover:border-gray-300 transition-colors"
         >
           <span className={`w-1.5 h-1.5 rounded-[1px] mr-2 ${dotColor}`} />
           {strength}
@@ -223,10 +223,10 @@ export const ListView: React.FC<ListViewProps> = ({ campaigns, columns, visibleC
               />
             </div>
             <div>
-              <div className="text-[13px] tracking-[-0.0125em] font-medium text-gray-900 group-hover:underline">
+              <div className="text-[13px] tracking-[-0.0125em] font-medium text-[color:var(--sl-fg-base)] group-hover:underline">
                 {campaign.title}
               </div>
-              <div className="text-[11px] text-gray-400 mt-1 font-mono">
+              <div className="text-[11px] text-[color:var(--sl-fg-base-muted)] mt-1 font-mono">
                 {campaign.id}
               </div>
             </div>
@@ -234,7 +234,7 @@ export const ListView: React.FC<ListViewProps> = ({ campaigns, columns, visibleC
         );
       case 'publisher':
         return (
-          <div className="text-sm text-gray-700 font-normal tracking-[-0.0125em]">{campaign.publisher}</div>
+          <div className="text-sm text-[color:var(--sl-fg-base)] font-normal tracking-[-0.0125em]">{campaign.publisher}</div>
         );
       case 'mediaTypes':
         return (
@@ -248,12 +248,12 @@ export const ListView: React.FC<ListViewProps> = ({ campaigns, columns, visibleC
                 <div 
                   className="w-7 h-7 rounded-full bg-white border border-gray-200 flex items-center justify-center relative hover:scale-110 transition-transform cursor-default shadow-sm"
                 >
-                  <span className="material-symbols-outlined text-[14px] text-gray-500">{getMediaIcon(type)}</span>
+                  <span className="material-symbols-outlined text-[14px] text-[color:var(--sl-fg-base-soft)]">{getMediaIcon(type)}</span>
                 </div>
               </Tooltip>
             ))}
             {campaign.mediaTypes.length === 0 && (
-               <span className="text-xs text-gray-400 italic">Nenhuma</span>
+               <span className="text-xs text-[color:var(--sl-fg-base-muted)] italic">Nenhuma</span>
             )}
           </div>
         );
@@ -286,7 +286,7 @@ export const ListView: React.FC<ListViewProps> = ({ campaigns, columns, visibleC
         const cellContent = (
           <div className="flex flex-col w-32">
             <div className="flex items-center justify-start gap-2 mb-1">
-              <span className="text-xs text-gray-700 font-normal tracking-[-0.0125em] w-full">
+              <span className="text-xs text-[color:var(--sl-fg-base)] font-normal tracking-[-0.0125em] w-full">
                 {formatCurrency(campaign.spend)}
               </span>
               {pacing.status === 'on_track' && (
@@ -335,12 +335,12 @@ export const ListView: React.FC<ListViewProps> = ({ campaigns, columns, visibleC
             content={
               <div className="flex flex-col gap-1.5 text-left py-0.5 px-0.5">
                 <div className="flex items-center justify-between gap-6 text-[12px]">
-                  <span className="text-gray-400 font-normal">Total Gasto:</span>
+                  <span className="text-[color:var(--sl-fg-base-muted)] font-normal">Total Gasto:</span>
                   <span className="font-normal tabular-nums text-white">{formatCurrency(campaign.spend)}</span>
                 </div>
                 <div className="flex items-center justify-between gap-6 text-[12px]">
-                  <span className="text-gray-400 font-normal">Disponível:</span>
-                  <span className={`font-normal tabular-nums ${available === 0 ? 'text-gray-500' : 'text-green-400'}`}>
+                  <span className="text-[color:var(--sl-fg-base-muted)] font-normal">Disponível:</span>
+                  <span className={`font-normal tabular-nums ${available === 0 ? 'text-[color:var(--sl-fg-base-soft)]' : 'text-[color:var(--sl-fg-base-muted)]'}`}>
                     {formatCurrency(available)}
                   </span>
                 </div>
@@ -373,17 +373,17 @@ export const ListView: React.FC<ListViewProps> = ({ campaigns, columns, visibleC
       case 'startDate':
         return (
           <div className="flex flex-col">
-            <span className="text-xs text-gray-700 font-normal tracking-[-0.0125em]">
+            <span className="text-xs text-[color:var(--sl-fg-base)] font-normal tracking-[-0.0125em]">
               {formatDate(campaign.startDate)}
             </span>
-            <span className="text-[12px] text-gray-400 mt-0.5 tracking-[-0.0125em]">
+            <span className="text-[12px] text-[color:var(--sl-fg-base-muted)] mt-0.5 tracking-[-0.0125em]">
               até {formatDate(campaign.endDate)}
             </span>
           </div>
         );
       case 'duration':
         return (
-          <span className="text-sm text-gray-500 font-normal tracking-[-0.0125em]">
+          <span className="text-sm text-[color:var(--sl-fg-base-soft)] font-normal tracking-[-0.0125em]">
             {getDuration(campaign.startDate, campaign.endDate)}
           </span>
         );
@@ -394,8 +394,8 @@ export const ListView: React.FC<ListViewProps> = ({ campaigns, columns, visibleC
 
   if (campaigns.length === 0) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center text-gray-400 min-h-[400px]">
-        <span className="material-symbols-outlined text-[48px] mb-4 text-gray-200">search_off</span>
+      <div className="flex-1 flex flex-col items-center justify-center text-[color:var(--sl-fg-base-muted)] min-h-[400px]">
+        <span className="material-symbols-outlined text-[48px] mb-4 text-[color:var(--sl-fg-base-muted)]">search_off</span>
         <p className="text-sm font-medium">Nenhuma campanha encontrada</p>
       </div>
     );
@@ -428,15 +428,15 @@ export const ListView: React.FC<ListViewProps> = ({ campaigns, columns, visibleC
                   <LazyImage src={campaign.products?.[0]?.imageUrl || campaign.imageUrl} className="w-full h-full object-contain" alt="" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 truncate">{campaign.title || 'Sem título'}</p>
+                  <p className="text-sm font-medium text-[color:var(--sl-fg-base)] truncate">{campaign.title || 'Sem título'}</p>
                   <div className="flex items-center gap-2 mt-1 flex-wrap">
                     <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium ${
-                      campaign.status === 'Ativo' ? 'bg-green-50 text-green-700' :
-                      campaign.status === 'Concluído' ? 'bg-blue-50 text-blue-700' : 'bg-gray-100 text-gray-600'
+                      campaign.status === 'Ativo' ? 'bg-green-50 text-[color:var(--sl-fg-base)]' :
+                      campaign.status === 'Concluído' ? 'bg-blue-50 text-[color:var(--sl-fg-base-soft)]' : 'bg-gray-100 text-[color:var(--sl-fg-base-soft)]'
                     }`}>
                       {campaign.status}
                     </span>
-                    <span className="text-xs text-gray-400">
+                    <span className="text-xs text-[color:var(--sl-fg-base-muted)]">
                       {formatDate(campaign.startDate)} – {formatDate(campaign.endDate)}
                     </span>
                   </div>
@@ -444,7 +444,7 @@ export const ListView: React.FC<ListViewProps> = ({ campaigns, columns, visibleC
                 <button
                   type="button"
                   onClick={(e) => openMobileContextMenu(e, campaign)}
-                  className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600 touch-manipulation shrink-0 -mr-1"
+                  className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full text-[color:var(--sl-fg-base-muted)] hover:bg-gray-100 hover:text-[color:var(--sl-fg-base-soft)] touch-manipulation shrink-0 -mr-1"
                   aria-label="Abrir opções"
                 >
                   <span className="material-symbols-outlined text-[22px]">more_vert</span>
@@ -530,9 +530,9 @@ export const ListView: React.FC<ListViewProps> = ({ campaigns, columns, visibleC
               onCampaignClick(contextMenu.campaign);
               setContextMenu(null);
             }}
-            className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 flex items-center gap-3 transition-colors"
+            className="w-full text-left px-4 py-2.5 text-sm text-[color:var(--sl-fg-base)] hover:bg-gray-50 hover:text-[color:var(--sl-fg-base)] flex items-center gap-3 transition-colors"
           >
-            <span className="material-symbols-outlined text-[18px] text-gray-500">edit</span>
+            <span className="material-symbols-outlined text-[18px] text-[color:var(--sl-fg-base-soft)]">edit</span>
             Editar
           </button>
           <button 
@@ -540,9 +540,9 @@ export const ListView: React.FC<ListViewProps> = ({ campaigns, columns, visibleC
               if (onDuplicateCampaign) onDuplicateCampaign(contextMenu.campaign);
               setContextMenu(null);
             }}
-            className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 flex items-center gap-3 transition-colors"
+            className="w-full text-left px-4 py-2.5 text-sm text-[color:var(--sl-fg-base)] hover:bg-gray-50 hover:text-[color:var(--sl-fg-base)] flex items-center gap-3 transition-colors"
           >
-            <span className="material-symbols-outlined text-[18px] text-gray-500">content_copy</span>
+            <span className="material-symbols-outlined text-[18px] text-[color:var(--sl-fg-base-soft)]">content_copy</span>
             Duplicar
           </button>
           <div className="h-px bg-gray-100 my-1" />
@@ -551,7 +551,7 @@ export const ListView: React.FC<ListViewProps> = ({ campaigns, columns, visibleC
               if (onDeleteCampaign) onDeleteCampaign(contextMenu.campaign.id);
               setContextMenu(null);
             }}
-            className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 hover:text-red-700 flex items-center gap-3 transition-colors"
+            className="w-full text-left px-4 py-2.5 text-sm text-[color:var(--sl-fg-base-soft)] hover:bg-red-50 hover:text-[color:var(--sl-fg-base)] flex items-center gap-3 transition-colors"
           >
             <span className="material-symbols-outlined text-[18px]">delete</span>
             Apagar

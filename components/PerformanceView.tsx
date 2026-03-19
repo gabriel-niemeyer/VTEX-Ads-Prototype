@@ -172,10 +172,10 @@ export const PerformanceView: React.FC<PerformanceViewProps> = ({ campaigns, col
   }, [campaigns]);
 
   const RoasBadge = ({ value }: { value: number }) => {
-    let colorClass = 'text-gray-700 bg-gray-50';
-    if (value >= 10) colorClass = 'text-green-700 bg-green-50 font-normal';
-    else if (value >= 5) colorClass = 'text-blue-700 bg-blue-50';
-    else if (value < 2 && value > 0) colorClass = 'text-red-700 bg-red-50';
+    let colorClass = 'text-[color:var(--sl-fg-base)] bg-gray-50';
+    if (value >= 10) colorClass = 'text-[color:var(--sl-fg-base)] bg-green-50 font-normal';
+    else if (value >= 5) colorClass = 'text-[color:var(--sl-fg-base-soft)] bg-blue-50';
+    else if (value < 2 && value > 0) colorClass = 'text-[color:var(--sl-fg-base)] bg-red-50';
 
     return (
       <div className={`inline-flex justify-end px-2 py-1 rounded-md min-w-[3.5rem] ${colorClass}`}>
@@ -187,7 +187,7 @@ export const PerformanceView: React.FC<PerformanceViewProps> = ({ campaigns, col
   const renderCell = (colId: SortKey, campaign: Campaign, metrics: any) => {
     // Style definition to match "Pedidos" (Conversions)
     // Added tracking-[-0.0125em] for tighter letter spacing
-    const standardCellStyle = "text-gray-600 font-variant-numeric tabular-nums tracking-[-0.0125em]";
+    const standardCellStyle = "text-[color:var(--sl-fg-base-soft)] font-variant-numeric tabular-nums tracking-[-0.0125em]";
 
     switch (colId) {
       case 'title':
@@ -200,8 +200,8 @@ export const PerformanceView: React.FC<PerformanceViewProps> = ({ campaigns, col
                   <LazyImage src={campaign.products?.[0]?.imageUrl || campaign.imageUrl} className="w-full h-full rounded" alt="" />
               </div>
               <div>
-                  <div className="font-medium text-gray-900 tracking-[-0.0125em] group-hover/title:underline decoration-gray-900 underline-offset-2">{campaign.title}</div>
-                  <div className="text-xs text-gray-400">{campaign.publisher}</div>
+                  <div className="font-medium text-[color:var(--sl-fg-base)] tracking-[-0.0125em] group-hover/title:underline decoration-gray-900 underline-offset-2">{campaign.title}</div>
+                  <div className="text-xs text-[color:var(--sl-fg-base-muted)]">{campaign.publisher}</div>
               </div>
           </div>
         );
@@ -225,12 +225,12 @@ export const PerformanceView: React.FC<PerformanceViewProps> = ({ campaigns, col
                 <div 
                   className="w-7 h-7 rounded-full bg-white border border-gray-200 flex items-center justify-center relative hover:scale-110 transition-transform cursor-default shadow-sm"
                 >
-                  <span className="material-symbols-outlined text-[14px] text-gray-500">{getMediaIcon(type)}</span>
+                  <span className="material-symbols-outlined text-[14px] text-[color:var(--sl-fg-base-soft)]">{getMediaIcon(type)}</span>
                 </div>
               </Tooltip>
             ))}
             {campaign.mediaTypes.length === 0 && (
-               <span className="text-xs text-gray-400 italic">Nenhuma</span>
+               <span className="text-xs text-[color:var(--sl-fg-base-muted)] italic">Nenhuma</span>
             )}
           </div>
         );
@@ -296,8 +296,8 @@ export const PerformanceView: React.FC<PerformanceViewProps> = ({ campaigns, col
       {/* Mobile: cards com métricas essenciais (ROAS, Receita, Status) */}
       <div className="flex-1 overflow-auto scroll-touch md:hidden pb-4">
         {sortedCampaigns.length === 0 ? (
-          <div className="flex flex-col items-center justify-center text-gray-400 min-h-[300px] px-4">
-            <span className="material-symbols-outlined text-[48px] mb-4 text-gray-200">analytics</span>
+          <div className="flex flex-col items-center justify-center text-[color:var(--sl-fg-base-muted)] min-h-[300px] px-4">
+            <span className="material-symbols-outlined text-[48px] mb-4 text-[color:var(--sl-fg-base-muted)]">analytics</span>
             <p className="text-sm font-medium text-center">Nenhuma campanha para exibir</p>
           </div>
         ) : (
@@ -316,23 +316,23 @@ export const PerformanceView: React.FC<PerformanceViewProps> = ({ campaigns, col
                     <LazyImage src={campaign.products?.[0]?.imageUrl || campaign.imageUrl} className="w-full h-full object-contain" alt="" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900 truncate">{campaign.title || 'Sem título'}</p>
+                    <p className="text-sm font-medium text-[color:var(--sl-fg-base)] truncate">{campaign.title || 'Sem título'}</p>
                     <div className="flex items-center gap-2 mt-1 flex-wrap">
                       <span className={`inline-flex px-2 py-0.5 rounded-md text-[11px] font-medium ${
-                        campaign.status === 'Ativo' ? 'bg-green-50 text-green-700' :
-                        campaign.status === 'Concluído' ? 'bg-blue-50 text-blue-700' : 'bg-gray-100 text-gray-600'
+                        campaign.status === 'Ativo' ? 'bg-green-50 text-[color:var(--sl-fg-base)]' :
+                        campaign.status === 'Concluído' ? 'bg-blue-50 text-[color:var(--sl-fg-base-soft)]' : 'bg-gray-100 text-[color:var(--sl-fg-base-soft)]'
                       }`}>
                         {campaign.status}
                       </span>
-                      <span className="text-xs font-medium text-gray-700 tabular-nums">
+                      <span className="text-xs font-medium text-[color:var(--sl-fg-base)] tabular-nums">
                         ROAS {roas.toFixed(2)}x
                       </span>
-                      <span className="text-xs text-gray-500">
+                      <span className="text-xs text-[color:var(--sl-fg-base-soft)]">
                         {formatCurrency(campaign.revenue)}
                       </span>
                     </div>
                   </div>
-                  <span className="material-symbols-outlined text-gray-300 shrink-0">chevron_right</span>
+                  <span className="material-symbols-outlined text-[color:var(--sl-fg-base-muted)] shrink-0">chevron_right</span>
                 </button>
               </li>
             );
@@ -379,7 +379,7 @@ export const PerformanceView: React.FC<PerformanceViewProps> = ({ campaigns, col
                       py-4 px-6 text-[12px] font-normal select-none cursor-pointer transition-colors 
                       ${col.defaultWidth} 
                       ${col.align === 'right' ? 'text-right' : 'text-left'} 
-                      ${isActive || isHovered ? 'text-gray-700' : 'text-gray-400 hover:text-gray-600'}
+                      ${isActive || isHovered ? 'text-[color:var(--sl-fg-base)]' : 'text-[color:var(--sl-fg-base-muted)] hover:text-[color:var(--sl-fg-base-soft)]'}
                       ${stickyStyles}
                       whitespace-nowrap
                     `}
@@ -473,7 +473,7 @@ export const PerformanceView: React.FC<PerformanceViewProps> = ({ campaigns, col
                         key={col.id} 
                         onMouseEnter={() => setHoveredColumn(col.id)}
                         onMouseLeave={() => setHoveredColumn(null)}
-                        className={`py-6 px-6 ${col.align === 'right' ? 'text-right' : 'text-left'} text-gray-900 tracking-[-0.0125em] ${isHovered ? 'bg-gray-100' : 'bg-gray-50'} ${isFirstVisible ? 'font-normal' : ''} ${stickyClasses} whitespace-nowrap`}
+                        className={`py-6 px-6 ${col.align === 'right' ? 'text-right' : 'text-left'} text-[color:var(--sl-fg-base)] tracking-[-0.0125em] ${isHovered ? 'bg-gray-100' : 'bg-gray-50'} ${isFirstVisible ? 'font-normal' : ''} ${stickyClasses} whitespace-nowrap`}
                     >
                       {content}
                     </td>

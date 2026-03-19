@@ -64,7 +64,7 @@ export const Tooltip: React.FC<TooltipProps> = ({ text, content, children, class
           <>
             <span className="mr-0.5">{mainText}</span>
             {shortcutKey && (
-              <span className="ml-2 flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold font-sans text-gray-300 bg-white/10 border border-white/10 rounded-[4px]">
+              <span className="ml-2 flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold font-sans text-[color:var(--sl-fg-base-muted)] bg-white/10 border border-white/10 rounded-[4px]">
                 {shortcutKey}
               </span>
             )}
