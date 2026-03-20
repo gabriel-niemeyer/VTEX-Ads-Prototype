@@ -42,13 +42,9 @@ const parseBr = (s: string): number => {
 };
 
 /** Valor máximo em centavos (99.999.999,99) */
-const MAX_CENTS = 999999999;
-
-const MAX_MONEY = MAX_CENTS / 100;
-
 function clampMoney(n: number): number {
   if (!Number.isFinite(n)) return 0;
-  return Math.min(MAX_MONEY, Math.max(0, n));
+  return Math.max(0, n);
 }
 
 function roundMoneyDecimals(n: number, decimals: number): number {
@@ -88,7 +84,7 @@ function caretFromDigitIndex(formatted: string, digitIndex: number): number {
 
 /** Parte inteira com separador de milhar (pt-BR), sem decimais. */
 function formatBrIntegerPart(intN: number): string {
-  const n = Math.max(0, Math.min(Math.floor(intN), Math.floor(MAX_MONEY)));
+  const n = Math.max(0, Math.floor(intN));
   const fixed = n.toFixed(0);
   const [intPart] = fixed.split('.');
   return intPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
@@ -144,7 +140,7 @@ function applyMoneyMask(
       intN = id ? parseInt(id, 10) : 0;
       fracRaw = inner.slice(lc + 1).replace(/\D/g, '').slice(0, decimals);
     }
-    const intClamped = Math.max(0, Math.min(Math.floor(intN), Math.floor(MAX_MONEY)));
+    const intClamped = Math.max(0, Math.floor(intN));
     text =
       fracRaw === ''
         ? `${formatBrIntegerPart(intClamped)},`
@@ -1484,9 +1480,9 @@ const EditableMoneyCell: React.FC<{
     size === 'md'
       ? 'min-w-[12rem] rounded-md px-1.5 py-0.5 whitespace-nowrap tabular-nums w-max max-w-full [field-sizing:content]'
       : size === 'compactAllocation'
-      ? 'min-w-0 w-full max-w-[5.25rem] rounded-md px-1 py-0.5 whitespace-nowrap tabular-nums text-xs leading-4 [field-sizing:content]'
+      ? 'min-w-0 w-full max-w-[10rem] rounded-md pl-1 pr-1 py-0.5 whitespace-nowrap tabular-nums text-xs leading-4 [field-sizing:content]'
       : size === 'compact'
-      ? 'min-w-0 w-full max-w-[4.75rem] rounded-md px-1 py-0.5 whitespace-nowrap tabular-nums text-xs leading-4 [field-sizing:content]'
+      ? 'min-w-0 w-full max-w-[4.75rem] rounded-md pl-1 pr-1 py-0.5 whitespace-nowrap tabular-nums text-xs leading-4 [field-sizing:content]'
       : 'min-w-[6.5rem] rounded-md px-1.5 py-0.5 whitespace-nowrap tabular-nums w-max max-w-full [field-sizing:content]';
 
   const commit = () => {
@@ -1552,7 +1548,7 @@ const EditableMoneyCell: React.FC<{
     <div
       className={`flex flex-col justify-center shrink-0 ${
         size === 'compact' || size === 'compactAllocation'
-          ? `w-full min-w-0 ${size === 'compactAllocation' ? 'max-w-[5.25rem]' : 'max-w-[4.75rem]'}`
+          ? `w-full min-w-0 ${size === 'compactAllocation' ? 'max-w-[10rem]' : 'max-w-[4.75rem]'}`
           : 'w-max max-w-full'
       }`}
     >
@@ -1650,7 +1646,7 @@ const MediaRow: React.FC<{
             onClick={stop}
           >
             <div className="flex flex-col justify-center min-w-0 items-start text-left">
-              <span className="text-xs leading-4 text-[color:var(--sl-fg-base-soft)]">Alocação total</span>
+              <span className="text-xs leading-4 text-[color:var(--sl-fg-base-soft)] pl-1">Alocação total</span>
               {canEdit && onAllocationChange ? (
                 <EditableMoneyCell
                   value={allocation}
@@ -1660,7 +1656,7 @@ const MediaRow: React.FC<{
                   ariaLabel={`Alocação total em reais, ${labels.name}`}
                 />
               ) : (
-                <span className="text-xs leading-4 tracking-[-0.14px] text-[color:var(--sl-fg-base)] tabular-nums max-w-[5.25rem] truncate">
+                <span className="text-xs leading-4 tracking-[-0.14px] text-[color:var(--sl-fg-base)] tabular-nums max-w-[10rem] truncate">
                   {fmtMoney(allocation)}
                 </span>
               )}
@@ -1668,7 +1664,7 @@ const MediaRow: React.FC<{
             <div className="w-[4.75rem] min-w-[4.75rem] max-w-[4.75rem] flex flex-col justify-center items-start">
               {bid && labels.bidLabel ? (
                 <>
-                  <span className="text-xs leading-4 text-[color:var(--sl-fg-base-soft)] truncate w-full">{labels.bidLabel}</span>
+                  <span className="text-xs leading-4 text-[color:var(--sl-fg-base-soft)] truncate w-full pl-1">{labels.bidLabel}</span>
                   {canEdit && onBidChange ? (
                     <EditableMoneyCell
                       value={bid.currentBid}
@@ -1693,7 +1689,7 @@ const MediaRow: React.FC<{
             <div className="w-[4.75rem] min-w-[4.75rem] max-w-[4.75rem] flex flex-col justify-center items-start">
               {bid && showSecondBid ? (
                 <>
-                  <span className="text-xs leading-4 text-[color:var(--sl-fg-base-soft)]">CPM</span>
+                  <span className="text-xs leading-4 text-[color:var(--sl-fg-base-soft)] pl-1">CPM</span>
                   {canEdit && onBidChange ? (
                     <EditableMoneyCell
                       value={bid.suggestedBid}
