@@ -643,6 +643,8 @@ const INSIGHTS_SIDEBAR_MS = 620;
 const INSIGHTS_SIDEBAR_EASING = 'cubic-bezier(0.22, 1, 0.28, 1)';
 /** Conteúdo entra um pouco antes do fim do layout para a abertura parecer contínua, não em dois passos. */
 const INSIGHTS_SIDEBAR_CONTENT_DELAY_MS = Math.round(INSIGHTS_SIDEBAR_MS * 0.34);
+/** Deslocamento do painel na animação: entrada vem da direita, saída vai para a direita (mesmo valor para consistência). */
+const INSIGHTS_SIDEBAR_SLIDE_OFFSET_PX = 18;
 const INSIGHTS_SIDEBAR_DEFAULT_W = 400;
 const INSIGHTS_SIDEBAR_MIN_W = 280;
 const INSIGHTS_SIDEBAR_HANDLE_PX = 6;
@@ -795,19 +797,19 @@ export const BudgetReportModal: React.FC<BudgetReportModalProps> = ({ campaign, 
   }, [isInsightsOpen, clampInsightsSidebarWidth]);
 
   useEffect(() => {
-    if (!isInsightsOpen) {
-      setIsInsightsContentVisible(false);
-      return;
+    if (isInsightsOpen) {
+      const reduceMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (reduceMotion) {
+        setIsInsightsContentVisible(true);
+        return;
+      }
+      const t = window.setTimeout(() => setIsInsightsContentVisible(true), INSIGHTS_SIDEBAR_CONTENT_DELAY_MS);
+      return () => window.clearTimeout(t);
+    } else {
+      // Esconder o conteúdo só depois da animação de fechamento (mesmo tempo e aceleração da abertura)
+      const t = window.setTimeout(() => setIsInsightsContentVisible(false), INSIGHTS_SIDEBAR_MS);
+      return () => window.clearTimeout(t);
     }
-
-    const reduceMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduceMotion) {
-      setIsInsightsContentVisible(true);
-      return;
-    }
-
-    const t = window.setTimeout(() => setIsInsightsContentVisible(true), INSIGHTS_SIDEBAR_CONTENT_DELAY_MS);
-    return () => window.clearTimeout(t);
   }, [isInsightsOpen]);
 
   useEffect(() => {
@@ -2036,7 +2038,7 @@ export const BudgetReportModal: React.FC<BudgetReportModalProps> = ({ campaign, 
       ? `${((animatedValue / totalValue) * 100).toFixed(1)}%`
       : extra;
     return (
-      <div className="flex min-w-[min(100%,260px)] grow shrink basis-[260px] flex-col gap-5 p-5 rounded-[12px] border border-[#e0e0e0] bg-white h-fit transition-shadow duration-200 hover:shadow-sm hover:border-[#d0d0d0]">
+      <div className="flex min-w-[280px] shrink-0 basis-[260px] flex-1 flex-col gap-5 p-5 rounded-[12px] border border-[#e0e0e0] bg-white h-fit transition-shadow duration-200 hover:shadow-sm hover:border-[#d0d0d0]">
         <div className="flex flex-nowrap items-center justify-between gap-2 min-h-[17px]">
           <span className="text-[16px] font-normal text-[color:var(--sl-fg-base-soft)] tracking-[-0.32px] leading-6 whitespace-nowrap" title={title}>{title}</span>
           <div className={`inline-flex items-center gap-1 px-2 py-1 rounded-[8px] shrink-0 whitespace-nowrap ${s.badgeBg}`}>
@@ -2050,9 +2052,9 @@ export const BudgetReportModal: React.FC<BudgetReportModalProps> = ({ campaign, 
             )}
           </div>
         </div>
-        <div className="flex flex-col gap-2">
-          <div className="flex flex-nowrap items-baseline justify-between gap-x-2">
-            <p className="text-[28px] font-medium text-[color:var(--sl-fg-base)] tracking-[-1.12px] tabular-nums leading-normal whitespace-nowrap">
+        <div className="flex flex-col gap-2 min-w-0">
+          <div className="flex flex-nowrap items-baseline justify-between gap-x-2 min-w-0">
+            <p className="text-[28px] font-medium text-[color:var(--sl-fg-base)] tracking-[-1.12px] tabular-nums leading-normal min-w-0 truncate" title={formatCurrencyFull(animatedValue)}>
               {formatCurrencyFull(animatedValue)}
             </p>
             {extra != null && (
@@ -2110,7 +2112,7 @@ export const BudgetReportModal: React.FC<BudgetReportModalProps> = ({ campaign, 
         >
         <div className="shrink-0 bg-white px-8 py-6 flex items-center justify-between z-10 border-b border-[#E1E1E1]">
           <div className="flex flex-col gap-0.5">
-            <h1 className="text-2xl font-medium text-[color:var(--sl-fg-base)] tracking-[-0.8px] leading-8">
+            <h1 className="text-2xl font-semibold text-[color:var(--sl-fg-base)] tracking-[-0.8px] leading-8">
               Relatório de consumo de orçamento
             </h1>
             {onOpenCampaign ? (
@@ -2130,12 +2132,12 @@ export const BudgetReportModal: React.FC<BudgetReportModalProps> = ({ campaign, 
             <button
               type="button"
               onClick={() => setIsInsightsOpen((open) => !open)}
-              className={`flex items-center gap-2 px-3 py-2 rounded-lg active:scale-95 transition-all duration-150 ease-out text-sm font-medium ${isInsightsOpen ? 'bg-[#eaf2ff] text-[color:var(--sl-fg-base-soft)]' : 'text-[color:var(--sl-fg-base-soft)] hover:bg-gray-100 hover:text-[color:var(--sl-fg-base)]'}`}
-              aria-label="Gerar insights"
-              title="Gerar insights"
+              className={`flex items-center gap-2 p-2 rounded-lg active:scale-95 transition-all duration-150 ease-out text-sm font-medium ${isInsightsOpen ? 'bg-gray-200 text-[color:var(--sl-fg-base)]' : 'text-[color:var(--sl-fg-base-soft)] hover:bg-gray-100 hover:text-[color:var(--sl-fg-base)]'}`}
+              aria-label="Ver insights"
+              title="Ver insights"
             >
-              <span className="material-symbols-outlined text-[18px]">lightbulb</span>
-              Gerar insights
+              <span className="material-symbols-outlined">lightbulb</span>
+              Ver insights
             </button>
             <button
               type="button"
@@ -2412,12 +2414,14 @@ export const BudgetReportModal: React.FC<BudgetReportModalProps> = ({ campaign, 
           onKeyDown={onInsightsResizeKeyDown}
         />
         <aside
-          className={`min-w-0 overflow-hidden bg-white ${isInsightsOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+          className={`overflow-hidden bg-white ${isInsightsOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
           style={{
+            width: insightsSidebarWidth,
+            minWidth: insightsSidebarWidth,
             transitionProperty: 'opacity, transform',
             transitionDuration: `${INSIGHTS_SIDEBAR_MS}ms`,
             transitionTimingFunction: INSIGHTS_SIDEBAR_EASING,
-            transform: isInsightsOpen ? 'translateX(0)' : 'translateX(10px)',
+            transform: isInsightsOpen ? 'translateX(0)' : `translateX(${INSIGHTS_SIDEBAR_SLIDE_OFFSET_PX}px)`,
           }}
         >
           <div className="flex h-full min-h-0 flex-col overflow-y-auto bg-white custom-scrollbar">
