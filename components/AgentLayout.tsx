@@ -89,34 +89,13 @@ export const AgentLayout: React.FC<AgentLayoutProps> = ({
     }
   }, [editingCampaign]);
 
-  const suggestedCampaigns = useMemo(() => {
-    const list = campaigns
-      .filter((c) => suggestedCampaignIds.includes(c.id))
-      .sort((a, b) => (a.startDate?.getTime() ?? 0) - (b.startDate?.getTime() ?? 0))
-      .map((c) => ({ ...c, status: CampaignStatus.DRAFT }));
-
-    const now = new Date();
-    const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
-
-    let nextStart = tomorrow;
-    const oneDayMs = 24 * 60 * 60 * 1000;
-    return list.map((c) => {
-      const start = c.startDate instanceof Date ? c.startDate : new Date(c.startDate);
-      const end = c.endDate instanceof Date ? c.endDate : new Date(c.endDate);
-      let durationMs = end.getTime() - start.getTime();
-      if (!Number.isFinite(durationMs) || durationMs < 0) durationMs = 15 * oneDayMs; // fallback 15 dias
-
-      const useShift = start.getTime() < nextStart.getTime();
-      const startDate = useShift ? new Date(nextStart) : new Date(start);
-      const endDate = useShift
-        ? new Date(startDate.getTime() + durationMs)
-        : new Date(end);
-
-      nextStart = new Date(endDate.getTime() + oneDayMs);
-
-      return { ...c, startDate, endDate };
-    });
-  }, [campaigns, suggestedCampaignIds]);
+  const suggestedCampaigns = useMemo(
+    () =>
+      campaigns
+        .filter((c) => suggestedCampaignIds.includes(c.id))
+        .map((c) => ({ ...c, status: CampaignStatus.DRAFT })),
+    [campaigns, suggestedCampaignIds]
+  );
 
   const handleSend = useCallback(
     (text: string) => {
