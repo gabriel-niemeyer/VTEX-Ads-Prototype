@@ -1,9 +1,11 @@
 
-import React, { useMemo, useRef, useState, useEffect } from 'react';
+import React, { useMemo, useRef, useState, useEffect, useLayoutEffect, useCallback } from 'react';
 import { Campaign, TimelineDay, CampaignStatus } from '../types';
 import { LazyImage } from './LazyImage';
 import { 
-  TIMELINE_START_DATE, 
+  TIMELINE_START_DATE,
+  TIMELINE_INITIAL_SCROLL_DATE,
+  TIMELINE_SCROLL_AFTER_CANVAS_REVEAL_MS,
   TOTAL_DAYS, 
   MONTH_NAMES_PT,
   ROW_HEIGHT 
@@ -65,6 +67,14 @@ export const Timeline: React.FC<TimelineProps> = ({
     return (diff >= 0 && diff < TOTAL_DAYS) ? diff : -1;
   }, []);
 
+  /** Índice do dia 15/04 (alinhado ao início das campanhas) — scroll inicial do canvas. */
+  const initialScrollDayIdx = useMemo(() => {
+    const diff = Math.floor(
+      (TIMELINE_INITIAL_SCROLL_DATE.getTime() - TIMELINE_START_DATE.getTime()) / (1000 * 60 * 60 * 24)
+    );
+    return diff >= 0 && diff < TOTAL_DAYS ? diff : 0;
+  }, []);
+
   const scrollRafRef = useRef<number | null>(null);
   const handleTimelineScroll = () => {
     if (scrollRafRef.current != null) cancelAnimationFrame(scrollRafRef.current);
@@ -85,18 +95,44 @@ export const Timeline: React.FC<TimelineProps> = ({
     return todayCenter >= scrollLeft && todayCenter <= scrollLeft + containerWidth;
   }, [todayIdx, columnWidth, scrollLeft, containerWidth]);
 
-  const hasScrolledToTodayRef = useRef(false);
-  useEffect(() => {
-    if (todayIdx < 0 || hasScrolledToTodayRef.current) return;
+  /** Scroll inicial para 15/04 só quando o container tem largura real (canvas após animação do layout). */
+  const hasScrolledToInitialFocusRef = useRef(false);
+
+  const applyInitialScrollToApril15 = useCallback((el: HTMLDivElement) => {
+    if (hasScrolledToInitialFocusRef.current) return;
+    const w = el.clientWidth;
+    if (w <= 0 || el.scrollWidth <= 0) return;
+    const maxLeft = Math.max(0, el.scrollWidth - w);
+    const centerOnDay = initialScrollDayIdx * columnWidth + columnWidth / 2;
+    const targetScroll = Math.min(maxLeft, Math.max(0, centerOnDay - w / 2));
+    hasScrolledToInitialFocusRef.current = true;
+    el.scrollTo({ left: targetScroll, top: el.scrollTop, behavior: 'auto' });
+  }, [initialScrollDayIdx, columnWidth]);
+
+  useLayoutEffect(() => {
     const el = containerRef.current;
     if (!el) return;
-    hasScrolledToTodayRef.current = true;
-    const targetScroll = Math.max(0, todayIdx * columnWidth - el.clientWidth / 2 + columnWidth / 2);
-    const t = setTimeout(() => {
-      el.scrollTo({ left: targetScroll, behavior: 'smooth' });
-    }, 100);
-    return () => clearTimeout(t);
-  }, [todayIdx, columnWidth]);
+    applyInitialScrollToApril15(el);
+  }, [applyInitialScrollToApril15]);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    const ro = new ResizeObserver(() => {
+      applyInitialScrollToApril15(el);
+    });
+    ro.observe(el);
+
+    const t = window.setTimeout(() => {
+      applyInitialScrollToApril15(el);
+    }, TIMELINE_SCROLL_AFTER_CANVAS_REVEAL_MS);
+
+    return () => {
+      ro.disconnect();
+      window.clearTimeout(t);
+    };
+  }, [applyInitialScrollToApril15]);
 
   useEffect(() => {
     setShowBackToToday(todayIdx >= 0 && !isTodayInViewport);

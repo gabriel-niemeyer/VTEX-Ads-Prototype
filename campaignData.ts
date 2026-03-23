@@ -183,68 +183,67 @@ const spec = (
   status,
 });
 
+/** Todas as campanhas começam em 15/04 ou depois; títulos alinhados ao calendário comercial BR (2026). */
 const CAMPAIGN_SPECS: CampaignSpec[] = [
-  spec(0, 5, 18, 'Volta às Aulas: Lancheira com Nescau e Cereais', 'lancheira', 'Carrefour', 42000, ['Produto patrocinado', 'Banner patrocinado', 'Instore display'], 7),
-  spec(0, 9, 16, 'Café da Manhã de Verão com Nestlé', 'breakfast', 'Extra', 28000, ['Produto patrocinado', 'Marca patrocinada'], 6),
-  spec(0, 13, 12, 'Rotina Infantil: Fórmulas e Compostos Lácteos', 'infant', 'Amazon Brasil', 36000, ['Produto patrocinado', 'Banner patrocinado'], 5),
-  spec(0, 20, 11, 'Janeiro Gelado: Sorvetes Nestlé', 'sorvetes', 'Mercado Livre', 22000, ['Banner patrocinado', 'Video'], 6),
+  // Abril — pós-Páscoa (05/04), esquenta Dia das Mães (10/05)
+  spec(3, 15, 12, 'Pós-Páscoa: recompra de chocolates e bombons', 'chocolates', 'Carrefour', 32000, ['Produto patrocinado', 'Banner patrocinado'], 7),
+  spec(3, 18, 11, 'Esquenta Dia das Mães: café da manhã com Nescafé e cereais', 'breakfast', 'Extra', 30000, ['Produto patrocinado', 'Marca patrocinada'], 6),
+  spec(3, 22, 10, 'Presentes doces: KitKat, Alpino e Talento para surpreender', 'chocolates', 'Mercado Livre', 28000, ['Banner patrocinado', 'Video'], 7),
+  spec(3, 26, 9, 'Receitas com Moça e Leite Moça para o Dia das Mães', 'culinary', 'Pão de Açúcar', 26000, ['Produto patrocinado', 'Video'], 5),
 
-  spec(1, 2, 13, 'Esquenta Carnaval com Chocolates Nestlé', 'chocolates', 'Carrefour', 26000, ['Banner patrocinado', 'Video'], 7),
-  spec(1, 8, 14, 'Última Chamada Volta às Aulas: Biscoitos e Achocolatados', 'lancheira', 'Extra', 31000, ['Produto patrocinado', 'Banner patrocinado'], 6),
-  spec(1, 12, 10, 'Café Gelado e Cappuccino Nescafé', 'beverages', 'Amazon Brasil', 19000, ['Produto patrocinado', 'Marca patrocinada'], 5),
-  spec(1, 17, 12, 'Iogurtes e Lácteos para o Dia a Dia', 'dairy', 'Pão de Açúcar', 24000, ['Produto patrocinado', 'Banner patrocinado'], 6),
+  // Maio — Dia do Trabalho (01/05), Dia das Mães (10/05)
+  spec(4, 1, 10, 'Dia do Trabalho: pausa para café com Nescafé e cappuccino', 'beverages', 'Carrefour', 24000, ['Produto patrocinado', 'Marca patrocinada', 'Instore display'], 6),
+  spec(4, 4, 8, 'Semana do Dia das Mães: iogurtes, Chandelle e sobremesas', 'dairy', 'Extra', 35000, ['Produto patrocinado', 'Banner patrocinado'], 6),
+  spec(4, 8, 7, 'Dia das Mães: mix café da manhã e chocolates premium', 'rotina', 'Amazon Brasil', 42000, ['Produto patrocinado', 'Banner patrocinado', 'Marca patrocinada'], 8),
+  spec(4, 12, 10, 'Pós-Dia das Mães: biscoitos e achocolatado para a família', 'lancheira', 'Rappi', 27000, ['Produto patrocinado', 'Banner patrocinado'], 7),
+  spec(4, 18, 11, 'Maio em família: fórmulas infantis e compostos lácteos', 'infant', 'Magalu', 33000, ['Produto patrocinado', 'Marca patrocinada'], 5),
+  spec(4, 25, 10, 'Nutrição no outono: Nutren, aveia Neston e rotina', 'nutricao', 'Pão de Açúcar', 29000, ['Produto patrocinado', 'Video'], 6),
 
-  spec(2, 1, 21, 'Semana do Consumidor: Mix Nestlé para Despensa', 'rotina', 'Carrefour', 56000, ['Produto patrocinado', 'Marca patrocinada', 'Instore display'], 8),
-  spec(2, 4, 16, 'Semana do Consumidor: Chocolates e Wafer', 'chocolates', 'Mercado Livre', 37000, ['Banner patrocinado', 'Video'], 7),
-  spec(2, 7, 18, 'Pré-Páscoa: Alpino, KitKat e Garoto', 'pascoa', 'Extra', 48000, ['Produto patrocinado', 'Banner patrocinado', 'Marca patrocinada'], 8),
-  spec(2, 10, 13, 'Março Saudável: Neston, Aveia e Nutren', 'nutricao', 'Amazon Brasil', 29000, ['Produto patrocinado', 'Video'], 6),
-  spec(2, 15, 14, 'Busca Patrocinada: Iogurtes e Sobremesas Nestlé', 'dairy', 'Rappi', 27000, ['Produto patrocinado', 'Banner patrocinado'], 6),
-  spec(2, 21, 12, 'Março Infantil: Nan, Neslac e Nestogeno', 'infant', 'Magalu', 33000, ['Produto patrocinado', 'Marca patrocinada'], 5),
+  // Junho — Festa Junina e Dia dos Namorados (12/06)
+  spec(5, 2, 14, 'Esquenta Festa Junina: achocolatado, biscoitos e pipoca', 'lancheira', 'Carrefour', 31000, ['Produto patrocinado', 'Banner patrocinado', 'Instore display'], 7),
+  spec(5, 8, 12, 'Festa Junina: chocolates quentes e wafer para a quadrilha', 'chocolates', 'Extra', 28000, ['Banner patrocinado', 'Video'], 6),
+  spec(5, 12, 9, 'Dia dos Namorados: presentes com Talento, Garoto e bombons', 'chocolates', 'Mercado Livre', 38000, ['Produto patrocinado', 'Banner patrocinado', 'Marca patrocinada'], 8),
+  spec(5, 16, 11, 'Inverno: Nescafé Dolce Gusto e bebidas quentes', 'beverages', 'Amazon Brasil', 26000, ['Produto patrocinado', 'Marca patrocinada'], 5),
+  spec(5, 22, 10, 'Sobremesas de festa: Moça, creme de leite e leite condensado', 'sobremesas', 'Rappi', 25000, ['Produto patrocinado', 'Banner patrocinado'], 6),
 
-  spec(3, 1, 20, 'Páscoa Nestlé: Ovos e Bombons em Destaque', 'pascoa', 'Carrefour', 68000, ['Produto patrocinado', 'Banner patrocinado', 'Marca patrocinada', 'Instore display'], 8),
-  spec(3, 4, 17, 'Páscoa Carrefour: KitKat, Alpino e Talento', 'pascoa', 'Extra', 52000, ['Produto patrocinado', 'Banner patrocinado', 'Video'], 7),
-  spec(3, 10, 12, 'Sobremesas de Páscoa com Moça e Creme de Leite', 'sobremesas', 'Pão de Açúcar', 34000, ['Marca patrocinada', 'Video'], 6),
-  spec(3, 18, 11, 'Pós-Páscoa: Chocolate para Recompra', 'chocolates', 'Mercado Livre', 25000, ['Produto patrocinado', 'Banner patrocinado'], 6),
+  // Julho — férias escolares (inverno no BR)
+  spec(6, 1, 14, 'Férias de julho: sorvetes Nestlé e momentos gelados', 'sorvetes', 'Carrefour', 27000, ['Banner patrocinado', 'Video'], 6),
+  spec(6, 8, 12, 'Lanche de férias: cookies, Nesfit e Nescau', 'biscoitos', 'Extra', 26000, ['Produto patrocinado', 'Banner patrocinado'], 7),
+  spec(6, 14, 11, 'Café da tarde em casa: Nescafé e Chocobiscuit', 'beverages', 'Pão de Açúcar', 22000, ['Produto patrocinado', 'Marca patrocinada'], 5),
+  spec(6, 20, 12, 'Meio do ano: linha infantil Nan, Neslac e rotina', 'infant', 'Amazon Brasil', 32000, ['Produto patrocinado', 'Banner patrocinado'], 5),
 
-  spec(4, 2, 14, 'Dia das Mães: Café da Manhã com Nescafé e Iogurtes', 'rotina', 'Carrefour', 36000, ['Produto patrocinado', 'Marca patrocinada'], 7),
-  spec(4, 6, 13, 'Receitas com Moça para Presentear no Dia das Mães', 'culinary', 'Extra', 27000, ['Banner patrocinado', 'Video'], 5),
-  spec(4, 12, 10, 'Chocolates Premium para Compartilhar', 'chocolates', 'Amazon Brasil', 24000, ['Produto patrocinado', 'Banner patrocinado'], 6),
-  spec(4, 18, 12, 'Rotina em Família: Lácteos e Cereais Nestlé', 'breakfast', 'Pão de Açúcar', 22000, ['Produto patrocinado', 'Banner patrocinado'], 6),
+  // Agosto — Dia dos Pais (09/08/2026)
+  spec(7, 1, 12, 'Pré-Dia dos Pais: cafés especiais e cappuccinos', 'beverages', 'Carrefour', 26000, ['Produto patrocinado', 'Marca patrocinada', 'Instore display'], 5),
+  spec(7, 7, 8, 'Dia dos Pais: chocolates premium e kits para presentear', 'chocolates', 'Mercado Livre', 36000, ['Produto patrocinado', 'Banner patrocinado', 'Video'], 7),
+  spec(7, 12, 10, 'Pós-Dia dos Pais: cereais e café da manhã completo', 'breakfast', 'Extra', 23000, ['Produto patrocinado', 'Banner patrocinado'], 6),
+  spec(7, 18, 11, 'Agosto saudável: Nutren, aveia e rotina 50+', 'nutricao', 'Rappi', 28000, ['Produto patrocinado', 'Video'], 5),
+  spec(7, 25, 10, 'Despensa Nestlé: Moça, creme de leite e mercearia', 'culinary', 'Pão de Açúcar', 27000, ['Produto patrocinado', 'Banner patrocinado'], 5),
 
-  spec(5, 3, 15, 'Festa Junina: Achocolatados e Biscoitos Nestlé', 'lancheira', 'Carrefour', 30000, ['Produto patrocinado', 'Banner patrocinado', 'Instore display'], 7),
-  spec(5, 7, 14, 'Arraiá do Doce: Chocolates e Wafer', 'chocolates', 'Extra', 26000, ['Banner patrocinado', 'Video'], 6),
-  spec(5, 11, 12, 'Cappuccino e Nescafé para o Inverno', 'beverages', 'Amazon Brasil', 21000, ['Produto patrocinado', 'Marca patrocinada'], 5),
-  spec(5, 19, 10, 'Sobremesas Cremosas com Moça', 'sobremesas', 'Rappi', 23000, ['Produto patrocinado', 'Banner patrocinado'], 6),
+  // Setembro — primavera, volta às aulas (2º semestre)
+  spec(8, 2, 13, 'Primavera: lanches leves, cereais e iogurtes', 'breakfast', 'Carrefour', 24000, ['Produto patrocinado', 'Banner patrocinado'], 6, CampaignStatus.DRAFT),
+  spec(8, 9, 12, 'Volta às aulas 2º semestre: lancheira com Nescau e biscoitos', 'lancheira', 'Extra', 29000, ['Produto patrocinado', 'Banner patrocinado'], 7, CampaignStatus.DRAFT),
+  spec(8, 16, 11, 'Momento doce: chocolates para compartilhar na escola', 'chocolates', 'Mercado Livre', 25000, ['Banner patrocinado', 'Video'], 6, CampaignStatus.DRAFT),
+  spec(8, 23, 10, 'Iogurtes e sobremesas para a rotina de setembro', 'dairy', 'Amazon Brasil', 22000, ['Produto patrocinado', 'Marca patrocinada'], 6, CampaignStatus.DRAFT),
 
-  spec(6, 2, 17, 'Férias de Julho: Sorvetes Nestlé em Alta', 'sorvetes', 'Carrefour', 26000, ['Banner patrocinado', 'Video'], 6),
-  spec(6, 6, 14, 'Snacks de Férias: Biscoitos e Chocolates', 'biscoitos', 'Mercado Livre', 24000, ['Produto patrocinado', 'Banner patrocinado'], 7),
-  spec(6, 13, 10, 'Café da Tarde com Nescafé e Cookies', 'beverages', 'Extra', 20000, ['Produto patrocinado', 'Marca patrocinada'], 5),
-  spec(6, 20, 11, 'Linha Infantil para Reforço da Rotina', 'infant', 'Amazon Brasil', 31000, ['Produto patrocinado', 'Banner patrocinado'], 5),
+  // Outubro — Dia das Crianças (12/10)
+  spec(9, 1, 11, 'Esquenta Dia das Crianças: Chambinho, Chamyto e doces', 'dairy', 'Carrefour', 30000, ['Produto patrocinado', 'Banner patrocinado'], 7),
+  spec(9, 8, 8, 'Dia das Crianças: biscoitos, cereais e surpresa Nestlé', 'lancheira', 'Extra', 36000, ['Produto patrocinado', 'Banner patrocinado', 'Instore display'], 7),
+  spec(9, 12, 10, 'Outubro: sorvetes e sobremesas para a família', 'sorvetes', 'Rappi', 24000, ['Banner patrocinado', 'Video'], 6),
+  spec(9, 18, 11, 'Nutrição infantil: fórmulas e papinhas Nestlé', 'infant', 'Magalu', 31000, ['Produto patrocinado', 'Marca patrocinada'], 5),
+  spec(9, 25, 10, 'Esquenta Black Friday: mix despensa Nestlé', 'rotina', 'Pão de Açúcar', 38000, ['Produto patrocinado', 'Marca patrocinada'], 8),
 
-  spec(7, 4, 12, 'Dia dos Pais: Cafés e Cappuccinos Nestlé', 'beverages', 'Carrefour', 25000, ['Produto patrocinado', 'Marca patrocinada', 'Instore display'], 5),
-  spec(7, 8, 14, 'Presenteie com Chocolates Premium', 'chocolates', 'Extra', 28000, ['Banner patrocinado', 'Video'], 6),
-  spec(7, 15, 11, 'Café da Manhã Completo com Cereais Nestlé', 'breakfast', 'Pão de Açúcar', 22000, ['Produto patrocinado', 'Banner patrocinado'], 6),
-  spec(7, 21, 10, 'Rotina Saudável com Nutren e Aveia', 'nutricao', 'Rappi', 27000, ['Produto patrocinado', 'Video'], 5),
+  // Novembro — Black Friday (27/11/2026)
+  spec(10, 1, 14, 'Novembro: chocolates e wafer em destaque', 'chocolates', 'Carrefour', 40000, ['Produto patrocinado', 'Banner patrocinado', 'Video'], 7, CampaignStatus.DRAFT),
+  spec(10, 10, 12, 'Esquenta Black Friday: multipacks mercearia Moça e Leite Moça', 'culinary', 'Extra', 42000, ['Produto patrocinado', 'Banner patrocinado'], 6, CampaignStatus.DRAFT),
+  spec(10, 18, 11, 'Black Friday: Nescafé, Nescau e bebidas', 'beverages', 'Amazon Brasil', 35000, ['Marca patrocinada', 'Video', 'Produto patrocinado'], 6, CampaignStatus.DRAFT),
+  spec(10, 24, 10, 'Black Friday Nestlé: full mix patrocinado', 'rotina', 'Mercado Livre', 52000, ['Produto patrocinado', 'Banner patrocinado', 'Marca patrocinada'], 8, CampaignStatus.DRAFT),
 
-  spec(8, 3, 15, 'Primavera Nestlé: Lanches Leves e Cereais', 'breakfast', 'Carrefour', 23000, ['Produto patrocinado', 'Banner patrocinado'], 6, CampaignStatus.DRAFT),
-  spec(8, 9, 13, 'Momento Doce: Chocolates para Compartilhar', 'chocolates', 'Mercado Livre', 26000, ['Banner patrocinado', 'Video'], 6),
-  spec(8, 14, 11, 'Iogurtes e Sobremesas para o Dia a Dia', 'dairy', 'Extra', 21000, ['Produto patrocinado', 'Marca patrocinada'], 6),
-  spec(8, 20, 10, 'Abasteça a Despensa com Moça e Creme de Leite', 'culinary', 'Pão de Açúcar', 24000, ['Produto patrocinado', 'Banner patrocinado'], 5, CampaignStatus.DRAFT),
-
-  spec(9, 2, 16, 'Dia das Crianças: Chambinho, Chamyto e Chocolates', 'dairy', 'Carrefour', 34000, ['Produto patrocinado', 'Banner patrocinado', 'Instore display'], 7),
-  spec(9, 7, 13, 'Lancheira Divertida: Biscoitos Nestlé e Cereais', 'lancheira', 'Extra', 25000, ['Produto patrocinado', 'Banner patrocinado'], 7),
-  spec(9, 13, 12, 'Outubro Gelado: Sorvetes e Sobremesas', 'sorvetes', 'Rappi', 22000, ['Banner patrocinado', 'Video'], 6),
-  spec(9, 20, 10, 'Kids Nutrition: Nutren e Linha Infantil', 'infant', 'Amazon Brasil', 30000, ['Produto patrocinado', 'Marca patrocinada'], 5),
-
-  spec(10, 3, 17, 'Esquenta Black Friday Nestlé', 'rotina', 'Carrefour', 43000, ['Produto patrocinado', 'Banner patrocinado', 'Marca patrocinada'], 8, CampaignStatus.DRAFT),
-  spec(10, 7, 16, 'Black Friday: Chocolates, Biscoitos e Wafer', 'chocolates', 'Mercado Livre', 54000, ['Produto patrocinado', 'Banner patrocinado', 'Video'], 8, CampaignStatus.DRAFT),
-  spec(10, 13, 11, 'Black Friday: Multipacks de Mercearia Nestlé', 'culinary', 'Extra', 38000, ['Produto patrocinado', 'Banner patrocinado'], 6, CampaignStatus.DRAFT),
-  spec(10, 20, 9, 'Black Friday: Nescafé, Nescau e Bebidas', 'beverages', 'Amazon Brasil', 31000, ['Marca patrocinada', 'Video'], 6, CampaignStatus.DRAFT),
-
-  spec(11, 1, 18, 'Natal Nestlé: Chocolates para Presentear', 'chocolates', 'Carrefour', 46000, ['Produto patrocinado', 'Banner patrocinado', 'Marca patrocinada'], 8, CampaignStatus.DRAFT),
-  spec(11, 5, 14, 'Ceia Doce: Moça, Creme de Leite e Sobremesas', 'sobremesas', 'Extra', 36000, ['Produto patrocinado', 'Banner patrocinado', 'Video'], 7, CampaignStatus.DRAFT),
-  spec(11, 12, 12, 'Verão com Sorvetes Nestlé', 'sorvetes', 'Rappi', 24000, ['Banner patrocinado', 'Video'], 6, CampaignStatus.DRAFT),
-  spec(11, 20, 8, 'Ano-Novo Abastecido: Café da Manhã e Lanches', 'rotina', 'Pão de Açúcar', 28000, ['Produto patrocinado', 'Marca patrocinada'], 7, CampaignStatus.DRAFT),
+  // Dezembro — Natal e virada
+  spec(11, 1, 16, 'Natal: chocolates Talento, KitKat e presentes', 'chocolates', 'Carrefour', 48000, ['Produto patrocinado', 'Banner patrocinado', 'Marca patrocinada'], 8, CampaignStatus.DRAFT),
+  spec(11, 8, 14, 'Ceia de Natal: Moça, creme de leite e sobremesas', 'sobremesas', 'Extra', 40000, ['Produto patrocinado', 'Banner patrocinado', 'Video'], 7, CampaignStatus.DRAFT),
+  spec(11, 15, 12, 'Natal: café da manhã com família e cereais Nestlé', 'breakfast', 'Pão de Açúcar', 32000, ['Produto patrocinado', 'Marca patrocinada'], 6, CampaignStatus.DRAFT),
+  spec(11, 22, 10, 'Última semana de Natal: sorvetes e sobremesas geladas', 'sorvetes', 'Rappi', 26000, ['Banner patrocinado', 'Video'], 6, CampaignStatus.DRAFT),
+  spec(11, 28, 9, 'Réveillon abastecido: mix Nestlé para começar o ano', 'rotina', 'Carrefour', 30000, ['Produto patrocinado', 'Banner patrocinado'], 7, CampaignStatus.DRAFT),
 ];
 
 const inferStatus = (startDate: Date, endDate: Date, index: number) => {

@@ -8,6 +8,12 @@ export const ROW_HEIGHT = 80; // px
 export const TIMELINE_START_DATE = new Date(2026, 0, 1); // Jan 1st, 2026
 export const TOTAL_DAYS = 365; // Full year
 
+/** Primeiro dia das campanhas sugeridas — a timeline abre com este dia visível (scroll inicial). */
+export const TIMELINE_INITIAL_SCROLL_DATE = new Date(TIMELINE_START_DATE.getFullYear(), 3, 15);
+
+/** Espera o fim da animação de largura do canvas no agente antes de reforçar o scroll (ms). */
+export const TIMELINE_SCROLL_AFTER_CANVAS_REVEAL_MS = 1100;
+
 export const MONTH_NAMES_PT = [
   'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
   'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
