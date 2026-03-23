@@ -4,6 +4,9 @@ import { NESTLE_PRODUCTS } from './data/nestleProducts';
 export const ALL_PRODUCTS: Product[] = NESTLE_PRODUCTS;
 export const DEFAULT_NESTLE_IMAGE = ALL_PRODUCTS[0]?.imageUrl ?? '';
 
+/** Quantidade de campanhas sugeridas pelo agente (subset da lista). */
+export const RECOMMENDED_CAMPAIGN_COUNT = 5;
+
 export const generateMockBids = (mediaTypes: MediaType[]): Bid[] => {
   return mediaTypes.map((type) => {
     const suggested = Number((Math.random() * 3 + 1).toFixed(2));
@@ -102,8 +105,28 @@ const BASE_COLLECTIONS = {
   ]),
   biscoitos: filterProducts(['biscoito', 'cookie', 'wafer', 'chocobiscuit', 'chococookies', 'nesfit', 'surpresa']),
   breakfast: filterProducts(['cereal', 'snow flakes', 'aveia', 'farinha lactea', 'neston']),
-  beverages: filterProducts(['nescafe', 'cafe', 'cappuccino', 'capsula', 'achocolatado', 'bebida', 'mochaccino']),
-  dairy: filterProducts(['iogurte', 'chandelle', 'chambinho', 'petit suisse', 'sobremesa']),
+  beverages: filterProducts([
+    'nescafe',
+    'cafe',
+    'cappuccino',
+    'capsula',
+    'achocolatado',
+    'bebida',
+    'mochaccino',
+    'água',
+    'agua',
+    'pureza',
+    'mineral',
+  ]),
+  dairy: filterProducts([
+    'iogurte',
+    'chandelle',
+    'chambinho',
+    'petit suisse',
+    'sobremesa',
+    'zero lactose',
+    'molico',
+  ]),
   culinary: filterProducts(['creme de leite', 'leite condensado', 'moca']),
   infant: filterProducts(['formula infantil', 'nan', 'nestogeno', 'neslac', 'papinha']),
   nutricao: filterProducts(['nutren', 'proteinada', 'molico']),
@@ -183,67 +206,65 @@ const spec = (
   status,
 });
 
-/** Todas as campanhas começam em 15/04 ou depois; títulos alinhados ao calendário comercial BR (2026). */
+/** Cinco campanhas (Drogarias São Paulo), sortimento típico de farmácia; datas a partir de 15/04. */
+const PHARMACY_PUBLISHER = 'Drogarias São Paulo';
+
 const CAMPAIGN_SPECS: CampaignSpec[] = [
-  // Abril — pós-Páscoa (05/04), esquenta Dia das Mães (10/05)
-  spec(3, 15, 12, 'Pós-Páscoa: recompra de chocolates e bombons', 'chocolates', 'Carrefour', 32000, ['Produto patrocinado', 'Banner patrocinado'], 7),
-  spec(3, 18, 11, 'Esquenta Dia das Mães: café da manhã com Nescafé e cereais', 'breakfast', 'Extra', 30000, ['Produto patrocinado', 'Marca patrocinada'], 6),
-  spec(3, 22, 10, 'Presentes doces: KitKat, Alpino e Talento para surpreender', 'chocolates', 'Mercado Livre', 28000, ['Banner patrocinado', 'Video'], 7),
-  spec(3, 26, 9, 'Receitas com Moça e Leite Moça para o Dia das Mães', 'culinary', 'Pão de Açúcar', 26000, ['Produto patrocinado', 'Video'], 5),
-
-  // Maio — Dia do Trabalho (01/05), Dia das Mães (10/05)
-  spec(4, 1, 10, 'Dia do Trabalho: pausa para café com Nescafé e cappuccino', 'beverages', 'Carrefour', 24000, ['Produto patrocinado', 'Marca patrocinada', 'Instore display'], 6),
-  spec(4, 4, 8, 'Semana do Dia das Mães: iogurtes, Chandelle e sobremesas', 'dairy', 'Extra', 35000, ['Produto patrocinado', 'Banner patrocinado'], 6),
-  spec(4, 8, 7, 'Dia das Mães: mix café da manhã e chocolates premium', 'rotina', 'Amazon Brasil', 42000, ['Produto patrocinado', 'Banner patrocinado', 'Marca patrocinada'], 8),
-  spec(4, 12, 10, 'Pós-Dia das Mães: biscoitos e achocolatado para a família', 'lancheira', 'Rappi', 27000, ['Produto patrocinado', 'Banner patrocinado'], 7),
-  spec(4, 18, 11, 'Maio em família: fórmulas infantis e compostos lácteos', 'infant', 'Magalu', 33000, ['Produto patrocinado', 'Marca patrocinada'], 5),
-  spec(4, 25, 10, 'Nutrição no outono: Nutren, aveia Neston e rotina', 'nutricao', 'Pão de Açúcar', 29000, ['Produto patrocinado', 'Video'], 6),
-
-  // Junho — Festa Junina e Dia dos Namorados (12/06)
-  spec(5, 2, 14, 'Esquenta Festa Junina: achocolatado, biscoitos e pipoca', 'lancheira', 'Carrefour', 31000, ['Produto patrocinado', 'Banner patrocinado', 'Instore display'], 7),
-  spec(5, 8, 12, 'Festa Junina: chocolates quentes e wafer para a quadrilha', 'chocolates', 'Extra', 28000, ['Banner patrocinado', 'Video'], 6),
-  spec(5, 12, 9, 'Dia dos Namorados: presentes com Talento, Garoto e bombons', 'chocolates', 'Mercado Livre', 38000, ['Produto patrocinado', 'Banner patrocinado', 'Marca patrocinada'], 8),
-  spec(5, 16, 11, 'Inverno: Nescafé Dolce Gusto e bebidas quentes', 'beverages', 'Amazon Brasil', 26000, ['Produto patrocinado', 'Marca patrocinada'], 5),
-  spec(5, 22, 10, 'Sobremesas de festa: Moça, creme de leite e leite condensado', 'sobremesas', 'Rappi', 25000, ['Produto patrocinado', 'Banner patrocinado'], 6),
-
-  // Julho — férias escolares (inverno no BR)
-  spec(6, 1, 14, 'Férias de julho: sorvetes Nestlé e momentos gelados', 'sorvetes', 'Carrefour', 27000, ['Banner patrocinado', 'Video'], 6),
-  spec(6, 8, 12, 'Lanche de férias: cookies, Nesfit e Nescau', 'biscoitos', 'Extra', 26000, ['Produto patrocinado', 'Banner patrocinado'], 7),
-  spec(6, 14, 11, 'Café da tarde em casa: Nescafé e Chocobiscuit', 'beverages', 'Pão de Açúcar', 22000, ['Produto patrocinado', 'Marca patrocinada'], 5),
-  spec(6, 20, 12, 'Meio do ano: linha infantil Nan, Neslac e rotina', 'infant', 'Amazon Brasil', 32000, ['Produto patrocinado', 'Banner patrocinado'], 5),
-
-  // Agosto — Dia dos Pais (09/08/2026)
-  spec(7, 1, 12, 'Pré-Dia dos Pais: cafés especiais e cappuccinos', 'beverages', 'Carrefour', 26000, ['Produto patrocinado', 'Marca patrocinada', 'Instore display'], 5),
-  spec(7, 7, 8, 'Dia dos Pais: chocolates premium e kits para presentear', 'chocolates', 'Mercado Livre', 36000, ['Produto patrocinado', 'Banner patrocinado', 'Video'], 7),
-  spec(7, 12, 10, 'Pós-Dia dos Pais: cereais e café da manhã completo', 'breakfast', 'Extra', 23000, ['Produto patrocinado', 'Banner patrocinado'], 6),
-  spec(7, 18, 11, 'Agosto saudável: Nutren, aveia e rotina 50+', 'nutricao', 'Rappi', 28000, ['Produto patrocinado', 'Video'], 5),
-  spec(7, 25, 10, 'Despensa Nestlé: Moça, creme de leite e mercearia', 'culinary', 'Pão de Açúcar', 27000, ['Produto patrocinado', 'Banner patrocinado'], 5),
-
-  // Setembro — primavera, volta às aulas (2º semestre)
-  spec(8, 2, 13, 'Primavera: lanches leves, cereais e iogurtes', 'breakfast', 'Carrefour', 24000, ['Produto patrocinado', 'Banner patrocinado'], 6, CampaignStatus.DRAFT),
-  spec(8, 9, 12, 'Volta às aulas 2º semestre: lancheira com Nescau e biscoitos', 'lancheira', 'Extra', 29000, ['Produto patrocinado', 'Banner patrocinado'], 7, CampaignStatus.DRAFT),
-  spec(8, 16, 11, 'Momento doce: chocolates para compartilhar na escola', 'chocolates', 'Mercado Livre', 25000, ['Banner patrocinado', 'Video'], 6, CampaignStatus.DRAFT),
-  spec(8, 23, 10, 'Iogurtes e sobremesas para a rotina de setembro', 'dairy', 'Amazon Brasil', 22000, ['Produto patrocinado', 'Marca patrocinada'], 6, CampaignStatus.DRAFT),
-
-  // Outubro — Dia das Crianças (12/10)
-  spec(9, 1, 11, 'Esquenta Dia das Crianças: Chambinho, Chamyto e doces', 'dairy', 'Carrefour', 30000, ['Produto patrocinado', 'Banner patrocinado'], 7),
-  spec(9, 8, 8, 'Dia das Crianças: biscoitos, cereais e surpresa Nestlé', 'lancheira', 'Extra', 36000, ['Produto patrocinado', 'Banner patrocinado', 'Instore display'], 7),
-  spec(9, 12, 10, 'Outubro: sorvetes e sobremesas para a família', 'sorvetes', 'Rappi', 24000, ['Banner patrocinado', 'Video'], 6),
-  spec(9, 18, 11, 'Nutrição infantil: fórmulas e papinhas Nestlé', 'infant', 'Magalu', 31000, ['Produto patrocinado', 'Marca patrocinada'], 5),
-  spec(9, 25, 10, 'Esquenta Black Friday: mix despensa Nestlé', 'rotina', 'Pão de Açúcar', 38000, ['Produto patrocinado', 'Marca patrocinada'], 8),
-
-  // Novembro — Black Friday (27/11/2026)
-  spec(10, 1, 14, 'Novembro: chocolates e wafer em destaque', 'chocolates', 'Carrefour', 40000, ['Produto patrocinado', 'Banner patrocinado', 'Video'], 7, CampaignStatus.DRAFT),
-  spec(10, 10, 12, 'Esquenta Black Friday: multipacks mercearia Moça e Leite Moça', 'culinary', 'Extra', 42000, ['Produto patrocinado', 'Banner patrocinado'], 6, CampaignStatus.DRAFT),
-  spec(10, 18, 11, 'Black Friday: Nescafé, Nescau e bebidas', 'beverages', 'Amazon Brasil', 35000, ['Marca patrocinada', 'Video', 'Produto patrocinado'], 6, CampaignStatus.DRAFT),
-  spec(10, 24, 10, 'Black Friday Nestlé: full mix patrocinado', 'rotina', 'Mercado Livre', 52000, ['Produto patrocinado', 'Banner patrocinado', 'Marca patrocinada'], 8, CampaignStatus.DRAFT),
-
-  // Dezembro — Natal e virada
-  spec(11, 1, 16, 'Natal: chocolates Talento, KitKat e presentes', 'chocolates', 'Carrefour', 48000, ['Produto patrocinado', 'Banner patrocinado', 'Marca patrocinada'], 8, CampaignStatus.DRAFT),
-  spec(11, 8, 14, 'Ceia de Natal: Moça, creme de leite e sobremesas', 'sobremesas', 'Extra', 40000, ['Produto patrocinado', 'Banner patrocinado', 'Video'], 7, CampaignStatus.DRAFT),
-  spec(11, 15, 12, 'Natal: café da manhã com família e cereais Nestlé', 'breakfast', 'Pão de Açúcar', 32000, ['Produto patrocinado', 'Marca patrocinada'], 6, CampaignStatus.DRAFT),
-  spec(11, 22, 10, 'Última semana de Natal: sorvetes e sobremesas geladas', 'sorvetes', 'Rappi', 26000, ['Banner patrocinado', 'Video'], 6, CampaignStatus.DRAFT),
-  spec(11, 28, 9, 'Réveillon abastecido: mix Nestlé para começar o ano', 'rotina', 'Carrefour', 30000, ['Produto patrocinado', 'Banner patrocinado'], 7, CampaignStatus.DRAFT),
+  spec(
+    3,
+    15,
+    16,
+    'Primeira infância: fórmulas Nan, Nestogeno e compostos lácteos',
+    'infant',
+    PHARMACY_PUBLISHER,
+    38000,
+    ['Produto patrocinado', 'Banner patrocinado', 'Instore display'],
+    6
+  ),
+  spec(
+    3,
+    28,
+    14,
+    'Nutrição 50+: Nutren Sênior, Nutren Active e leites Molico',
+    'nutricao',
+    PHARMACY_PUBLISHER,
+    34000,
+    ['Produto patrocinado', 'Marca patrocinada', 'Instore display'],
+    6
+  ),
+  spec(
+    4,
+    10,
+    15,
+    'Lácteos e digestão: iogurtes, Chandelle, zero lactose e petit suisse',
+    'dairy',
+    PHARMACY_PUBLISHER,
+    32000,
+    ['Produto patrocinado', 'Banner patrocinado'],
+    6
+  ),
+  spec(
+    4,
+    22,
+    14,
+    'Nutrição oral: Nutren Protein, suplementos em pó e complementos',
+    'nutricao',
+    PHARMACY_PUBLISHER,
+    36000,
+    ['Produto patrocinado', 'Banner patrocinado', 'Video'],
+    6
+  ),
+  spec(
+    5,
+    1,
+    14,
+    'Hidratação e bebidas: água Pureza Vital e Nutren Protein pronto',
+    'beverages',
+    PHARMACY_PUBLISHER,
+    28000,
+    ['Produto patrocinado', 'Marca patrocinada'],
+    6
+  ),
 ];
 
 const inferStatus = (startDate: Date, endDate: Date, index: number) => {

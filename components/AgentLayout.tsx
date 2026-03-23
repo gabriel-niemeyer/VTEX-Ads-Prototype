@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useMemo, useEffect, useLayoutEffect, useRef } from 'react';
 import { Campaign, CampaignStatus, Product } from '../types';
+import { RECOMMENDED_CAMPAIGN_COUNT } from '../campaignData';
 import { AgentSidebar } from './AgentSidebar';
 import { AgentWelcome } from './AgentWelcome';
 import { AgentChatPanel, ChatMessage } from './AgentChatPanel';
@@ -29,7 +30,7 @@ function mockAgentResponse(
 ): { reply: string; ids: string[] } {
   const lower = userText.toLowerCase();
   if (hasPdfAttachment) {
-    const subset = allCampaigns.filter((_, i) => i < 7);
+    const subset = allCampaigns.filter((_, i) => i < RECOMMENDED_CAMPAIGN_COUNT);
     const docHint = userText.trim()
       ? ' Li o que você pediu no texto e usei o PDF como referência.'
       : ' Usei o PDF anexado como referência para montar as campanhas.';
@@ -38,8 +39,8 @@ function mockAgentResponse(
       ids: subset.map((c) => c.id),
     };
   }
-  if (lower.includes('campanha') || lower.includes('campanhas') || lower.includes('7') || lower.includes('casas bahia') || lower.includes('jbp') || lower.includes('desdobrar')) {
-    const subset = allCampaigns.filter((_, i) => i < 7);
+  if (lower.includes('campanha') || lower.includes('campanhas') || lower.includes('casas bahia') || lower.includes('jbp') || lower.includes('desdobrar')) {
+    const subset = allCampaigns.filter((_, i) => i < RECOMMENDED_CAMPAIGN_COUNT);
     return {
       reply: `Criei ${subset.length} campanhas com base na sua solicitação. Você pode visualizá-las na timeline à direita, editar datas e detalhes clicando em cada uma, ou adicionar novas clicando em um espaço vazio.`,
       ids: subset.map((c) => c.id),
@@ -52,7 +53,7 @@ function mockAgentResponse(
       ids: active.map((c) => c.id),
     };
   }
-  const fallback = allCampaigns.slice(0, 3);
+  const fallback = allCampaigns.slice(0, RECOMMENDED_CAMPAIGN_COUNT);
   return {
     reply: 'Entendi sua solicitação. Coloquei algumas campanhas na timeline para você revisar. Se quiser, peça algo mais específico, como "desdobrar JBP de 2026 com as Casas Bahia" ou "mostrar campanhas ativas".',
     ids: fallback.map((c) => c.id),
