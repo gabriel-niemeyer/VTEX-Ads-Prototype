@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { Campaign } from '../types';
 import { Timeline } from './Timeline';
+import { CampaignListView } from './CampaignListView';
+
+type CanvasViewMode = 'timeline' | 'list';
 
 interface AgentCanvasProps {
   campaigns: Campaign[];
@@ -16,13 +19,48 @@ export const AgentCanvas: React.FC<AgentCanvasProps> = ({
   onEmptySpaceClick,
 }) => {
   const [zoomLevel, setZoomLevel] = useState(48);
+  const [viewMode, setViewMode] = useState<CanvasViewMode>('timeline');
 
   return (
     <div className="flex h-full min-h-0 flex-col bg-white">
-      <div className="shrink-0 bg-white px-5 pt-3.5 pb-2">
+      <div className="flex shrink-0 items-center justify-between gap-3 bg-white px-5 pt-3.5 pb-2">
         <p className="text-[18px] font-semibold tracking-[-0.3px] text-[color:var(--sl-fg-base)]">
           Campanhas sugeridas
         </p>
+        {campaigns.length > 0 ? (
+          <div
+            className="inline-flex shrink-0 rounded-[10px] bg-neutral-50/80 p-[3px] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.06)]"
+            role="group"
+            aria-label="Modo de visualização"
+          >
+            <button
+              type="button"
+              aria-pressed={viewMode === 'list'}
+              aria-label="Lista de campanhas"
+              onClick={() => setViewMode('list')}
+              className={`flex h-[30px] w-[30px] items-center justify-center rounded-[7px] transition-colors duration-150 ${
+                viewMode === 'list'
+                  ? 'bg-white text-neutral-800 shadow-[0_1px_2px_rgba(0,0,0,0.05)]'
+                  : 'text-neutral-400 hover:text-neutral-600'
+              }`}
+            >
+              <span className="material-symbols-outlined text-[19px]">view_list</span>
+            </button>
+            <button
+              type="button"
+              aria-pressed={viewMode === 'timeline'}
+              aria-label="Timeline"
+              onClick={() => setViewMode('timeline')}
+              className={`flex h-[30px] w-[30px] items-center justify-center rounded-[7px] transition-colors duration-150 ${
+                viewMode === 'timeline'
+                  ? 'bg-white text-neutral-800 shadow-[0_1px_2px_rgba(0,0,0,0.05)]'
+                  : 'text-neutral-400 hover:text-neutral-600'
+              }`}
+            >
+              <span className="material-symbols-outlined text-[19px]">view_timeline</span>
+            </button>
+          </div>
+        ) : null}
       </div>
 
       <div className="flex min-h-0 flex-1 bg-white">
@@ -40,6 +78,8 @@ export const AgentCanvas: React.FC<AgentCanvasProps> = ({
               </p>
             </div>
           </div>
+        ) : viewMode === 'list' ? (
+          <CampaignListView campaigns={campaigns} onCampaignClick={onCampaignClick} />
         ) : (
           <Timeline
             campaigns={campaigns}

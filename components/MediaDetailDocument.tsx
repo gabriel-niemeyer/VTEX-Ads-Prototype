@@ -1,6 +1,11 @@
-import React, { useState, useRef, useEffect, useCallback, useLayoutEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useLayoutEffect, useMemo } from 'react';
 import { Campaign, MediaType, Bid } from '../types';
 import { UserAvatar } from './UserAvatar';
+import { NestleBannerCreative } from './NestleBannerCreative';
+import {
+  getPrefilledNestleBannerAsset,
+  hasPrefilledNestleBannerCampaign,
+} from '../data/prefilledNestleBanners';
 import {
   formatBr,
   clampMoney,
@@ -15,6 +20,9 @@ type ImageSlot = {
   label: string;
   dimensions: string;
 };
+
+const formatSlotId = (label: string, dimensions: string) =>
+  `slot-${`${label}-${dimensions}`.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
 
 /** Slots iniciais — Banner patrocinado */
 const BANNER_INITIAL_SLOTS: ImageSlot[] = [
@@ -32,6 +40,14 @@ const BANNER_EXTRA_FORMATS: { label: string; dimensions: string }[] = [
   { label: 'Half page', dimensions: '300 x 600' },
   { label: 'Quadrado HD', dimensions: '1200 x 1200' },
   { label: 'Retângulo feed', dimensions: '1200 x 628' },
+];
+
+const ALL_BANNER_SLOTS: ImageSlot[] = [
+  ...BANNER_INITIAL_SLOTS,
+  ...BANNER_EXTRA_FORMATS.map((format) => ({
+    id: formatSlotId(format.label, format.dimensions),
+    ...format,
+  })),
 ];
 
 /** Slots iniciais — Vídeo */
@@ -265,6 +281,60 @@ function EditableMoneyField({
   );
 }
 
+function PrefilledBannerAssetPreview({
+  campaign,
+  label,
+  dimensions,
+}: {
+  campaign: Campaign;
+  label: string;
+  dimensions: string;
+}) {
+  const assetPath = getPrefilledNestleBannerAsset(campaign.id, label, dimensions);
+  const [assetFailed, setAssetFailed] = useState(!assetPath);
+
+  useEffect(() => {
+    setAssetFailed(!assetPath);
+  }, [assetPath]);
+
+  if (!assetPath || assetFailed) {
+    return (
+      <div className="flex flex-col gap-2.5">
+        <div className="flex items-center justify-between gap-2">
+          <span className="inline-flex items-center rounded-full bg-[#0c3b85] px-2.5 py-1 text-[10px] font-semibold tracking-[0.08em] text-white uppercase">
+            Fallback local
+          </span>
+          <span className="text-[11px] text-[color:var(--sl-fg-base-soft)]">
+            PNG ainda não gerado
+          </span>
+        </div>
+        <NestleBannerCreative campaign={campaign} label={label} dimensions={dimensions} />
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-2.5">
+      <div className="flex items-center justify-between gap-2">
+        <span className="inline-flex items-center rounded-full bg-[#0c3b85] px-2.5 py-1 text-[10px] font-semibold tracking-[0.08em] text-white uppercase">
+          PNG por IA
+        </span>
+        <span className="text-[11px] text-[color:var(--sl-fg-base-soft)]">
+          Arquivo pronto em public/generated-banners
+        </span>
+      </div>
+      <div className="rounded-[18px] bg-[#f4f6fa] border border-black/[0.05] p-3 sm:p-4 flex items-center justify-center min-h-[190px]">
+        <img
+          src={assetPath}
+          alt={`${campaign.title} - ${label}`}
+          className="max-w-full max-h-[420px] w-auto h-auto rounded-[18px] shadow-[0_22px_44px_rgba(8,31,68,0.18)]"
+          onError={() => setAssetFailed(true)}
+        />
+      </div>
+    </div>
+  );
+}
+
 export const MediaDetailDocument: React.FC<MediaDetailDocumentProps> = ({
   campaign,
   mediaType,
@@ -294,9 +364,13 @@ export const MediaDetailDocument: React.FC<MediaDetailDocumentProps> = ({
   const usesDynamicSlotUpload =
     mediaType === 'Banner patrocinado' ||
     mediaType === 'Video';
+  const hasPrefilledBannerCreatives =
+    mediaType === 'Banner patrocinado' && hasPrefilledNestleBannerCampaign(campaign.id);
 
   const [uploads, setUploads] = useState<Record<number, { url: string; name: string }>>({});
-  const [dynamicSlots, setDynamicSlots] = useState<ImageSlot[]>(() => initialDynamicSlots(mediaType));
+  const [dynamicSlots, setDynamicSlots] = useState<ImageSlot[]>(() =>
+    hasPrefilledBannerCreatives ? [...ALL_BANNER_SLOTS] : initialDynamicSlots(mediaType)
+  );
   const [dynamicUploads, setDynamicUploads] = useState<
     Record<string, { url: string; name: string; mime?: string }>
   >({});
@@ -305,17 +379,34 @@ export const MediaDetailDocument: React.FC<MediaDetailDocumentProps> = ({
 
   const [searchTerms, setSearchTerms] = useState<{ id: string; text: string }[]>([]);
   const [termDraft, setTermDraft] = useState('');
+  const availableFormats = useMemo(() => {
+    const sourceFormats =
+      mediaType === 'Banner patrocinado'
+        ? ALL_BANNER_SLOTS.map(({ label, dimensions }) => ({ label, dimensions }))
+        : extraFormatsForMediaType(mediaType);
+
+    return sourceFormats.filter(
+      (format) =>
+        !dynamicSlots.some(
+          (slot) => slot.label === format.label && slot.dimensions === format.dimensions
+        )
+    );
+  }, [dynamicSlots, mediaType]);
 
   useEffect(() => {
     setDynamicUploads((prev) => {
       (Object.values(prev) as { url: string }[]).forEach((u) => URL.revokeObjectURL(u.url));
       return {};
     });
-    setDynamicSlots(initialDynamicSlots(mediaType));
+    setDynamicSlots(
+      mediaType === 'Banner patrocinado' && hasPrefilledNestleBannerCampaign(campaign.id)
+        ? [...ALL_BANNER_SLOTS]
+        : initialDynamicSlots(mediaType)
+    );
     setFormatPickerOpen(false);
     setSearchTerms([]);
     setTermDraft('');
-  }, [mediaType]);
+  }, [campaign.id, mediaType]);
 
   useEffect(() => {
     if (!formatPickerOpen) return;
@@ -370,11 +461,19 @@ export const MediaDetailDocument: React.FC<MediaDetailDocumentProps> = ({
   }, []);
 
   const addDynamicFormat = useCallback((fmt: { label: string; dimensions: string }) => {
-    setDynamicSlots((prev) => [...prev, { id: newSlotId(), ...fmt }]);
+    setDynamicSlots((prev) => [
+      ...prev,
+      {
+        id:
+          mediaType === 'Banner patrocinado'
+            ? formatSlotId(fmt.label, fmt.dimensions)
+            : newSlotId(),
+        ...fmt,
+      },
+    ]);
     setFormatPickerOpen(false);
-  }, []);
+  }, [mediaType]);
 
-  const extraFormats = extraFormatsForMediaType(mediaType);
   const fileAccept = fileAcceptForMediaType(mediaType);
 
   const addSearchTerm = useCallback(() => {
@@ -617,6 +716,26 @@ export const MediaDetailDocument: React.FC<MediaDetailDocumentProps> = ({
                             />
                           </label>
                         )
+                      ) : hasPrefilledBannerCreatives ? (
+                        <div className="flex flex-col gap-2.5">
+                          <div className="flex items-center justify-between gap-2">
+                            <label className="inline-flex cursor-pointer items-center gap-1 text-[12px] font-medium text-[#2563eb] hover:text-[#1d4ed8] hover:underline">
+                              <span className="material-symbols-outlined text-[16px]">swap_horiz</span>
+                              Substituir arte
+                              <input
+                                type="file"
+                                accept={fileAccept}
+                                className="hidden"
+                                onChange={(e) => handleDynamicFileChange(slot.id, e)}
+                              />
+                            </label>
+                          </div>
+                          <PrefilledBannerAssetPreview
+                            campaign={campaign}
+                            label={slot.label}
+                            dimensions={slot.dimensions}
+                          />
+                        </div>
                       ) : (
                         <label className="bg-[#fafafa] h-[120px] rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-gray-100/80 transition-colors gap-1.5 border border-dashed border-transparent hover:border-gray-300">
                           <span className="material-symbols-outlined text-[24px] text-[color:var(--sl-fg-base-muted)]">
@@ -697,7 +816,7 @@ export const MediaDetailDocument: React.FC<MediaDetailDocumentProps> = ({
                     </div>
                   );
                 })}
-            {usesDynamicSlotUpload && (
+            {usesDynamicSlotUpload && availableFormats.length > 0 && (
               <div className="relative pt-1" ref={formatPickerRef}>
                 <button
                   type="button"
@@ -717,7 +836,7 @@ export const MediaDetailDocument: React.FC<MediaDetailDocumentProps> = ({
                     <p className="px-3 py-2 text-[11px] tracking-wide text-[color:var(--sl-fg-base-soft)]">
                       Escolha o formato
                     </p>
-                    {extraFormats.map((fmt) => (
+                    {availableFormats.map((fmt) => (
                       <button
                         key={`${fmt.label}-${fmt.dimensions}`}
                         type="button"

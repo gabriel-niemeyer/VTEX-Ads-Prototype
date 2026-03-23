@@ -229,7 +229,7 @@ const CAMPAIGN_SPECS: CampaignSpec[] = [
     'nutricao',
     PHARMACY_PUBLISHER,
     34000,
-    ['Produto patrocinado', 'Marca patrocinada', 'Instore display'],
+    ['Produto patrocinado', 'Banner patrocinado', 'Marca patrocinada', 'Instore display'],
     6
   ),
   spec(
