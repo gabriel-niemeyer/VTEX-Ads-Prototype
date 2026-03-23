@@ -7,7 +7,7 @@ import {
   ALL_PRODUCTS,
   generateMockBids,
   ensureNoSpendForFutureCampaigns,
-  DEFAULT_APPLE_IMAGE,
+  DEFAULT_NESTLE_IMAGE,
 } from './campaignData';
 
 const App: React.FC = () => {
@@ -71,7 +71,7 @@ const App: React.FC = () => {
       units: 0,
       ntbUnits: 0,
       impressionShare: 0,
-      imageUrl: DEFAULT_APPLE_IMAGE,
+      imageUrl: DEFAULT_NESTLE_IMAGE,
     });
   };
 

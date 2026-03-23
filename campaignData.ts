@@ -1,79 +1,34 @@
 import { Campaign, CampaignStatus, MediaType, Product, Bid } from './types';
+import { NESTLE_PRODUCTS } from './data/nestleProducts';
 
-const APPLE_IMG = (slug: string) => `https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/${slug}?wid=400&hei=400&fmt=png-alpha`;
+export const ALL_PRODUCTS: Product[] = NESTLE_PRODUCTS;
+export const DEFAULT_NESTLE_IMAGE = ALL_PRODUCTS[0]?.imageUrl ?? '';
 
-const MOCK_PRODUCTS: Record<string, Product[]> = {
-  iphones: [
-    { id: 'p1', name: 'iPhone 16 Pro Max', imageUrl: APPLE_IMG('iphone-16-pro-finish-select-202409-6-9inch-deserttitanium') },
-    { id: 'p2', name: 'iPhone 16 Pro', imageUrl: APPLE_IMG('iphone-16-pro-finish-select-202409-6-3inch-deserttitanium') },
-    { id: 'p3', name: 'iPhone 16', imageUrl: APPLE_IMG('iphone-16-finish-select-202409-6-1inch-ultramarine') },
-    { id: 'p4', name: 'iPhone 16 Plus', imageUrl: APPLE_IMG('iphone-16-finish-select-202409-6-7inch-ultramarine') },
-    { id: 'p5', name: 'iPhone 16e', imageUrl: APPLE_IMG('iphone-16e-finish-select-202502-black') },
-    { id: 'p6', name: 'iPhone 15', imageUrl: APPLE_IMG('iphone-15-finish-select-202309-6-1inch-black') },
-  ],
-  macs: [
-    { id: 'p7', name: 'MacBook Pro 16"', imageUrl: APPLE_IMG('mbp16-spaceblack-select-202410') },
-    { id: 'p8', name: 'MacBook Pro 14"', imageUrl: APPLE_IMG('mbp14-spaceblack-select-202410') },
-    { id: 'p9', name: 'MacBook Air 15"', imageUrl: APPLE_IMG('mba15-midnight-select-202306') },
-    { id: 'p10', name: 'MacBook Air 13"', imageUrl: APPLE_IMG('mba13-midnight-select-202402') },
-    { id: 'p11', name: 'iMac 24"', imageUrl: APPLE_IMG('imac-color-unselect-202601-gallery-1') },
-    { id: 'p12', name: 'Mac Mini', imageUrl: APPLE_IMG('mac-mini-chip-unselect-202601-gallery-1') },
-    { id: 'p13', name: 'Mac Studio', imageUrl: APPLE_IMG('mac-studio-select-202503') },
-  ],
-  ipads: [
-    { id: 'p14', name: 'iPad Pro 13" M4', imageUrl: APPLE_IMG('ipad-pro-13-select-wifi-spaceblack-202405') },
-    { id: 'p15', name: 'iPad Pro 11" M4', imageUrl: APPLE_IMG('ipad-pro-11-select-wifi-spaceblack-202405') },
-    { id: 'p16', name: 'iPad Air 13"', imageUrl: APPLE_IMG('ipad-air-finish-select-gallery-202405-13inch-blue-wifi') },
-    { id: 'p17', name: 'iPad Air 11"', imageUrl: APPLE_IMG('ipad-air-finish-select-gallery-202405-11inch-blue-wifi') },
-    { id: 'p18', name: 'iPad 10ª geração', imageUrl: APPLE_IMG('ipad-2022-hero-blue-wifi-select') },
-    { id: 'p19', name: 'iPad mini', imageUrl: APPLE_IMG('ipad-mini-select-wifi-blue-202410') },
-  ],
-  wearables: [
-    { id: 'p20', name: 'Apple Watch Ultra 2', imageUrl: APPLE_IMG('ultra-case-unselect-gallery-1-202409') },
-    { id: 'p21', name: 'Apple Watch Series 10', imageUrl: APPLE_IMG('s10-case-unselect-gallery-1-202409') },
-    { id: 'p22', name: 'AirPods Pro 2', imageUrl: APPLE_IMG('airpods-pro-2-hero-select-202409') },
-    { id: 'p23', name: 'AirPods Max', imageUrl: APPLE_IMG('airpods-max-select-202409-midnight') },
-    { id: 'p24', name: 'AirPods 4', imageUrl: APPLE_IMG('airpods-4-hero-select-202409') },
-  ],
-};
-
-export const ALL_PRODUCTS: Product[] = [
-  ...MOCK_PRODUCTS.iphones,
-  ...MOCK_PRODUCTS.macs,
-  ...MOCK_PRODUCTS.ipads,
-  ...MOCK_PRODUCTS.wearables,
-];
-
-// Helper to generate mock bids
 export const generateMockBids = (mediaTypes: MediaType[]): Bid[] => {
-  return mediaTypes.map(type => {
+  return mediaTypes.map((type) => {
     const suggested = Number((Math.random() * 3 + 1).toFixed(2));
-    // Generate current bid with more variety
-    const match = Math.random() > 0.4;
-    const current = match 
-        ? suggested * (0.95 + Math.random() * 0.1) // Strong
-        : suggested * (0.4 + Math.random() * 0.5); // Intermediate/Weak
-    
+    const match = Math.random() > 0.42;
+    const current = match
+      ? suggested * (0.94 + Math.random() * 0.12)
+      : suggested * (0.45 + Math.random() * 0.45);
+
     return {
       mediaType: type,
       currentBid: Number(current.toFixed(2)),
-      suggestedBid: suggested
+      suggestedBid: suggested,
     };
   });
 };
 
-export const DEFAULT_APPLE_IMAGE = APPLE_IMG('iphone-16-pro-finish-select-202409-6-9inch-deserttitanium');
-
-/** Data de hoje (meia-noite) para comparação com datas de campanha. */
 function todayMidnight(): Date {
   const t = new Date();
   return new Date(t.getFullYear(), t.getMonth(), t.getDate());
 }
 
-/** Se a campanha ainda não começou (startDate > hoje), zera gasto e métricas de entrega. */
 export function ensureNoSpendForFutureCampaigns(c: Campaign): Campaign {
   const today = todayMidnight();
   const start = new Date(c.startDate.getFullYear(), c.startDate.getMonth(), c.startDate.getDate());
+
   if (start > today) {
     return {
       ...c,
@@ -89,1282 +44,297 @@ export function ensureNoSpendForFutureCampaigns(c: Campaign): Campaign {
       impressionShare: 0,
     };
   }
+
   return c;
 }
 
-export const INITIAL_CAMPAIGNS: Campaign[] = [
-  // JANEIRO
-  {
-    id: '1',
-    title: 'Volta às Aulas: iPad para Estudantes',
-    status: CampaignStatus.COMPLETED,
-    publisher: 'Casas Bahia',
-    startDate: new Date(2026, 0, 5),
-    endDate: new Date(2026, 0, 25),
-    imageUrl: APPLE_IMG('ipad-air-finish-select-gallery-202405-13inch-blue-wifi'),
-    budget: 50000,
-    spend: 50000,
-    mediaTypes: ['Produto patrocinado', 'Banner patrocinado', 'Instore display'],
-    products: MOCK_PRODUCTS.ipads,
-    bidStrength: 'Forte',
-    bids: generateMockBids(['Produto patrocinado', 'Banner patrocinado', 'Instore display']),
-    impressions: 2500000,
-    clicks: 45000,
-    conversions: 1200,
-    revenue: 480000,
-    ntbConversions: 400,
-    ntbRevenue: 150000,
-    units: 1860,
-    ntbUnits: 620,
-    impressionShare: 85.5
-  },
-  {
-    id: '2',
-    title: 'Lançamento MacBook Air M4',
-    status: CampaignStatus.COMPLETED,
-    publisher: 'Magalu',
-    startDate: new Date(2026, 0, 10),
-    endDate: new Date(2026, 0, 20),
-    imageUrl: APPLE_IMG('mba13-midnight-select-202402'),
-    budget: 35000,
-    spend: 34200,
-    mediaTypes: ['Produto patrocinado', 'Video'],
-    products: MOCK_PRODUCTS.macs,
-    bidStrength: 'Intermediário',
-    bids: generateMockBids(['Produto patrocinado', 'Video']),
-    impressions: 1800000,
-    clicks: 32000,
-    conversions: 850,
-    revenue: 290000,
-    ntbConversions: 200,
-    ntbRevenue: 60000,
-    units: 1320,
-    ntbUnits: 310,
-    impressionShare: 60.2
-  },
-  // FEVEREIRO
-  {
-    id: '3',
-    title: 'Carnaval com AirPods: Música Sem Limites',
-    status: CampaignStatus.COMPLETED,
-    publisher: 'Mercado Livre',
-    startDate: new Date(2026, 1, 1),
-    endDate: new Date(2026, 1, 15),
-    imageUrl: APPLE_IMG('airpods-pro-2-hero-select-202409'),
-    budget: 20000,
-    spend: 19500,
-    mediaTypes: ['Banner patrocinado', 'Video'],
-    products: [...MOCK_PRODUCTS.wearables.slice(2), MOCK_PRODUCTS.iphones[0]],
-    bidStrength: 'Fraco',
-    bids: generateMockBids(['Banner patrocinado', 'Video']),
-    impressions: 1250000,
-    clicks: 23400,
-    conversions: 624,
-    revenue: 148000,
-    ntbConversions: 390,
-    ntbRevenue: 86000,
-    units: 967,
-    ntbUnits: 608,
-    impressionShare: 45.0
-  },
-  {
-    id: '4',
-    title: 'iPhone 16 Pro: Compre o Seu',
-    status: CampaignStatus.COMPLETED,
-    publisher: 'Americanas',
-    startDate: new Date(2026, 1, 12),
-    endDate: new Date(2026, 1, 28),
-    imageUrl: APPLE_IMG('iphone-16-pro-finish-select-202409-6-3inch-deserttitanium'),
-    budget: 45000,
-    spend: 40500,
-    mediaTypes: ['Produto patrocinado', 'Marca patrocinada'],
-    products: MOCK_PRODUCTS.iphones,
-    bidStrength: 'Forte',
-    bids: generateMockBids(['Produto patrocinado', 'Marca patrocinada']),
-    impressions: 2430000,
-    clicks: 48600,
-    conversions: 945,
-    revenue: 378000,
-    ntbConversions: 486,
-    ntbRevenue: 189000,
-    units: 1458,
-    ntbUnits: 756,
-    impressionShare: 72.3
-  },
-  // MARÇO
-  {
-    id: '5',
-    title: 'Semana do Consumidor: iPhone 16 Pro Max',
-    status: CampaignStatus.ACTIVE,
-    publisher: 'Fast Shop',
-    startDate: new Date(2026, 2, 5),
-    endDate: new Date(2026, 2, 20),
-    imageUrl: APPLE_IMG('iphone-16-pro-finish-select-202409-6-9inch-deserttitanium'),
-    budget: 80000,
-    spend: 45000,
-    mediaTypes: ['Banner patrocinado', 'Instore display', 'Marca patrocinada'],
-    products: [MOCK_PRODUCTS.iphones[0], MOCK_PRODUCTS.iphones[1]],
-    bidStrength: 'Forte',
-    bids: generateMockBids(['Banner patrocinado', 'Instore display', 'Marca patrocinada']),
-    impressions: 1250000,
-    clicks: 28000,
-    conversions: 620,
-    revenue: 520000,
-    ntbConversions: 200,
-    ntbRevenue: 150000,
-    units: 960,
-    ntbUnits: 310,
-    impressionShare: 65.4
-  },
-  {
-    id: '6',
-    title: 'Semana do Consumidor: Ofertas Apple',
-    status: CampaignStatus.ACTIVE,
-    publisher: 'Amazon Brasil',
-    startDate: new Date(2026, 2, 10),
-    endDate: new Date(2026, 2, 18),
-    imageUrl: APPLE_IMG('mbp16-spaceblack-select-202410'),
-    budget: 60000,
-    spend: 26700,
-    mediaTypes: ['Produto patrocinado', 'Marca patrocinada', 'Video'],
-    products: [...MOCK_PRODUCTS.iphones, ...MOCK_PRODUCTS.macs],
-    bidStrength: 'Intermediário',
-    bids: generateMockBids(['Produto patrocinado', 'Marca patrocinada', 'Video']),
-    impressions: 659000,
-    clicks: 15300,
-    conversions: 333,
-    revenue: 264000,
-    ntbConversions: 104,
-    ntbRevenue: 76300,
-    units: 517,
-    ntbUnits: 163,
-    impressionShare: 55.8
-  },
-  // ABRIL
-  {
-    id: '7',
-    title: 'Apple Watch Ultra 2: Aventura e Esporte',
-    status: CampaignStatus.ACTIVE,
-    publisher: 'Kabum',
-    startDate: new Date(2026, 3, 1),
-    endDate: new Date(2026, 3, 15),
-    imageUrl: APPLE_IMG('ultra-case-unselect-gallery-1-202409'),
-    budget: 15000,
-    spend: 0,
-    mediaTypes: ['Produto patrocinado'],
-    products: MOCK_PRODUCTS.wearables,
-    bidStrength: 'Fraco',
-    bids: generateMockBids(['Produto patrocinado']),
-    impressions: 0,
-    clicks: 0,
-    conversions: 0,
-    revenue: 0,
-    ntbConversions: 0,
-    ntbRevenue: 0,
-    units: 0,
-    ntbUnits: 0,
-    impressionShare: 0
-  },
-  {
-    id: '8',
-    title: 'iPad Pro M4: Criatividade Profissional',
-    status: CampaignStatus.ACTIVE,
-    publisher: 'Americanas',
-    startDate: new Date(2026, 3, 10),
-    endDate: new Date(2026, 3, 22),
-    imageUrl: APPLE_IMG('ipad-pro-13-select-wifi-spaceblack-202405'),
-    budget: 40000,
-    spend: 0,
-    mediaTypes: ['Banner patrocinado', 'Video'],
-    products: [MOCK_PRODUCTS.ipads[0], MOCK_PRODUCTS.ipads[1]],
-    bidStrength: 'Intermediário',
-    bids: generateMockBids(['Banner patrocinado', 'Video']),
-    impressions: 0,
-    clicks: 0,
-    conversions: 0,
-    revenue: 0,
-    ntbConversions: 0,
-    ntbRevenue: 0,
-    units: 0,
-    ntbUnits: 0,
-    impressionShare: 0
-  },
-  // MAIO
-  {
-    id: '9',
-    title: 'Dia das Mães: Presentes Apple',
-    status: CampaignStatus.DRAFT,
-    publisher: 'Casas Bahia',
-    startDate: new Date(2026, 4, 1),
-    endDate: new Date(2026, 4, 12),
-    imageUrl: APPLE_IMG('iphone-16-pro-finish-select-202409-6-9inch-deserttitanium'),
-    budget: 120000,
-    spend: 0,
-    mediaTypes: ['Produto patrocinado', 'Marca patrocinada', 'Video', 'Instore display'],
-    products: [...MOCK_PRODUCTS.iphones, ...MOCK_PRODUCTS.wearables],
-    bidStrength: 'Forte',
-    bids: generateMockBids(['Produto patrocinado', 'Marca patrocinada', 'Video', 'Instore display']),
-    impressions: 0, clicks: 0, conversions: 0, revenue: 0,
-    ntbConversions: 0, ntbRevenue: 0, units: 0, ntbUnits: 0, impressionShare: 0
-  },
-  {
-    id: '10',
-    title: 'MacBook Pro para Mães Criativas',
-    status: CampaignStatus.DRAFT,
-    publisher: 'Magalu',
-    startDate: new Date(2026, 4, 10),
-    endDate: new Date(2026, 4, 25),
-    imageUrl: APPLE_IMG('mbp14-spaceblack-select-202410'),
-    budget: 30000,
-    spend: 0,
-    mediaTypes: ['Produto patrocinado', 'Banner patrocinado'],
-    products: MOCK_PRODUCTS.macs,
-    bidStrength: 'Intermediário',
-    bids: generateMockBids(['Produto patrocinado', 'Banner patrocinado']),
-    impressions: 0, clicks: 0, conversions: 0, revenue: 0,
-    ntbConversions: 0, ntbRevenue: 0, units: 0, ntbUnits: 0, impressionShare: 0
-  },
-  // JUNHO
-  {
-    id: '11',
-    title: 'Dia dos Namorados: Apple Watch Series 10',
-    status: CampaignStatus.DRAFT,
-    publisher: 'Submarino',
-    startDate: new Date(2026, 5, 1),
-    endDate: new Date(2026, 5, 12),
-    imageUrl: APPLE_IMG('s10-case-unselect-gallery-1-202409'),
-    budget: 25000,
-    spend: 0,
-    mediaTypes: ['Video', 'Marca patrocinada'],
-    products: [...MOCK_PRODUCTS.wearables, ...MOCK_PRODUCTS.iphones],
-    bidStrength: 'Intermediário',
-    bids: generateMockBids(['Video', 'Marca patrocinada']),
-    impressions: 0, clicks: 0, conversions: 0, revenue: 0,
-    ntbConversions: 0, ntbRevenue: 0, units: 0, ntbUnits: 0, impressionShare: 0
-  },
-  {
-    id: '12',
-    title: 'Festa Junina: AirPods & Wearables',
-    status: CampaignStatus.DRAFT,
-    publisher: 'Carrefour',
-    startDate: new Date(2026, 5, 15),
-    endDate: new Date(2026, 5, 30),
-    imageUrl: APPLE_IMG('airpods-max-select-202409-midnight'),
-    budget: 10000,
-    spend: 0,
-    mediaTypes: ['Produto patrocinado'],
-    products: MOCK_PRODUCTS.wearables,
-    bidStrength: 'Fraco',
-    bids: generateMockBids(['Produto patrocinado']),
-    impressions: 0, clicks: 0, conversions: 0, revenue: 0,
-    ntbConversions: 0, ntbRevenue: 0, units: 0, ntbUnits: 0, impressionShare: 0
-  },
-  // JULHO
-  {
-    id: '13',
-    title: 'Férias de Inverno: Mac para Produtividade',
-    status: CampaignStatus.DRAFT,
-    publisher: 'Casas Bahia',
-    startDate: new Date(2026, 6, 1),
-    endDate: new Date(2026, 6, 31),
-    imageUrl: APPLE_IMG('imac-color-unselect-202601-gallery-1'),
-    budget: 45000,
-    spend: 0,
-    mediaTypes: ['Produto patrocinado', 'Banner patrocinado'],
-    products: MOCK_PRODUCTS.macs,
-    bidStrength: 'Intermediário',
-    bids: generateMockBids(['Produto patrocinado', 'Banner patrocinado']),
-    impressions: 0, clicks: 0, conversions: 0, revenue: 0,
-    ntbConversions: 0, ntbRevenue: 0, units: 0, ntbUnits: 0, impressionShare: 0
-  },
-  // AGOSTO
-  {
-    id: '14',
-    title: 'Dia dos Pais: iPhone & Apple Watch',
-    status: CampaignStatus.DRAFT,
-    publisher: 'Shoptime',
-    startDate: new Date(2026, 7, 1),
-    endDate: new Date(2026, 7, 10),
-    imageUrl: APPLE_IMG('iphone-16-pro-finish-select-202409-6-3inch-deserttitanium'),
-    budget: 60000,
-    spend: 0,
-    mediaTypes: ['Banner patrocinado', 'Video', 'Instore display'],
-    products: [...MOCK_PRODUCTS.iphones, ...MOCK_PRODUCTS.wearables],
-    bidStrength: 'Forte',
-    bids: generateMockBids(['Banner patrocinado', 'Video', 'Instore display']),
-    impressions: 0, clicks: 0, conversions: 0, revenue: 0,
-    ntbConversions: 0, ntbRevenue: 0, units: 0, ntbUnits: 0, impressionShare: 0
-  },
-  {
-    id: '15',
-    title: 'Ecossistema Apple: iPhone + Mac + iPad',
-    status: CampaignStatus.DRAFT,
-    publisher: 'Extra',
-    startDate: new Date(2026, 7, 15),
-    endDate: new Date(2026, 7, 30),
-    imageUrl: APPLE_IMG('iphone-16-finish-select-202409-6-1inch-ultramarine'),
-    budget: 55000,
-    spend: 0,
-    mediaTypes: ['Produto patrocinado', 'Marca patrocinada'],
-    products: [...MOCK_PRODUCTS.iphones, ...MOCK_PRODUCTS.macs, ...MOCK_PRODUCTS.ipads],
-    bidStrength: 'Intermediário',
-    bids: generateMockBids(['Produto patrocinado', 'Marca patrocinada']),
-    impressions: 0, clicks: 0, conversions: 0, revenue: 0,
-    ntbConversions: 0, ntbRevenue: 0, units: 0, ntbUnits: 0, impressionShare: 0
-  },
-  // SETEMBRO
-  {
-    id: '16',
-    title: 'Lançamento: iPhone 17 Pro',
-    status: CampaignStatus.DRAFT,
-    publisher: 'Amazon Brasil',
-    startDate: new Date(2026, 8, 15),
-    endDate: new Date(2026, 9, 15),
-    imageUrl: APPLE_IMG('iphone-16-pro-finish-select-202409-6-9inch-deserttitanium'),
-    budget: 250000,
-    spend: 0,
-    mediaTypes: ['Produto patrocinado', 'Banner patrocinado', 'Marca patrocinada', 'Video', 'Instore display'],
-    products: MOCK_PRODUCTS.iphones,
-    bidStrength: 'Forte',
-    bids: generateMockBids(['Produto patrocinado', 'Banner patrocinado', 'Marca patrocinada', 'Video', 'Instore display']),
-    impressions: 0, clicks: 0, conversions: 0, revenue: 0,
-    ntbConversions: 0, ntbRevenue: 0, units: 0, ntbUnits: 0, impressionShare: 0
-  },
-  // OUTUBRO
-  {
-    id: '17',
-    title: 'Dia das Crianças: iPad e Apple Watch',
-    status: CampaignStatus.DRAFT,
-    publisher: 'Magalu',
-    startDate: new Date(2026, 9, 1),
-    endDate: new Date(2026, 9, 12),
-    imageUrl: APPLE_IMG('ipad-2022-hero-blue-wifi-select'),
-    budget: 35000,
-    spend: 0,
-    mediaTypes: ['Produto patrocinado', 'Video'],
-    products: [...MOCK_PRODUCTS.ipads, ...MOCK_PRODUCTS.wearables],
-    bidStrength: 'Fraco',
-    bids: generateMockBids(['Produto patrocinado', 'Video']),
-    impressions: 0, clicks: 0, conversions: 0, revenue: 0,
-    ntbConversions: 0, ntbRevenue: 0, units: 0, ntbUnits: 0, impressionShare: 0
-  },
-  // NOVEMBRO
-  {
-    id: '18',
-    title: 'Esquenta Black Friday: MacBook Pro',
-    status: CampaignStatus.DRAFT,
-    publisher: 'Kabum',
-    startDate: new Date(2026, 10, 1),
-    endDate: new Date(2026, 10, 15),
-    imageUrl: APPLE_IMG('mbp16-spaceblack-select-202410'),
-    budget: 15000,
-    spend: 0,
-    mediaTypes: ['Banner patrocinado'],
-    products: MOCK_PRODUCTS.macs,
-    bidStrength: 'Fraco',
-    bids: generateMockBids(['Banner patrocinado']),
-    impressions: 0, clicks: 0, conversions: 0, revenue: 0,
-    ntbConversions: 0, ntbRevenue: 0, units: 0, ntbUnits: 0, impressionShare: 0
-  },
-  {
-    id: '19',
-    title: 'Black Friday: Apple em Oferta',
-    status: CampaignStatus.DRAFT,
-    publisher: 'Amazon Brasil',
-    startDate: new Date(2026, 10, 20),
-    endDate: new Date(2026, 10, 30),
-    imageUrl: APPLE_IMG('iphone-16-pro-finish-select-202409-6-9inch-deserttitanium'),
-    budget: 330000,
-    spend: 0,
-    mediaTypes: ['Produto patrocinado', 'Banner patrocinado', 'Marca patrocinada', 'Video', 'Instore display'],
-    products: [...MOCK_PRODUCTS.iphones, ...MOCK_PRODUCTS.macs, ...MOCK_PRODUCTS.ipads, ...MOCK_PRODUCTS.wearables],
-    bidStrength: 'Forte',
-    bids: generateMockBids(['Produto patrocinado', 'Banner patrocinado', 'Marca patrocinada', 'Video', 'Instore display']),
-    impressions: 0, clicks: 0, conversions: 0, revenue: 0,
-    ntbConversions: 0, ntbRevenue: 0, units: 0, ntbUnits: 0, impressionShare: 0
-  },
-  // DEZEMBRO
-  {
-    id: '20',
-    title: 'Natal Apple: O Presente Perfeito',
-    status: CampaignStatus.DRAFT,
-    publisher: 'Casas Bahia',
-    startDate: new Date(2026, 11, 1),
-    endDate: new Date(2026, 11, 24),
-    imageUrl: APPLE_IMG('airpods-pro-2-hero-select-202409'),
-    budget: 150000,
-    spend: 0,
-    mediaTypes: ['Produto patrocinado', 'Banner patrocinado', 'Video'],
-    products: [...MOCK_PRODUCTS.iphones, ...MOCK_PRODUCTS.wearables],
-    bidStrength: 'Forte',
-    bids: generateMockBids(['Produto patrocinado', 'Banner patrocinado', 'Video']),
-    impressions: 0, clicks: 0, conversions: 0, revenue: 0,
-    ntbConversions: 0, ntbRevenue: 0, units: 0, ntbUnits: 0, impressionShare: 0
-  },
-  {
-    id: '21',
-    title: 'Réveillon: iPad & Mac para o Novo Ano',
-    status: CampaignStatus.DRAFT,
-    publisher: 'Mercado Livre',
-    startDate: new Date(2026, 11, 26),
-    endDate: new Date(2027, 0, 5),
-    imageUrl: APPLE_IMG('ipad-pro-11-select-wifi-spaceblack-202405'),
-    budget: 60000,
-    spend: 0,
-    mediaTypes: ['Produto patrocinado', 'Marca patrocinada'],
-    products: [...MOCK_PRODUCTS.ipads, ...MOCK_PRODUCTS.macs],
-    bidStrength: 'Intermediário',
-    bids: generateMockBids(['Produto patrocinado', 'Marca patrocinada']),
-    impressions: 0, clicks: 0, conversions: 0, revenue: 0,
-    ntbConversions: 0, ntbRevenue: 0, units: 0, ntbUnits: 0, impressionShare: 0
-  },
-  // ——— Campanhas adicionais para teste do relatório de orçamento ———
-  // Ongoing: abaixo do ritmo
-  {
-    id: '22',
-    title: 'Março: iPhone em Destaque (em andamento)',
-    status: CampaignStatus.ACTIVE,
-    publisher: 'Fast Shop',
-    startDate: new Date(2026, 2, 1),
-    endDate: new Date(2026, 2, 25),
-    imageUrl: APPLE_IMG('iphone-16-pro-finish-select-202409-6-3inch-deserttitanium'),
-    budget: 60000,
-    spend: 24000,
-    mediaTypes: ['Produto patrocinado', 'Banner patrocinado'],
-    products: MOCK_PRODUCTS.iphones,
-    bidStrength: 'Intermediário',
-    bids: generateMockBids(['Produto patrocinado', 'Banner patrocinado']),
-    impressions: 820000,
-    clicks: 18500,
-    conversions: 412,
-    revenue: 328000,
-    ntbConversions: 120,
-    ntbRevenue: 48000,
-    units: 618,
-    ntbUnits: 185,
-    impressionShare: 52.0
-  },
-  // Ongoing: no ritmo
-  {
-    id: '23',
-    title: 'Campanha Março: MacBook e iPad',
-    status: CampaignStatus.ACTIVE,
-    publisher: 'Magalu',
-    startDate: new Date(2026, 2, 5),
-    endDate: new Date(2026, 2, 28),
-    imageUrl: APPLE_IMG('mbp16-spaceblack-select-202410'),
-    budget: 80000,
-    spend: 42000,
-    mediaTypes: ['Produto patrocinado', 'Marca patrocinada', 'Video'],
-    products: [...MOCK_PRODUCTS.macs, ...MOCK_PRODUCTS.ipads],
-    bidStrength: 'Forte',
-    bids: generateMockBids(['Produto patrocinado', 'Marca patrocinada', 'Video']),
-    impressions: 1580000,
-    clicks: 35200,
-    conversions: 780,
-    revenue: 624000,
-    ntbConversions: 234,
-    ntbRevenue: 187200,
-    units: 1170,
-    ntbUnits: 351,
-    impressionShare: 68.2
-  },
-  // Ongoing: acima do ritmo
-  {
-    id: '24',
-    title: 'Ofertas Março: Wearables',
-    status: CampaignStatus.ACTIVE,
-    publisher: 'Americanas',
-    startDate: new Date(2026, 2, 8),
-    endDate: new Date(2026, 2, 22),
-    imageUrl: APPLE_IMG('s10-case-unselect-gallery-1-202409'),
-    budget: 35000,
-    spend: 28500,
-    mediaTypes: ['Banner patrocinado', 'Video'],
-    products: MOCK_PRODUCTS.wearables,
-    bidStrength: 'Forte',
-    bids: generateMockBids(['Banner patrocinado', 'Video']),
-    impressions: 980000,
-    clicks: 24500,
-    conversions: 612,
-    revenue: 183600,
-    ntbConversions: 245,
-    ntbRevenue: 73500,
-    units: 918,
-    ntbUnits: 368,
-    impressionShare: 58.5
-  },
-  // Ongoing: com histórico de orçamento (aumento no meio)
-  {
-    id: '25',
-    title: 'Semana do Consumidor Extendida',
-    status: CampaignStatus.ACTIVE,
-    publisher: 'Amazon Brasil',
-    startDate: new Date(2026, 2, 1),
-    endDate: new Date(2026, 2, 31),
-    imageUrl: APPLE_IMG('iphone-16-pro-finish-select-202409-6-9inch-deserttitanium'),
-    budget: 100000,
-    spend: 72000,
-    mediaTypes: ['Produto patrocinado', 'Banner patrocinado', 'Marca patrocinada'],
-    products: MOCK_PRODUCTS.iphones,
-    bidStrength: 'Forte',
-    bids: generateMockBids(['Produto patrocinado', 'Banner patrocinado', 'Marca patrocinada']),
-    impressions: 2100000,
-    clicks: 52000,
-    conversions: 1300,
-    revenue: 1040000,
-    ntbConversions: 390,
-    ntbRevenue: 312000,
-    units: 1950,
-    ntbUnits: 585,
-    impressionShare: 75.0
-  },
-  // Ongoing: gasto zero ainda (começou há pouco)
-  {
-    id: '26',
-    title: 'Lançamento Março: AirPods Pro',
-    status: CampaignStatus.ACTIVE,
-    publisher: 'Kabum',
-    startDate: new Date(2026, 2, 14),
-    endDate: new Date(2026, 2, 30),
-    imageUrl: APPLE_IMG('airpods-pro-2-hero-select-202409'),
-    budget: 28000,
-    spend: 0,
-    mediaTypes: ['Produto patrocinado', 'Video'],
-    products: MOCK_PRODUCTS.wearables,
-    bidStrength: 'Intermediário',
-    bids: generateMockBids(['Produto patrocinado', 'Video']),
-    impressions: 0,
-    clicks: 0,
-    conversions: 0,
-    revenue: 0,
-    ntbConversions: 0,
-    ntbRevenue: 0,
-    units: 0,
-    ntbUnits: 0,
-    impressionShare: 0
-  },
-  // ——— Campanhas passadas com histórico de uso ———
-  {
-    id: '27',
-    title: 'Janeiro: Promoção iPad (encerrada)',
-    status: CampaignStatus.COMPLETED,
-    publisher: 'Casas Bahia',
-    startDate: new Date(2026, 0, 1),
-    endDate: new Date(2026, 0, 20),
-    imageUrl: APPLE_IMG('ipad-air-finish-select-gallery-202405-11inch-blue-wifi'),
-    budget: 30000,
-    spend: 27800,
-    mediaTypes: ['Produto patrocinado', 'Banner patrocinado'],
-    products: MOCK_PRODUCTS.ipads,
-    bidStrength: 'Intermediário',
-    bids: generateMockBids(['Produto patrocinado', 'Banner patrocinado']),
-    impressions: 1450000,
-    clicks: 29000,
-    conversions: 580,
-    revenue: 232000,
-    ntbConversions: 174,
-    ntbRevenue: 69600,
-    units: 870,
-    ntbUnits: 261,
-    impressionShare: 62.0
-  },
-  {
-    id: '28',
-    title: 'Fevereiro: Black Month Mac (encerrada – esgotou orçamento)',
-    status: CampaignStatus.COMPLETED,
-    publisher: 'Submarino',
-    startDate: new Date(2026, 1, 1),
-    endDate: new Date(2026, 1, 14),
-    imageUrl: APPLE_IMG('mbp14-spaceblack-select-202410'),
-    budget: 55000,
-    spend: 55000,
-    mediaTypes: ['Produto patrocinado', 'Marca patrocinada', 'Video'],
-    products: MOCK_PRODUCTS.macs,
-    bidStrength: 'Forte',
-    bids: generateMockBids(['Produto patrocinado', 'Marca patrocinada', 'Video']),
-    impressions: 2200000,
-    clicks: 44000,
-    conversions: 880,
-    revenue: 704000,
-    ntbConversions: 264,
-    ntbRevenue: 211200,
-    units: 1320,
-    ntbUnits: 396,
-    impressionShare: 78.5
-  },
-  {
-    id: '29',
-    title: 'Fev–Mar: iPhone (encerrada – estourou orçamento, com alteração de meta)',
-    status: CampaignStatus.COMPLETED,
-    publisher: 'Mercado Livre',
-    startDate: new Date(2026, 1, 10),
-    endDate: new Date(2026, 2, 5),
-    imageUrl: APPLE_IMG('iphone-16-finish-select-202409-6-1inch-ultramarine'),
-    budget: 45000,
-    spend: 51800,
-    mediaTypes: ['Produto patrocinado', 'Banner patrocinado'],
-    products: MOCK_PRODUCTS.iphones,
-    bidStrength: 'Forte',
-    bids: generateMockBids(['Produto patrocinado', 'Banner patrocinado']),
-    impressions: 1950000,
-    clicks: 48750,
-    conversions: 975,
-    revenue: 390000,
-    ntbConversions: 293,
-    ntbRevenue: 117200,
-    units: 1463,
-    ntbUnits: 439,
-    impressionShare: 71.0
-  },
-  {
-    id: '30',
-    title: 'Janeiro: Dia do Respeito (encerrada – subutilização)',
-    status: CampaignStatus.COMPLETED,
-    publisher: 'Carrefour',
-    startDate: new Date(2026, 0, 15),
-    endDate: new Date(2026, 1, 5),
-    imageUrl: APPLE_IMG('airpods-4-hero-select-202409'),
-    budget: 25000,
-    spend: 21800,
-    mediaTypes: ['Video', 'Marca patrocinada'],
-    products: MOCK_PRODUCTS.wearables,
-    bidStrength: 'Fraco',
-    bids: generateMockBids(['Video', 'Marca patrocinada']),
-    impressions: 980000,
-    clicks: 19600,
-    conversions: 392,
-    revenue: 78400,
-    ntbConversions: 118,
-    ntbRevenue: 23520,
-    units: 588,
-    ntbUnits: 176,
-    impressionShare: 48.0
-  },
-  {
-    id: '31',
-    title: 'Fev–Mar: Watch Ultra (encerrada, orçamento aumentado no meio)',
-    status: CampaignStatus.COMPLETED,
-    publisher: 'Extra',
-    startDate: new Date(2026, 1, 20),
-    endDate: new Date(2026, 2, 10),
-    imageUrl: APPLE_IMG('ultra-case-unselect-gallery-1-202409'),
-    budget: 70000,
-    spend: 66800,
-    mediaTypes: ['Produto patrocinado', 'Instore display'],
-    products: MOCK_PRODUCTS.wearables,
-    bidStrength: 'Intermediário',
-    bids: generateMockBids(['Produto patrocinado', 'Instore display']),
-    impressions: 1680000,
-    clicks: 33600,
-    conversions: 672,
-    revenue: 268800,
-    ntbConversions: 202,
-    ntbRevenue: 80640,
-    units: 1008,
-    ntbUnits: 303,
-    impressionShare: 65.0
-  },
-  // ——— Mais 10 campanhas em andamento ———
-  {
-    id: '32',
-    title: 'Março Premium: iPhone 16 Pro Max',
-    status: CampaignStatus.ACTIVE,
-    publisher: 'Shoptime',
-    startDate: new Date(2026, 2, 1),
-    endDate: new Date(2026, 2, 28),
-    imageUrl: APPLE_IMG('iphone-16-pro-finish-select-202409-6-9inch-deserttitanium'),
-    budget: 95000,
-    spend: 52000,
-    mediaTypes: ['Produto patrocinado', 'Marca patrocinada', 'Video'],
-    products: [MOCK_PRODUCTS.iphones[0], MOCK_PRODUCTS.iphones[1]],
-    bidStrength: 'Forte',
-    bids: generateMockBids(['Produto patrocinado', 'Marca patrocinada', 'Video']),
-    impressions: 1650000,
-    clicks: 41200,
-    conversions: 824,
-    revenue: 659200,
-    ntbConversions: 247,
-    ntbRevenue: 98800,
-    units: 1236,
-    ntbUnits: 371,
-    impressionShare: 70.0
-  },
-  {
-    id: '33',
-    title: 'Campanha Março: iMac e Mac Studio',
-    status: CampaignStatus.ACTIVE,
-    publisher: 'Kabum',
-    startDate: new Date(2026, 2, 3),
-    endDate: new Date(2026, 2, 25),
-    imageUrl: APPLE_IMG('imac-color-unselect-202601-gallery-1'),
-    budget: 42000,
-    spend: 18900,
-    mediaTypes: ['Produto patrocinado', 'Banner patrocinado'],
-    products: [MOCK_PRODUCTS.macs[4], MOCK_PRODUCTS.macs[5]],
-    bidStrength: 'Intermediário',
-    bids: generateMockBids(['Produto patrocinado', 'Banner patrocinado']),
-    impressions: 720000,
-    clicks: 14400,
-    conversions: 288,
-    revenue: 201600,
-    ntbConversions: 86,
-    ntbRevenue: 25800,
-    units: 432,
-    ntbUnits: 130,
-    impressionShare: 55.0
-  },
-  {
-    id: '34',
-    title: 'Ofertas Março: iPad Air e mini',
-    status: CampaignStatus.ACTIVE,
-    publisher: 'Mercado Livre',
-    startDate: new Date(2026, 2, 5),
-    endDate: new Date(2026, 2, 22),
-    imageUrl: APPLE_IMG('ipad-air-finish-select-gallery-202405-11inch-blue-wifi'),
-    budget: 38000,
-    spend: 31200,
-    mediaTypes: ['Produto patrocinado', 'Video'],
-    products: [MOCK_PRODUCTS.ipads[2], MOCK_PRODUCTS.ipads[4]],
-    bidStrength: 'Forte',
-    bids: generateMockBids(['Produto patrocinado', 'Video']),
-    impressions: 1280000,
-    clicks: 25600,
-    conversions: 512,
-    revenue: 204800,
-    ntbConversions: 154,
-    ntbRevenue: 61440,
-    units: 768,
-    ntbUnits: 230,
-    impressionShare: 62.0
-  },
-  {
-    id: '35',
-    title: 'Março: Ecossistema Apple (iPhone + Watch)',
-    status: CampaignStatus.ACTIVE,
-    publisher: 'Americanas',
-    startDate: new Date(2026, 2, 7),
-    endDate: new Date(2026, 2, 29),
-    imageUrl: APPLE_IMG('iphone-16-pro-finish-select-202409-6-3inch-deserttitanium'),
-    budget: 72000,
-    spend: 45800,
-    mediaTypes: ['Produto patrocinado', 'Banner patrocinado', 'Instore display'],
-    products: [...MOCK_PRODUCTS.iphones.slice(0, 3), ...MOCK_PRODUCTS.wearables.slice(0, 2)],
-    bidStrength: 'Forte',
-    bids: generateMockBids(['Produto patrocinado', 'Banner patrocinado', 'Instore display']),
-    impressions: 1920000,
-    clicks: 38400,
-    conversions: 768,
-    revenue: 614400,
-    ntbConversions: 230,
-    ntbRevenue: 92160,
-    units: 1152,
-    ntbUnits: 346,
-    impressionShare: 68.0
-  },
-  {
-    id: '36',
-    title: 'Semana do Consumidor: MacBook Pro',
-    status: CampaignStatus.ACTIVE,
-    publisher: 'Fast Shop',
-    startDate: new Date(2026, 2, 10),
-    endDate: new Date(2026, 2, 20),
-    imageUrl: APPLE_IMG('mbp16-spaceblack-select-202410'),
-    budget: 65000,
-    spend: 48500,
-    mediaTypes: ['Produto patrocinado', 'Marca patrocinada'],
-    products: MOCK_PRODUCTS.macs.slice(0, 3),
-    bidStrength: 'Forte',
-    bids: generateMockBids(['Produto patrocinado', 'Marca patrocinada']),
-    impressions: 1420000,
-    clicks: 35500,
-    conversions: 710,
-    revenue: 568000,
-    ntbConversions: 213,
-    ntbRevenue: 85200,
-    units: 1065,
-    ntbUnits: 320,
-    impressionShare: 72.0
-  },
-  {
-    id: '37',
-    title: 'Março: AirPods e Wearables',
-    status: CampaignStatus.ACTIVE,
-    publisher: 'Carrefour',
-    startDate: new Date(2026, 2, 1),
-    endDate: new Date(2026, 2, 26),
-    imageUrl: APPLE_IMG('airpods-pro-2-hero-select-202409'),
-    budget: 22000,
-    spend: 8200,
-    mediaTypes: ['Banner patrocinado', 'Video'],
-    products: MOCK_PRODUCTS.wearables,
-    bidStrength: 'Intermediário',
-    bids: generateMockBids(['Banner patrocinado', 'Video']),
-    impressions: 410000,
-    clicks: 10200,
-    conversions: 204,
-    revenue: 61200,
-    ntbConversions: 61,
-    ntbRevenue: 18360,
-    units: 306,
-    ntbUnits: 92,
-    impressionShare: 48.0
-  },
-  {
-    id: '38',
-    title: 'Campanha Continuada: iPhone 16 Plus',
-    status: CampaignStatus.ACTIVE,
-    publisher: 'Magalu',
-    startDate: new Date(2026, 2, 4),
-    endDate: new Date(2026, 2, 31),
-    imageUrl: APPLE_IMG('iphone-16-finish-select-202409-6-7inch-ultramarine'),
-    budget: 58000,
-    spend: 34800,
-    mediaTypes: ['Produto patrocinado', 'Banner patrocinado', 'Video'],
-    products: [MOCK_PRODUCTS.iphones[3], MOCK_PRODUCTS.iphones[2]],
-    bidStrength: 'Intermediário',
-    bids: generateMockBids(['Produto patrocinado', 'Banner patrocinado', 'Video']),
-    impressions: 1160000,
-    clicks: 29000,
-    conversions: 580,
-    revenue: 348000,
-    ntbConversions: 174,
-    ntbRevenue: 69600,
-    units: 870,
-    ntbUnits: 261,
-    impressionShare: 59.0
-  },
-  {
-    id: '39',
-    title: 'Março: iPad Pro M4 em Destaque',
-    status: CampaignStatus.ACTIVE,
-    publisher: 'Submarino',
-    startDate: new Date(2026, 2, 6),
-    endDate: new Date(2026, 2, 24),
-    imageUrl: APPLE_IMG('ipad-pro-13-select-wifi-spaceblack-202405'),
-    budget: 48000,
-    spend: 0,
-    mediaTypes: ['Produto patrocinado', 'Marca patrocinada'],
-    products: [MOCK_PRODUCTS.ipads[0], MOCK_PRODUCTS.ipads[1]],
-    bidStrength: 'Forte',
-    bids: generateMockBids(['Produto patrocinado', 'Marca patrocinada']),
-    impressions: 0,
-    clicks: 0,
-    conversions: 0,
-    revenue: 0,
-    ntbConversions: 0,
-    ntbRevenue: 0,
-    units: 0,
-    ntbUnits: 0,
-    impressionShare: 0
-  },
-  {
-    id: '40',
-    title: 'Promoção Março: MacBook Air',
-    status: CampaignStatus.ACTIVE,
-    publisher: 'Extra',
-    startDate: new Date(2026, 2, 2),
-    endDate: new Date(2026, 2, 27),
-    imageUrl: APPLE_IMG('mba13-midnight-select-202402'),
-    budget: 33000,
-    spend: 26500,
-    mediaTypes: ['Produto patrocinado', 'Banner patrocinado', 'Instore display'],
-    products: [MOCK_PRODUCTS.macs[2], MOCK_PRODUCTS.macs[3]],
-    bidStrength: 'Intermediário',
-    bids: generateMockBids(['Produto patrocinado', 'Banner patrocinado', 'Instore display']),
-    impressions: 1050000,
-    clicks: 26200,
-    conversions: 524,
-    revenue: 209600,
-    ntbConversions: 157,
-    ntbRevenue: 62880,
-    units: 786,
-    ntbUnits: 236,
-    impressionShare: 64.0
-  },
-  {
-    id: '41',
-    title: 'Março: Apple Watch Series 10',
-    status: CampaignStatus.ACTIVE,
-    publisher: 'Amazon Brasil',
-    startDate: new Date(2026, 2, 12),
-    endDate: new Date(2026, 2, 30),
-    imageUrl: APPLE_IMG('s10-case-unselect-gallery-1-202409'),
-    budget: 29000,
-    spend: 4200,
-    mediaTypes: ['Produto patrocinado', 'Video'],
-    products: [MOCK_PRODUCTS.wearables[1], MOCK_PRODUCTS.wearables[0]],
-    bidStrength: 'Fraco',
-    bids: generateMockBids(['Produto patrocinado', 'Video']),
-    impressions: 280000,
-    clicks: 7000,
-    conversions: 140,
-    revenue: 84000,
-    ntbConversions: 42,
-    ntbRevenue: 12600,
-    units: 210,
-    ntbUnits: 63,
-    impressionShare: 42.0
-  },
-  // ——— Mais campanhas em andamento para teste do relatório de orçamento ———
-  {
-    id: '42',
-    title: 'Março Digital: iPhone 16e',
-    status: CampaignStatus.ACTIVE,
-    publisher: 'Shoptime',
-    startDate: new Date(2026, 2, 1),
-    endDate: new Date(2026, 2, 28),
-    imageUrl: APPLE_IMG('iphone-16e-finish-select-202502-black'),
-    budget: 44000,
-    spend: 19800,
-    mediaTypes: ['Produto patrocinado', 'Banner patrocinado'],
-    products: [MOCK_PRODUCTS.iphones[4]],
-    bidStrength: 'Intermediário',
-    bids: generateMockBids(['Produto patrocinado', 'Banner patrocinado']),
-    impressions: 880000,
-    clicks: 22000,
-    conversions: 440,
-    revenue: 176000,
-    ntbConversions: 132,
-    ntbRevenue: 52800,
-    units: 660,
-    ntbUnits: 198,
-    impressionShare: 54.0
-  },
-  {
-    id: '43',
-    title: 'Campanha Março: Mac Mini e Studio',
-    status: CampaignStatus.ACTIVE,
-    publisher: 'Kabum',
-    startDate: new Date(2026, 2, 5),
-    endDate: new Date(2026, 2, 25),
-    imageUrl: APPLE_IMG('mac-mini-chip-unselect-202601-gallery-1'),
-    budget: 26000,
-    spend: 18200,
-    mediaTypes: ['Produto patrocinado'],
-    products: [MOCK_PRODUCTS.macs[5], MOCK_PRODUCTS.macs[6]],
-    bidStrength: 'Fraco',
-    bids: generateMockBids(['Produto patrocinado']),
-    impressions: 520000,
-    clicks: 13000,
-    conversions: 260,
-    revenue: 208000,
-    ntbConversions: 78,
-    ntbRevenue: 31200,
-    units: 390,
-    ntbUnits: 117,
-    impressionShare: 48.0
-  },
-  {
-    id: '44',
-    title: 'Ofertas Março: iPad 10ª geração',
-    status: CampaignStatus.ACTIVE,
-    publisher: 'Mercado Livre',
-    startDate: new Date(2026, 2, 8),
-    endDate: new Date(2026, 2, 24),
-    imageUrl: APPLE_IMG('ipad-2022-hero-blue-wifi-select'),
-    budget: 19500,
-    spend: 15600,
-    mediaTypes: ['Produto patrocinado', 'Video'],
-    products: [MOCK_PRODUCTS.ipads[4]],
-    bidStrength: 'Forte',
-    bids: generateMockBids(['Produto patrocinado', 'Video']),
-    impressions: 780000,
-    clicks: 19500,
-    conversions: 390,
-    revenue: 117000,
-    ntbConversions: 117,
-    ntbRevenue: 35100,
-    units: 585,
-    ntbUnits: 176,
-    impressionShare: 61.0
-  },
-  {
-    id: '45',
-    title: 'Março: iPhone + AirPods Bundle',
-    status: CampaignStatus.ACTIVE,
-    publisher: 'Americanas',
-    startDate: new Date(2026, 2, 3),
-    endDate: new Date(2026, 2, 29),
-    imageUrl: APPLE_IMG('iphone-16-pro-finish-select-202409-6-3inch-deserttitanium'),
-    budget: 88000,
-    spend: 52800,
-    mediaTypes: ['Produto patrocinado', 'Marca patrocinada', 'Instore display'],
-    products: [...MOCK_PRODUCTS.iphones.slice(0, 2), ...MOCK_PRODUCTS.wearables.slice(2, 4)],
-    bidStrength: 'Forte',
-    bids: generateMockBids(['Produto patrocinado', 'Marca patrocinada', 'Instore display']),
-    impressions: 2112000,
-    clicks: 52800,
-    conversions: 1056,
-    revenue: 844800,
-    ntbConversions: 317,
-    ntbRevenue: 126720,
-    units: 1584,
-    ntbUnits: 475,
-    impressionShare: 73.0
-  },
-  {
-    id: '46',
-    title: 'Semana do Consumidor: iMac',
-    status: CampaignStatus.ACTIVE,
-    publisher: 'Fast Shop',
-    startDate: new Date(2026, 2, 9),
-    endDate: new Date(2026, 2, 21),
-    imageUrl: APPLE_IMG('imac-color-unselect-202601-gallery-1'),
-    budget: 52000,
-    spend: 0,
-    mediaTypes: ['Banner patrocinado', 'Video'],
-    products: [MOCK_PRODUCTS.macs[4]],
-    bidStrength: 'Intermediário',
-    bids: generateMockBids(['Banner patrocinado', 'Video']),
-    impressions: 0,
-    clicks: 0,
-    conversions: 0,
-    revenue: 0,
-    ntbConversions: 0,
-    ntbRevenue: 0,
-    units: 0,
-    ntbUnits: 0,
-    impressionShare: 0
-  },
-  {
-    id: '47',
-    title: 'Março: AirPods Max Premium',
-    status: CampaignStatus.ACTIVE,
-    publisher: 'Carrefour',
-    startDate: new Date(2026, 2, 6),
-    endDate: new Date(2026, 2, 26),
-    imageUrl: APPLE_IMG('airpods-max-select-202409-midnight'),
-    budget: 31000,
-    spend: 24800,
-    mediaTypes: ['Produto patrocinado', 'Marca patrocinada'],
-    products: [MOCK_PRODUCTS.wearables[3]],
-    bidStrength: 'Forte',
-    bids: generateMockBids(['Produto patrocinado', 'Marca patrocinada']),
-    impressions: 992000,
-    clicks: 24800,
-    conversions: 496,
-    revenue: 198400,
-    ntbConversions: 149,
-    ntbRevenue: 59520,
-    units: 744,
-    ntbUnits: 223,
-    impressionShare: 66.0
-  },
-  {
-    id: '48',
-    title: 'Campanha Continuada Março: MacBook Pro 14"',
-    status: CampaignStatus.ACTIVE,
-    publisher: 'Magalu',
-    startDate: new Date(2026, 2, 2),
-    endDate: new Date(2026, 2, 31),
-    imageUrl: APPLE_IMG('mbp14-spaceblack-select-202410'),
-    budget: 76000,
-    spend: 60800,
-    mediaTypes: ['Produto patrocinado', 'Banner patrocinado', 'Video'],
-    products: [MOCK_PRODUCTS.macs[1]],
-    bidStrength: 'Forte',
-    bids: generateMockBids(['Produto patrocinado', 'Banner patrocinado', 'Video']),
-    impressions: 1824000,
-    clicks: 45600,
-    conversions: 912,
-    revenue: 729600,
-    ntbConversions: 274,
-    ntbRevenue: 109440,
-    units: 1368,
-    ntbUnits: 411,
-    impressionShare: 71.0
-  },
-  {
-    id: '49',
-    title: 'Março: iPad mini em Destaque',
-    status: CampaignStatus.ACTIVE,
-    publisher: 'Submarino',
-    startDate: new Date(2026, 2, 11),
-    endDate: new Date(2026, 2, 28),
-    imageUrl: APPLE_IMG('ipad-mini-select-wifi-blue-202410'),
-    budget: 23500,
-    spend: 3600,
-    mediaTypes: ['Produto patrocinado'],
-    products: [MOCK_PRODUCTS.ipads[5]],
-    bidStrength: 'Intermediário',
-    bids: generateMockBids(['Produto patrocinado']),
-    impressions: 180000,
-    clicks: 4500,
-    conversions: 90,
-    revenue: 36000,
-    ntbConversions: 27,
-    ntbRevenue: 10800,
-    units: 135,
-    ntbUnits: 41,
-    impressionShare: 38.0
-  },
-  {
-    id: '50',
-    title: 'Promoção Março: Ecossistema Completo',
-    status: CampaignStatus.ACTIVE,
-    publisher: 'Extra',
-    startDate: new Date(2026, 2, 1),
-    endDate: new Date(2026, 2, 30),
-    imageUrl: APPLE_IMG('iphone-16-pro-finish-select-202409-6-9inch-deserttitanium'),
-    budget: 125000,
-    spend: 87500,
-    mediaTypes: ['Produto patrocinado', 'Banner patrocinado', 'Marca patrocinada', 'Video'],
-    products: [...MOCK_PRODUCTS.iphones, ...MOCK_PRODUCTS.wearables],
-    bidStrength: 'Forte',
-    bids: generateMockBids(['Produto patrocinado', 'Banner patrocinado', 'Marca patrocinada', 'Video']),
-    impressions: 3125000,
-    clicks: 78100,
-    conversions: 1562,
-    revenue: 1249600,
-    ntbConversions: 469,
-    ntbRevenue: 187440,
-    units: 2343,
-    ntbUnits: 703,
-    impressionShare: 76.0
-  },
-  {
-    id: '51',
-    title: 'Março: Apple Watch Ultra 2 Aventura',
-    status: CampaignStatus.ACTIVE,
-    publisher: 'Amazon Brasil',
-    startDate: new Date(2026, 2, 7),
-    endDate: new Date(2026, 2, 22),
-    imageUrl: APPLE_IMG('ultra-case-unselect-gallery-1-202409'),
-    budget: 41000,
-    spend: 36900,
-    mediaTypes: ['Produto patrocinado', 'Video', 'Instore display'],
-    products: [MOCK_PRODUCTS.wearables[0]],
-    bidStrength: 'Forte',
-    bids: generateMockBids(['Produto patrocinado', 'Video', 'Instore display']),
-    impressions: 1476000,
-    clicks: 36900,
-    conversions: 738,
-    revenue: 295200,
-    ntbConversions: 221,
-    ntbRevenue: 88560,
-    units: 1107,
-    ntbUnits: 332,
-    impressionShare: 69.0
-  },
-  {
-    id: '52',
-    title: 'Campanha Março: iPhone 16 Plus',
-    status: CampaignStatus.ACTIVE,
-    publisher: 'Casas Bahia',
-    startDate: new Date(2026, 2, 4),
-    endDate: new Date(2026, 2, 27),
-    imageUrl: APPLE_IMG('iphone-16-finish-select-202409-6-7inch-ultramarine'),
-    budget: 54000,
-    spend: 24300,
-    mediaTypes: ['Produto patrocinado', 'Banner patrocinado'],
-    products: [MOCK_PRODUCTS.iphones[3]],
-    bidStrength: 'Intermediário',
-    bids: generateMockBids(['Produto patrocinado', 'Banner patrocinado']),
-    impressions: 972000,
-    clicks: 24300,
-    conversions: 486,
-    revenue: 291600,
-    ntbConversions: 146,
-    ntbRevenue: 58320,
-    units: 729,
-    ntbUnits: 219,
-    impressionShare: 58.0
-  },
-  {
-    id: '53',
-    title: 'Março: MacBook Air 15" Criatividade',
-    status: CampaignStatus.ACTIVE,
-    publisher: 'Shoptime',
-    startDate: new Date(2026, 2, 10),
-    endDate: new Date(2026, 2, 29),
-    imageUrl: APPLE_IMG('mba15-midnight-select-202306'),
-    budget: 47000,
-    spend: 28200,
-    mediaTypes: ['Produto patrocinado', 'Marca patrocinada'],
-    products: [MOCK_PRODUCTS.macs[2]],
-    bidStrength: 'Forte',
-    bids: generateMockBids(['Produto patrocinado', 'Marca patrocinada']),
-    impressions: 1128000,
-    clicks: 28200,
-    conversions: 564,
-    revenue: 451200,
-    ntbConversions: 169,
-    ntbRevenue: 67680,
-    units: 846,
-    ntbUnits: 254,
-    impressionShare: 63.0
-  },
-  {
-    id: '54',
-    title: 'Ofertas Março: iPad Pro 11"',
-    status: CampaignStatus.ACTIVE,
-    publisher: 'Kabum',
-    startDate: new Date(2026, 2, 8),
-    endDate: new Date(2026, 2, 25),
-    imageUrl: APPLE_IMG('ipad-pro-11-select-wifi-spaceblack-202405'),
-    budget: 39000,
-    spend: 0,
-    mediaTypes: ['Produto patrocinado', 'Video'],
-    products: [MOCK_PRODUCTS.ipads[1]],
-    bidStrength: 'Intermediário',
-    bids: generateMockBids(['Produto patrocinado', 'Video']),
-    impressions: 0,
-    clicks: 0,
-    conversions: 0,
-    revenue: 0,
-    ntbConversions: 0,
-    ntbRevenue: 0,
-    units: 0,
-    ntbUnits: 0,
-    impressionShare: 0
-  },
-  {
-    id: '55',
-    title: 'Março: AirPods 4 e Pro 2',
-    status: CampaignStatus.ACTIVE,
-    publisher: 'Mercado Livre',
-    startDate: new Date(2026, 2, 6),
-    endDate: new Date(2026, 2, 26),
-    imageUrl: APPLE_IMG('airpods-4-hero-select-202409'),
-    budget: 27500,
-    spend: 23100,
-    mediaTypes: ['Produto patrocinado', 'Banner patrocinado'],
-    products: [MOCK_PRODUCTS.wearables[2], MOCK_PRODUCTS.wearables[4]],
-    bidStrength: 'Forte',
-    bids: generateMockBids(['Produto patrocinado', 'Banner patrocinado']),
-    impressions: 924000,
-    clicks: 23100,
-    conversions: 462,
-    revenue: 138600,
-    ntbConversions: 139,
-    ntbRevenue: 41640,
-    units: 693,
-    ntbUnits: 208,
-    impressionShare: 64.0
-  },
-  {
-    id: '56',
-    title: 'Campanha Março: iPhone 15 Entrada',
-    status: CampaignStatus.ACTIVE,
-    publisher: 'Americanas',
-    startDate: new Date(2026, 2, 12),
-    endDate: new Date(2026, 2, 31),
-    imageUrl: APPLE_IMG('iphone-15-finish-select-202309-6-1inch-black'),
-    budget: 36000,
-    spend: 12600,
-    mediaTypes: ['Produto patrocinado', 'Banner patrocinado'],
-    products: [MOCK_PRODUCTS.iphones[5]],
-    bidStrength: 'Intermediário',
-    bids: generateMockBids(['Produto patrocinado', 'Banner patrocinado']),
-    impressions: 504000,
-    clicks: 12600,
-    conversions: 252,
-    revenue: 100800,
-    ntbConversions: 76,
-    ntbRevenue: 30240,
-    units: 378,
-    ntbUnits: 113,
-    impressionShare: 52.0
+const CURRENT_YEAR = 2026;
+
+const normalizeText = (value: string) =>
+  value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase();
+
+const uniqueProducts = (products: Product[]) =>
+  Array.from(new Map(products.map((product) => [product.id, product])).values());
+
+const filterProducts = (keywords: string[]) => {
+  const normalizedKeywords = keywords.map(normalizeText);
+  return ALL_PRODUCTS.filter((product) => {
+    const normalizedName = normalizeText(product.name);
+    return normalizedKeywords.some((keyword) => normalizedName.includes(keyword));
+  });
+};
+
+const cycleProducts = (products: Product[], count: number, seed: number) => {
+  if (products.length === 0) return ALL_PRODUCTS.slice(0, count);
+  if (products.length <= count) return products;
+
+  const result: Product[] = [];
+  const start = seed % products.length;
+
+  for (let index = 0; index < count; index += 1) {
+    result.push(products[(start + index) % products.length]);
   }
+
+  return result;
+};
+
+const mergeCollections = (...collections: Product[][]) => uniqueProducts(collections.flat());
+
+const BASE_COLLECTIONS = {
+  pascoa: filterProducts(['páscoa', 'pascoa', 'ovo', 'alpino', 'kitkat', 'talento', 'garoto', 'caribe']),
+  chocolates: filterProducts([
+    'chocolate',
+    'bombom',
+    'kitkat',
+    'kit kat',
+    'prestigio',
+    'alpino',
+    'galak',
+    'garoto',
+    'talento',
+    'caribe',
+    'sensacao',
+    'crunch',
+    'chokito',
+  ]),
+  biscoitos: filterProducts(['biscoito', 'cookie', 'wafer', 'chocobiscuit', 'chococookies', 'nesfit', 'surpresa']),
+  breakfast: filterProducts(['cereal', 'snow flakes', 'aveia', 'farinha lactea', 'neston']),
+  beverages: filterProducts(['nescafe', 'cafe', 'cappuccino', 'capsula', 'achocolatado', 'bebida', 'mochaccino']),
+  dairy: filterProducts(['iogurte', 'chandelle', 'chambinho', 'petit suisse', 'sobremesa']),
+  culinary: filterProducts(['creme de leite', 'leite condensado', 'moca']),
+  infant: filterProducts(['formula infantil', 'nan', 'nestogeno', 'neslac', 'papinha']),
+  nutricao: filterProducts(['nutren', 'proteinada', 'molico']),
+  sorvetes: filterProducts(['sorvete']),
+};
+
+const PRODUCT_COLLECTIONS = {
+  ...BASE_COLLECTIONS,
+  rotina: mergeCollections(BASE_COLLECTIONS.breakfast, BASE_COLLECTIONS.beverages, BASE_COLLECTIONS.dairy, BASE_COLLECTIONS.culinary),
+  lancheira: mergeCollections(BASE_COLLECTIONS.breakfast, BASE_COLLECTIONS.biscoitos, BASE_COLLECTIONS.beverages),
+  sobremesas: mergeCollections(BASE_COLLECTIONS.culinary, BASE_COLLECTIONS.dairy, BASE_COLLECTIONS.chocolates),
+};
+
+type CollectionKey = keyof typeof PRODUCT_COLLECTIONS;
+
+const COLLECTION_PROFILES: Record<
+  CollectionKey,
+  {
+    ctr: number;
+    cvr: number;
+    orderValue: number;
+    ntbShare: number;
+    unitsPerOrder: number;
+    baseImpressionShare: number;
+    impressionsPerReal: number;
+  }
+> = {
+  pascoa: { ctr: 0.018, cvr: 0.039, orderValue: 42, ntbShare: 0.33, unitsPerOrder: 1.9, baseImpressionShare: 72, impressionsPerReal: 25 },
+  chocolates: { ctr: 0.017, cvr: 0.034, orderValue: 28, ntbShare: 0.29, unitsPerOrder: 2.3, baseImpressionShare: 68, impressionsPerReal: 26 },
+  biscoitos: { ctr: 0.016, cvr: 0.031, orderValue: 18, ntbShare: 0.26, unitsPerOrder: 2.2, baseImpressionShare: 62, impressionsPerReal: 27 },
+  breakfast: { ctr: 0.015, cvr: 0.028, orderValue: 24, ntbShare: 0.24, unitsPerOrder: 2.0, baseImpressionShare: 60, impressionsPerReal: 24 },
+  beverages: { ctr: 0.015, cvr: 0.026, orderValue: 34, ntbShare: 0.27, unitsPerOrder: 1.7, baseImpressionShare: 58, impressionsPerReal: 23 },
+  dairy: { ctr: 0.016, cvr: 0.032, orderValue: 21, ntbShare: 0.23, unitsPerOrder: 2.1, baseImpressionShare: 61, impressionsPerReal: 25 },
+  culinary: { ctr: 0.014, cvr: 0.029, orderValue: 30, ntbShare: 0.21, unitsPerOrder: 2.4, baseImpressionShare: 57, impressionsPerReal: 22 },
+  infant: { ctr: 0.012, cvr: 0.021, orderValue: 86, ntbShare: 0.18, unitsPerOrder: 1.3, baseImpressionShare: 54, impressionsPerReal: 19 },
+  nutricao: { ctr: 0.013, cvr: 0.024, orderValue: 68, ntbShare: 0.2, unitsPerOrder: 1.4, baseImpressionShare: 56, impressionsPerReal: 20 },
+  sorvetes: { ctr: 0.017, cvr: 0.035, orderValue: 26, ntbShare: 0.31, unitsPerOrder: 2.0, baseImpressionShare: 63, impressionsPerReal: 24 },
+  rotina: { ctr: 0.014, cvr: 0.027, orderValue: 32, ntbShare: 0.22, unitsPerOrder: 1.9, baseImpressionShare: 59, impressionsPerReal: 23 },
+  lancheira: { ctr: 0.016, cvr: 0.033, orderValue: 22, ntbShare: 0.28, unitsPerOrder: 2.1, baseImpressionShare: 64, impressionsPerReal: 26 },
+  sobremesas: { ctr: 0.015, cvr: 0.03, orderValue: 29, ntbShare: 0.25, unitsPerOrder: 2.0, baseImpressionShare: 60, impressionsPerReal: 24 },
+};
+
+type CampaignSpec = {
+  month: number;
+  startDay: number;
+  duration: number;
+  title: string;
+  collection: CollectionKey;
+  publisher: string;
+  budget: number;
+  mediaTypes: MediaType[];
+  productCount?: number;
+  status?: CampaignStatus;
+};
+
+const spec = (
+  month: number,
+  startDay: number,
+  duration: number,
+  title: string,
+  collection: CollectionKey,
+  publisher: string,
+  budget: number,
+  mediaTypes: MediaType[],
+  productCount = 6,
+  status?: CampaignStatus
+): CampaignSpec => ({
+  month,
+  startDay,
+  duration,
+  title,
+  collection,
+  publisher,
+  budget,
+  mediaTypes,
+  productCount,
+  status,
+});
+
+const CAMPAIGN_SPECS: CampaignSpec[] = [
+  spec(0, 5, 18, 'Volta às Aulas: Lancheira com Nescau e Cereais', 'lancheira', 'Carrefour', 42000, ['Produto patrocinado', 'Banner patrocinado', 'Instore display'], 7),
+  spec(0, 9, 16, 'Café da Manhã de Verão com Nestlé', 'breakfast', 'Extra', 28000, ['Produto patrocinado', 'Marca patrocinada'], 6),
+  spec(0, 13, 12, 'Rotina Infantil: Fórmulas e Compostos Lácteos', 'infant', 'Amazon Brasil', 36000, ['Produto patrocinado', 'Banner patrocinado'], 5),
+  spec(0, 20, 11, 'Janeiro Gelado: Sorvetes Nestlé', 'sorvetes', 'Mercado Livre', 22000, ['Banner patrocinado', 'Video'], 6),
+
+  spec(1, 2, 13, 'Esquenta Carnaval com Chocolates Nestlé', 'chocolates', 'Carrefour', 26000, ['Banner patrocinado', 'Video'], 7),
+  spec(1, 8, 14, 'Última Chamada Volta às Aulas: Biscoitos e Achocolatados', 'lancheira', 'Extra', 31000, ['Produto patrocinado', 'Banner patrocinado'], 6),
+  spec(1, 12, 10, 'Café Gelado e Cappuccino Nescafé', 'beverages', 'Amazon Brasil', 19000, ['Produto patrocinado', 'Marca patrocinada'], 5),
+  spec(1, 17, 12, 'Iogurtes e Lácteos para o Dia a Dia', 'dairy', 'Pão de Açúcar', 24000, ['Produto patrocinado', 'Banner patrocinado'], 6),
+
+  spec(2, 1, 21, 'Semana do Consumidor: Mix Nestlé para Despensa', 'rotina', 'Carrefour', 56000, ['Produto patrocinado', 'Marca patrocinada', 'Instore display'], 8),
+  spec(2, 4, 16, 'Semana do Consumidor: Chocolates e Wafer', 'chocolates', 'Mercado Livre', 37000, ['Banner patrocinado', 'Video'], 7),
+  spec(2, 7, 18, 'Pré-Páscoa: Alpino, KitKat e Garoto', 'pascoa', 'Extra', 48000, ['Produto patrocinado', 'Banner patrocinado', 'Marca patrocinada'], 8),
+  spec(2, 10, 13, 'Março Saudável: Neston, Aveia e Nutren', 'nutricao', 'Amazon Brasil', 29000, ['Produto patrocinado', 'Video'], 6),
+  spec(2, 15, 14, 'Busca Patrocinada: Iogurtes e Sobremesas Nestlé', 'dairy', 'Rappi', 27000, ['Produto patrocinado', 'Banner patrocinado'], 6),
+  spec(2, 21, 12, 'Março Infantil: Nan, Neslac e Nestogeno', 'infant', 'Magalu', 33000, ['Produto patrocinado', 'Marca patrocinada'], 5),
+
+  spec(3, 1, 20, 'Páscoa Nestlé: Ovos e Bombons em Destaque', 'pascoa', 'Carrefour', 68000, ['Produto patrocinado', 'Banner patrocinado', 'Marca patrocinada', 'Instore display'], 8),
+  spec(3, 4, 17, 'Páscoa Carrefour: KitKat, Alpino e Talento', 'pascoa', 'Extra', 52000, ['Produto patrocinado', 'Banner patrocinado', 'Video'], 7),
+  spec(3, 10, 12, 'Sobremesas de Páscoa com Moça e Creme de Leite', 'sobremesas', 'Pão de Açúcar', 34000, ['Marca patrocinada', 'Video'], 6),
+  spec(3, 18, 11, 'Pós-Páscoa: Chocolate para Recompra', 'chocolates', 'Mercado Livre', 25000, ['Produto patrocinado', 'Banner patrocinado'], 6),
+
+  spec(4, 2, 14, 'Dia das Mães: Café da Manhã com Nescafé e Iogurtes', 'rotina', 'Carrefour', 36000, ['Produto patrocinado', 'Marca patrocinada'], 7),
+  spec(4, 6, 13, 'Receitas com Moça para Presentear no Dia das Mães', 'culinary', 'Extra', 27000, ['Banner patrocinado', 'Video'], 5),
+  spec(4, 12, 10, 'Chocolates Premium para Compartilhar', 'chocolates', 'Amazon Brasil', 24000, ['Produto patrocinado', 'Banner patrocinado'], 6),
+  spec(4, 18, 12, 'Rotina em Família: Lácteos e Cereais Nestlé', 'breakfast', 'Pão de Açúcar', 22000, ['Produto patrocinado', 'Banner patrocinado'], 6),
+
+  spec(5, 3, 15, 'Festa Junina: Achocolatados e Biscoitos Nestlé', 'lancheira', 'Carrefour', 30000, ['Produto patrocinado', 'Banner patrocinado', 'Instore display'], 7),
+  spec(5, 7, 14, 'Arraiá do Doce: Chocolates e Wafer', 'chocolates', 'Extra', 26000, ['Banner patrocinado', 'Video'], 6),
+  spec(5, 11, 12, 'Cappuccino e Nescafé para o Inverno', 'beverages', 'Amazon Brasil', 21000, ['Produto patrocinado', 'Marca patrocinada'], 5),
+  spec(5, 19, 10, 'Sobremesas Cremosas com Moça', 'sobremesas', 'Rappi', 23000, ['Produto patrocinado', 'Banner patrocinado'], 6),
+
+  spec(6, 2, 17, 'Férias de Julho: Sorvetes Nestlé em Alta', 'sorvetes', 'Carrefour', 26000, ['Banner patrocinado', 'Video'], 6),
+  spec(6, 6, 14, 'Snacks de Férias: Biscoitos e Chocolates', 'biscoitos', 'Mercado Livre', 24000, ['Produto patrocinado', 'Banner patrocinado'], 7),
+  spec(6, 13, 10, 'Café da Tarde com Nescafé e Cookies', 'beverages', 'Extra', 20000, ['Produto patrocinado', 'Marca patrocinada'], 5),
+  spec(6, 20, 11, 'Linha Infantil para Reforço da Rotina', 'infant', 'Amazon Brasil', 31000, ['Produto patrocinado', 'Banner patrocinado'], 5),
+
+  spec(7, 4, 12, 'Dia dos Pais: Cafés e Cappuccinos Nestlé', 'beverages', 'Carrefour', 25000, ['Produto patrocinado', 'Marca patrocinada', 'Instore display'], 5),
+  spec(7, 8, 14, 'Presenteie com Chocolates Premium', 'chocolates', 'Extra', 28000, ['Banner patrocinado', 'Video'], 6),
+  spec(7, 15, 11, 'Café da Manhã Completo com Cereais Nestlé', 'breakfast', 'Pão de Açúcar', 22000, ['Produto patrocinado', 'Banner patrocinado'], 6),
+  spec(7, 21, 10, 'Rotina Saudável com Nutren e Aveia', 'nutricao', 'Rappi', 27000, ['Produto patrocinado', 'Video'], 5),
+
+  spec(8, 3, 15, 'Primavera Nestlé: Lanches Leves e Cereais', 'breakfast', 'Carrefour', 23000, ['Produto patrocinado', 'Banner patrocinado'], 6, CampaignStatus.DRAFT),
+  spec(8, 9, 13, 'Momento Doce: Chocolates para Compartilhar', 'chocolates', 'Mercado Livre', 26000, ['Banner patrocinado', 'Video'], 6),
+  spec(8, 14, 11, 'Iogurtes e Sobremesas para o Dia a Dia', 'dairy', 'Extra', 21000, ['Produto patrocinado', 'Marca patrocinada'], 6),
+  spec(8, 20, 10, 'Abasteça a Despensa com Moça e Creme de Leite', 'culinary', 'Pão de Açúcar', 24000, ['Produto patrocinado', 'Banner patrocinado'], 5, CampaignStatus.DRAFT),
+
+  spec(9, 2, 16, 'Dia das Crianças: Chambinho, Chamyto e Chocolates', 'dairy', 'Carrefour', 34000, ['Produto patrocinado', 'Banner patrocinado', 'Instore display'], 7),
+  spec(9, 7, 13, 'Lancheira Divertida: Biscoitos Nestlé e Cereais', 'lancheira', 'Extra', 25000, ['Produto patrocinado', 'Banner patrocinado'], 7),
+  spec(9, 13, 12, 'Outubro Gelado: Sorvetes e Sobremesas', 'sorvetes', 'Rappi', 22000, ['Banner patrocinado', 'Video'], 6),
+  spec(9, 20, 10, 'Kids Nutrition: Nutren e Linha Infantil', 'infant', 'Amazon Brasil', 30000, ['Produto patrocinado', 'Marca patrocinada'], 5),
+
+  spec(10, 3, 17, 'Esquenta Black Friday Nestlé', 'rotina', 'Carrefour', 43000, ['Produto patrocinado', 'Banner patrocinado', 'Marca patrocinada'], 8, CampaignStatus.DRAFT),
+  spec(10, 7, 16, 'Black Friday: Chocolates, Biscoitos e Wafer', 'chocolates', 'Mercado Livre', 54000, ['Produto patrocinado', 'Banner patrocinado', 'Video'], 8, CampaignStatus.DRAFT),
+  spec(10, 13, 11, 'Black Friday: Multipacks de Mercearia Nestlé', 'culinary', 'Extra', 38000, ['Produto patrocinado', 'Banner patrocinado'], 6, CampaignStatus.DRAFT),
+  spec(10, 20, 9, 'Black Friday: Nescafé, Nescau e Bebidas', 'beverages', 'Amazon Brasil', 31000, ['Marca patrocinada', 'Video'], 6, CampaignStatus.DRAFT),
+
+  spec(11, 1, 18, 'Natal Nestlé: Chocolates para Presentear', 'chocolates', 'Carrefour', 46000, ['Produto patrocinado', 'Banner patrocinado', 'Marca patrocinada'], 8, CampaignStatus.DRAFT),
+  spec(11, 5, 14, 'Ceia Doce: Moça, Creme de Leite e Sobremesas', 'sobremesas', 'Extra', 36000, ['Produto patrocinado', 'Banner patrocinado', 'Video'], 7, CampaignStatus.DRAFT),
+  spec(11, 12, 12, 'Verão com Sorvetes Nestlé', 'sorvetes', 'Rappi', 24000, ['Banner patrocinado', 'Video'], 6, CampaignStatus.DRAFT),
+  spec(11, 20, 8, 'Ano-Novo Abastecido: Café da Manhã e Lanches', 'rotina', 'Pão de Açúcar', 28000, ['Produto patrocinado', 'Marca patrocinada'], 7, CampaignStatus.DRAFT),
 ];
+
+const inferStatus = (startDate: Date, endDate: Date, index: number) => {
+  const today = todayMidnight();
+
+  if (endDate < today) return CampaignStatus.COMPLETED;
+  if (startDate > today) return index % 4 === 0 ? CampaignStatus.DRAFT : CampaignStatus.ACTIVE;
+  return CampaignStatus.ACTIVE;
+};
+
+const calculateSpend = (status: CampaignStatus, budget: number, seed: number) => {
+  if (status === CampaignStatus.DRAFT) return 0;
+  if (status === CampaignStatus.COMPLETED) {
+    return Math.round(budget * (0.9 + ((seed % 5) * 0.02)));
+  }
+  return Math.round(budget * (0.28 + ((seed % 6) * 0.07)));
+};
+
+const buildMetrics = (collection: CollectionKey, spend: number, mediaTypes: MediaType[], seed: number) => {
+  if (spend <= 0) {
+    return {
+      impressions: 0,
+      clicks: 0,
+      conversions: 0,
+      revenue: 0,
+      ntbConversions: 0,
+      ntbRevenue: 0,
+      units: 0,
+      ntbUnits: 0,
+      impressionShare: 0,
+    };
+  }
+
+  const profile = COLLECTION_PROFILES[collection];
+  const mediaFactor = 0.92 + mediaTypes.length * 0.16;
+  const seedBump = 0.94 + ((seed % 5) * 0.04);
+  const ctr = profile.ctr + ((seed % 4) * 0.0012);
+  const cvr = profile.cvr + ((seed % 3) * 0.0011);
+  const ntbShare = profile.ntbShare + ((seed % 3) * 0.012);
+  const unitsPerOrder = profile.unitsPerOrder + ((seed % 4) * 0.08);
+  const orderValue = profile.orderValue + ((seed % 5) * 1.7);
+
+  const impressions = Math.round(spend * profile.impressionsPerReal * mediaFactor * seedBump);
+  const clicks = Math.round(impressions * ctr);
+  const conversions = Math.max(1, Math.round(clicks * cvr));
+  const units = Math.max(conversions, Math.round(conversions * unitsPerOrder));
+  const revenue = Math.round(conversions * orderValue);
+  const ntbConversions = Math.round(conversions * ntbShare);
+  const ntbRevenue = Math.round(revenue * ntbShare);
+  const ntbUnits = Math.round(units * ntbShare);
+  const impressionShare = Number((profile.baseImpressionShare + ((seed % 7) * 1.4)).toFixed(1));
+
+  return {
+    impressions,
+    clicks,
+    conversions,
+    revenue,
+    ntbConversions,
+    ntbRevenue,
+    units,
+    ntbUnits,
+    impressionShare,
+  };
+};
+
+const buildCampaign = (campaignSpec: CampaignSpec, index: number): Campaign => {
+  const startDate = new Date(CURRENT_YEAR, campaignSpec.month, campaignSpec.startDay);
+  const endDate = new Date(CURRENT_YEAR, campaignSpec.month, campaignSpec.startDay + campaignSpec.duration - 1);
+  const status = campaignSpec.status ?? inferStatus(startDate, endDate, index);
+  const collectionProducts = PRODUCT_COLLECTIONS[campaignSpec.collection];
+  const products = cycleProducts(collectionProducts, campaignSpec.productCount ?? 6, index * 3 + campaignSpec.month);
+  const spend = calculateSpend(status, campaignSpec.budget, index);
+  const metrics = buildMetrics(campaignSpec.collection, spend, campaignSpec.mediaTypes, index);
+
+  return {
+    id: String(index + 1),
+    title: campaignSpec.title,
+    status,
+    publisher: campaignSpec.publisher,
+    startDate,
+    endDate,
+    imageUrl: products[0]?.imageUrl ?? DEFAULT_NESTLE_IMAGE,
+    budget: campaignSpec.budget,
+    spend,
+    mediaTypes: campaignSpec.mediaTypes,
+    products,
+    bidStrength: 'Intermediário',
+    bids: generateMockBids(campaignSpec.mediaTypes),
+    ...metrics,
+  };
+};
+
+export const INITIAL_CAMPAIGNS: Campaign[] = CAMPAIGN_SPECS.map(buildCampaign);
