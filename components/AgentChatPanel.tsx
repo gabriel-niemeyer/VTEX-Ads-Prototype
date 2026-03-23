@@ -1,31 +1,39 @@
 import React, { useRef, useEffect } from 'react';
+import { AgentChatComposer, ChatSendPayload } from './AgentChatComposer';
 
 export interface ChatMessage {
   id: string;
   role: 'user' | 'assistant';
   content: string;
+  attachmentName?: string;
 }
 
 interface AgentChatPanelProps {
   messages: ChatMessage[];
   isThinking: boolean;
-  onSend: (text: string) => void;
+  onSend: (payload: ChatSendPayload) => void;
+}
+
+function MessagePdfChip({ name }: { name: string }) {
+  return (
+    <div className="mb-2 flex w-full max-w-[min(100%,320px)] items-center gap-2 rounded-lg border border-[#d8dee6] bg-white/80 px-2 py-1.5">
+      <div
+        className="flex h-7 w-7 shrink-0 items-center justify-center rounded bg-[#e5252a] text-[9px] font-bold text-white"
+        aria-hidden
+      >
+        PDF
+      </div>
+      <span className="min-w-0 flex-1 truncate text-left text-[13px] font-medium text-[color:var(--sl-fg-base)]">{name}</span>
+    </div>
+  );
 }
 
 export const AgentChatPanel: React.FC<AgentChatPanelProps> = ({ messages, isThinking, onSend }) => {
-  const [input, setInput] = React.useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
   }, [messages, isThinking]);
-
-  const handleSubmit = () => {
-    const t = input.trim();
-    if (!t) return;
-    onSend(t);
-    setInput('');
-  };
 
   return (
     <div className="flex flex-col h-full min-w-0 w-full bg-white">
@@ -41,7 +49,8 @@ export const AgentChatPanel: React.FC<AgentChatPanelProps> = ({ messages, isThin
                   msg.role === 'user' ? 'bg-[#ecf0f5]' : 'bg-gray-100'
                 }`}
               >
-                {msg.content}
+                {msg.role === 'user' && msg.attachmentName && <MessagePdfChip name={msg.attachmentName} />}
+                {msg.content ? <p className="whitespace-pre-wrap">{msg.content}</p> : null}
               </div>
             </div>
           ))}
@@ -58,32 +67,7 @@ export const AgentChatPanel: React.FC<AgentChatPanelProps> = ({ messages, isThin
         </div>
       </div>
       <div className="shrink-0 px-6 pb-4">
-        <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-full pl-3 pr-2 py-2 shadow-sm max-w-[620px] mx-auto">
-          <button type="button" className="w-7 h-7 rounded-full flex items-center justify-center text-[color:var(--sl-fg-base-soft)] hover:bg-gray-100 transition-colors" aria-label="Anexar">
-            <span className="material-symbols-outlined text-[18px]">add</span>
-          </button>
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault();
-                handleSubmit();
-              }
-            }}
-            placeholder="Fale com o agente"
-            className="flex-1 min-w-0 bg-transparent text-[15px] text-[color:var(--sl-fg-base)] placeholder:text-[color:var(--sl-fg-base-soft)] outline-none px-2 py-2.5"
-          />
-          <button
-            type="button"
-            onClick={handleSubmit}
-            className="w-9 h-9 rounded-full bg-[#0366dd] flex items-center justify-center text-white hover:bg-[#0256c7] transition-colors shrink-0"
-            aria-label="Enviar"
-          >
-            <span className="material-symbols-outlined text-[20px]">arrow_upward</span>
-          </button>
-        </div>
+        <AgentChatComposer variant="panel" placeholder="Fale com o agente" onSend={onSend} autoFocus />
       </div>
     </div>
   );

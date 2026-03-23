@@ -3,6 +3,7 @@ import { Campaign, CampaignStatus, Product } from '../types';
 import { AgentSidebar } from './AgentSidebar';
 import { AgentWelcome } from './AgentWelcome';
 import { AgentChatPanel, ChatMessage } from './AgentChatPanel';
+import { ChatSendPayload } from './AgentChatComposer';
 import { AgentCanvas } from './AgentCanvas';
 import { CampaignDocument } from './CampaignDocument';
 
@@ -21,8 +22,22 @@ interface AgentLayoutProps {
   onOpenClassicView?: () => void;
 }
 
-function mockAgentResponse(userText: string, allCampaigns: Campaign[]): { reply: string; ids: string[] } {
+function mockAgentResponse(
+  userText: string,
+  allCampaigns: Campaign[],
+  hasPdfAttachment: boolean
+): { reply: string; ids: string[] } {
   const lower = userText.toLowerCase();
+  if (hasPdfAttachment) {
+    const subset = allCampaigns.filter((_, i) => i < 7);
+    const docHint = userText.trim()
+      ? ' Li o que você pediu no texto e usei o PDF como referência.'
+      : ' Usei o PDF anexado como referência para montar as campanhas.';
+    return {
+      reply: `Recebi seu PDF.${docHint} Criei ${subset.length} campanhas na timeline à direita — revise datas e detalhes ou peça ajustes.`,
+      ids: subset.map((c) => c.id),
+    };
+  }
   if (lower.includes('campanha') || lower.includes('campanhas') || lower.includes('7') || lower.includes('casas bahia') || lower.includes('jbp') || lower.includes('desdobrar')) {
     const subset = allCampaigns.filter((_, i) => i < 7);
     return {
@@ -98,17 +113,20 @@ export const AgentLayout: React.FC<AgentLayoutProps> = ({
   );
 
   const handleSend = useCallback(
-    (text: string) => {
+    (payload: ChatSendPayload) => {
+      const { text, file } = payload;
+      const trimmed = text.trim();
       const userMsg: ChatMessage = {
         id: `user-${Date.now()}`,
         role: 'user',
-        content: text,
+        content: trimmed,
+        attachmentName: file?.name,
       };
       setMessages((prev) => [...prev, userMsg]);
       setIsThinking(true);
 
       setTimeout(() => {
-        const { reply, ids } = mockAgentResponse(text, campaigns);
+        const { reply, ids } = mockAgentResponse(trimmed, campaigns, !!file);
         onSuggestedIdsChange(ids);
         const assistantMsg: ChatMessage = {
           id: `assistant-${Date.now()}`,

@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { UserAvatar } from './UserAvatar';
+import React from 'react';
+import { AgentChatComposer, ChatSendPayload } from './AgentChatComposer';
 
 const STARTERS = [
   'Desdobrar JBP de 2026 com as Casas Bahia',
@@ -8,27 +8,13 @@ const STARTERS = [
 ];
 
 interface AgentWelcomeProps {
-  onSend: (text: string) => void;
+  onSend: (payload: ChatSendPayload) => void;
 }
 
 export const AgentWelcome: React.FC<AgentWelcomeProps> = ({ onSend }) => {
-  const [input, setInput] = useState('');
-  const inputRef = useRef<HTMLTextAreaElement>(null);
-
-  const handleSubmit = () => {
-    const t = input.trim();
-    if (!t) return;
-    onSend(t);
-    setInput('');
-  };
-
   const handleStarter = (text: string) => {
-    onSend(text);
+    onSend({ text });
   };
-
-  useEffect(() => {
-    inputRef.current?.focus();
-  }, []);
 
   return (
     <div className="flex flex-col items-center gap-10 w-full max-w-[640px] mx-auto px-4">
@@ -43,44 +29,12 @@ export const AgentWelcome: React.FC<AgentWelcomeProps> = ({ onSend }) => {
         </div>
       </div>
 
-      {/* Prompt card */}
-      <div className="w-full flex flex-col gap-5 bg-white border border-gray-200 rounded-[28px] p-4 pl-6 pr-3 pt-4 pb-3 shadow-sm">
-        <div className="min-h-[24px] flex items-end gap-3 w-full">
-          <UserAvatar size="md" className="self-end mb-0.5 shrink-0" />
-          <textarea
-            ref={inputRef}
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                handleSubmit();
-              }
-            }}
-            placeholder="Peça algo ao Campaign Manager"
-            className="w-full resize-none bg-transparent text-base text-[color:var(--sl-fg-base)] placeholder:text-[color:var(--sl-fg-base-muted)] outline-none leading-6 min-h-[24px]"
-            rows={1}
-          />
-        </div>
-        <div className="flex items-center justify-between w-full">
-          <button type="button" className="w-8 h-8 rounded-lg flex items-center justify-center text-[color:var(--sl-fg-base-soft)] hover:bg-gray-100 transition-colors" aria-label="Anexar">
-            <span className="material-symbols-outlined text-[20px]">add</span>
-          </button>
-          <div className="flex items-center gap-1">
-            <button type="button" className="w-8 h-8 rounded-lg flex items-center justify-center text-[color:var(--sl-fg-base-soft)] hover:bg-gray-100 transition-colors" aria-label="Microfone">
-              <span className="material-symbols-outlined text-[20px]">mic</span>
-            </button>
-            <button
-              type="button"
-              onClick={handleSubmit}
-              className="w-10 h-10 rounded-full bg-[#0366dd] flex items-center justify-center text-white hover:bg-[#0256c7] transition-colors disabled:opacity-50"
-              aria-label="Enviar"
-            >
-              <span className="material-symbols-outlined text-[20px]">arrow_upward</span>
-            </button>
-          </div>
-        </div>
-      </div>
+      <AgentChatComposer
+        variant="welcome"
+        placeholder="Peça algo ao Campaign Manager"
+        onSend={onSend}
+        autoFocus
+      />
 
       {/* Starters */}
       <div className="flex flex-wrap gap-2 justify-center items-center min-h-9">
