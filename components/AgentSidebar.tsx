@@ -1,4 +1,5 @@
 import React from 'react';
+import { UserAvatar } from './UserAvatar';
 
 interface AgentSidebarProps {
   onOpenClassicView?: () => void;
@@ -48,8 +49,8 @@ export const AgentSidebar: React.FC<AgentSidebarProps> = ({ onOpenClassicView })
             </button>
           )}
         </div>
-        <div className="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center overflow-hidden shrink-0">
-          <span className="material-symbols-outlined text-[color:var(--sl-fg-base-soft)] text-[20px]">person</span>
+        <div className="shrink-0" aria-label="Conta">
+          <UserAvatar size="md" />
         </div>
       </div>
     </aside>

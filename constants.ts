@@ -1,5 +1,7 @@
-
 import { ColumnConfig, MediaType, Bid, BidStrength } from './types';
+
+/** Avatar do utilizador logado (asset em `public/user-avatar.png`). */
+export const CURRENT_USER_AVATAR_SRC = '/user-avatar.png';
 
 export const DAY_COLUMN_WIDTH = 48; // px
 export const ROW_HEIGHT = 80; // px
@@ -44,7 +46,6 @@ export const calculateOverallStrength = (bids: Bid[]): BidStrength => {
   if (average >= 1.6) return 'Intermediário';
   return 'Fraco';
 };
-
 export const COLUMNS: ColumnConfig[] = [
   { id: 'title', label: 'Campanha', defaultWidth: 'w-[320px]', locked: true },
   { id: 'publisher', label: 'Publisher', defaultWidth: 'w-[180px]' },
@@ -197,3 +198,4 @@ export const PERFORMANCE_COLUMNS: ColumnConfig[] = [
     description: 'Porcentagem do total de unidades vendidas que foram para clientes New-to-Brand. Útil para categorias com múltiplos itens por pedido.'
   },
 ];
+

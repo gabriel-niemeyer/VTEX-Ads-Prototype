@@ -1,7 +1,21 @@
-import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
+import React, { useState, useCallback, useRef, useEffect, useLayoutEffect, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { Campaign, CampaignStatus, MediaType, Product, Bid } from '../types';
 import { LazyImage } from './LazyImage';
 import { MediaDetailDocument } from './MediaDetailDocument';
+import { UserAvatar } from './UserAvatar';
+import { CommentThreadPanel } from './CommentThreadPanel';
+import {
+  formatBr,
+  clampMoney,
+  roundMoneyDecimals,
+  parseMaskedMoneyFull,
+  applyMoneyMask,
+  normalizeMoneyDraft,
+} from '../utils/moneyFormat';
+
+/** Mesmo valor que `pl-[106px]` em `.doc-page-column` — eixo de texto para centralizar o popover. */
+const DOC_COLUMN_CONTENT_INSET_PX = 106;
 
 interface CampaignDocumentProps {
   campaign: Campaign;
@@ -23,137 +37,12 @@ const fmtDatePt = (d: Date) =>
 const fmtMoney = (v: number) =>
   v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' BRL';
 
-/** Formata número no padrão pt-BR: 1.234,56 */
-const formatBr = (v: number, decimals = 2): string => {
-  const fixed = v.toFixed(decimals);
-  const [intPart, decPart] = fixed.split('.');
-  const withDots = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-  return decPart ? `${withDots},${decPart}` : withDots;
-};
-
-/** Parse string pt-BR (1.234,56 ou 1234,56) para número */
-const parseBr = (s: string): number => {
-  const t = s.replace(/\s/g, '').trim();
-  if (!t) return 0;
-  const noDots = t.replace(/\./g, '');
-  const withPoint = noDots.replace(',', '.');
-  const n = parseFloat(withPoint);
-  return isNaN(n) ? 0 : n;
-};
-
-/** Valor máximo em centavos (99.999.999,99) */
-function clampMoney(n: number): number {
-  if (!Number.isFinite(n)) return 0;
-  return Math.max(0, n);
-}
-
-function roundMoneyDecimals(n: number, decimals: number): number {
-  const f = 10 ** decimals;
-  return Math.round(n * f) / f;
-}
-
-/** Só dígitos, ponto e vírgula (formato pt-BR). */
-function normalizeMoneyDraft(s: string): string {
-  return s.replace(/[^\d.,]/g, '');
-}
-
-/** Quantidade de dígitos estritamente antes do índice `caret` em `raw`. */
-function countDigitsBefore(raw: string, caret: number): number {
-  let c = 0;
-  const stop = Math.max(0, Math.min(caret, raw.length));
-  for (let i = 0; i < stop; i++) {
-    if (/\d/.test(raw[i])) c++;
-  }
-  return c;
-}
-
-/** Posição no texto formatado após os primeiros `digitIndex` dígitos (0 = início). */
-function caretFromDigitIndex(formatted: string, digitIndex: number): number {
-  const digits = (formatted.match(/\d/g) || []).length;
-  const k = Math.max(0, Math.min(digitIndex, digits));
-  if (k === 0) return 0;
-  let seen = 0;
-  for (let i = 0; i < formatted.length; i++) {
-    if (/\d/.test(formatted[i])) {
-      seen++;
-      if (seen === k) return i + 1;
-    }
-  }
-  return formatted.length;
-}
-
-/** Parte inteira com separador de milhar (pt-BR), sem decimais. */
-function formatBrIntegerPart(intN: number): string {
-  const n = Math.max(0, Math.floor(intN));
-  const fixed = n.toFixed(0);
-  const [intPart] = fixed.split('.');
-  return intPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-}
-
-/**
- * Interpreta texto mascarado: se termina em `,` essa vírgula é só cursor; a decimal é a última dentro do núcleo.
- * Sem vírgula: só parte inteira (pontos = milhar).
- */
-function parseMaskedMoneyFull(cleaned: string, decimals: number): number {
-  const t = cleaned.trim();
-  if (!t) return 0;
-  const core = t.endsWith(',') ? t.slice(0, -1) : t;
-  const lastComma = core.lastIndexOf(',');
-  if (lastComma === -1) {
-    const intPart = core.replace(/\D/g, '');
-    return intPart ? parseInt(intPart, 10) : 0;
-  }
-  const intPart = core.slice(0, lastComma).replace(/\D/g, '');
-  const fracPart = core.slice(lastComma + 1).replace(/\D/g, '');
-  const intN = intPart ? parseInt(intPart, 10) : 0;
-  const fd = fracPart.slice(0, decimals);
-  const fracPadded = (fd + '0'.repeat(decimals)).slice(0, decimals);
-  const fracVal = fd.length > 0 ? parseInt(fracPadded, 10) / 10 ** decimals : 0;
-  return intN + fracVal;
-}
-
-/** Aplica máscara pt-BR (milhar e decimal) e devolve texto + seleção estável pelo índice de dígitos. */
-function applyMoneyMask(
-  raw: string,
-  selStart: number,
-  selEnd: number,
-  decimals: number
-): { text: string; selStart: number; selEnd: number } {
-  const cleaned = normalizeMoneyDraft(raw);
-  const d0 = countDigitsBefore(raw, selStart);
-  const d1 = countDigitsBefore(raw, selEnd);
-
-  const trailComma = cleaned.endsWith(',');
-
-  let text: string;
-  if (trailComma) {
-    const inner = cleaned.slice(0, -1);
-    const lc = inner.lastIndexOf(',');
-    let intN: number;
-    let fracRaw: string;
-    if (lc === -1) {
-      const id = inner.replace(/\D/g, '');
-      intN = id ? parseInt(id, 10) : 0;
-      fracRaw = '';
-    } else {
-      const id = inner.slice(0, lc).replace(/\D/g, '');
-      intN = id ? parseInt(id, 10) : 0;
-      fracRaw = inner.slice(lc + 1).replace(/\D/g, '').slice(0, decimals);
-    }
-    const intClamped = Math.max(0, Math.floor(intN));
-    text =
-      fracRaw === ''
-        ? `${formatBrIntegerPart(intClamped)},`
-        : `${formatBrIntegerPart(intClamped)},${fracRaw}`;
-  } else {
-    text = formatBr(clampMoney(parseMaskedMoneyFull(cleaned, decimals)), decimals);
-  }
-
-  return {
-    text,
-    selStart: caretFromDigitIndex(text, d0),
-    selEnd: caretFromDigitIndex(text, d1),
-  };
+/** Dias de calendário do período (início e fim inclusivos), mínimo 1 — base para média diária × alocação total. */
+function campaignDurationDays(start: Date, end: Date): number {
+  const s = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+  const e = new Date(end.getFullYear(), end.getMonth(), end.getDate());
+  const diff = Math.round((e.getTime() - s.getTime()) / 86400000);
+  return Math.max(1, diff + 1);
 }
 
 const STATUS_MAP: Record<string, { label: string }> = {
@@ -215,6 +104,52 @@ const SIDEBAR_SECTIONS = [
   { id: 'plano-midia', label: 'Plano de mídia' },
 ];
 
+type DocComment = {
+  id: string;
+  message: string;
+  author: string;
+  createdAt: number;
+  reactions?: Record<string, string[]>;
+};
+
+/** CPC abaixo disso dispara aviso do Campaign Manager no thread da mídia (apenas tipos com lance CPC). */
+const CPC_LOW_THRESHOLD = 1.2;
+const RECOMMENDED_CPC_BRL = 1.5;
+const AGENT_CPC_OFFER_MARKER = 'Recomendo subir para';
+/** Atraso (ms) antes de mensagens automáticas do Campaign Manager (CPC baixo ou após "sim"). */
+const CAMPAIGN_MANAGER_AGENT_DELAY_MS = 2000;
+
+/** Alocação total que cai abaixo deste valor dispara aviso no thread "Alocação total". */
+const BUDGET_LOW_THRESHOLD = 5000;
+const RECOMMENDED_BUDGET_BRL = 5000;
+const AGENT_BUDGET_OFFER_MARKER = 'Sugiro planejar pelo menos';
+
+function userMessageAcceptsCpcRecommendation(text: string): boolean {
+  const t = text.trim().toLowerCase();
+  if (!t) return false;
+  const first = t.split(/\s+/)[0]?.replace(/[.!?,:;]+$/g, '') ?? '';
+  return /^(sim|sí|si|ok|pode|quero|aplica|aplicar|ajusta|aceito|isso)$/.test(first) || t === 's';
+}
+
+const COMMENT_TARGET_LABELS: Record<string, string> = {
+  resumo: 'Resumo da campanha',
+  produtos: 'Tabela de produtos',
+  investimento: 'Seção de investimento',
+  segmentacao: 'Seção de segmentação',
+  'plano-midia': 'Plano de mídia',
+  'input-title': 'Nome da campanha',
+  'row-pi': 'PI',
+  'row-funnel': 'Alocação',
+  'row-anunciante': 'Anunciante',
+  'row-publishers': 'Publishers',
+  'row-objetivo': 'Objetivo',
+  'row-periodo': 'Período',
+  'row-budget-total': 'Alocação total',
+  'row-daily-limit': 'Média diária',
+  'row-spending-rhythm': 'Ritmo de gasto',
+  'row-segmentar-por': 'Segmentar por',
+};
+
 export const CampaignDocument: React.FC<CampaignDocumentProps> = ({
   campaign,
   onClose,
@@ -229,7 +164,24 @@ export const CampaignDocument: React.FC<CampaignDocumentProps> = ({
   const [publishers, setPublishers] = useState<string[]>([campaign.publisher]);
   const [products, setProducts] = useState<Product[]>(campaign.products);
   const [budget, setBudget] = useState(campaign.budget);
-  const [dailyLimit, setDailyLimit] = useState(Math.round(campaign.budget / 30));
+  const [dailyLimit, setDailyLimit] = useState(() =>
+    roundMoneyDecimals(
+      clampMoney(campaign.budget / campaignDurationDays(campaign.startDate, campaign.endDate)),
+      2
+    )
+  );
+  const campaignDays = useMemo(
+    () => campaignDurationDays(startDate, endDate),
+    [startDate, endDate]
+  );
+  const dailyFromBudget = useCallback(
+    (b: number) => roundMoneyDecimals(clampMoney(b / campaignDays), 2),
+    [campaignDays]
+  );
+  const budgetFromDaily = useCallback(
+    (d: number) => roundMoneyDecimals(clampMoney(d * campaignDays), 2),
+    [campaignDays]
+  );
   const [spendingRhythm, setSpendingRhythm] = useState('Conforme a demanda');
   const [segment, setSegment] = useState('New-to-brand customers');
   const [mediaTypes, setMediaTypes] = useState<MediaType[]>(campaign.mediaTypes);
@@ -261,6 +213,35 @@ export const CampaignDocument: React.FC<CampaignDocumentProps> = ({
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const status = STATUS_MAP[campaign.status] ?? STATUS_MAP[CampaignStatus.DRAFT];
+  const [threadsByTarget, setThreadsByTarget] = useState<Record<string, DocComment[]>>({});
+  const [activeThreadTargetId, setActiveThreadTargetId] = useState<string | null>(null);
+  const [activeThreadLabel, setActiveThreadLabel] = useState('');
+  const [threadDrafts, setThreadDrafts] = useState<Record<string, string>>({});
+  const [threadPanelPos, setThreadPanelPos] = useState<{
+    top: number;
+    left: number;
+    width: number;
+    placement: 'above' | 'below';
+  } | null>(null);
+  const threadPanelRef = useRef<HTMLDivElement>(null);
+  /** Um timer por thread (`media-${tipo}`) antes do comentário automático de CPC baixo. */
+  const cpcLowCommentTimeoutsRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
+  /** Timer por thread após o utilizador aceitar a recomendação de CPC ("sim"). */
+  const cpcSimApplyTimeoutsRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
+  /** Timer antes do comentário automático quando a alocação total cai abaixo do patamar. */
+  const budgetLowCommentTimeoutsRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
+
+  useEffect(
+    () => () => {
+      cpcLowCommentTimeoutsRef.current.forEach((t) => clearTimeout(t));
+      cpcLowCommentTimeoutsRef.current.clear();
+      cpcSimApplyTimeoutsRef.current.forEach((t) => clearTimeout(t));
+      cpcSimApplyTimeoutsRef.current.clear();
+      budgetLowCommentTimeoutsRef.current.forEach((t) => clearTimeout(t));
+      budgetLowCommentTimeoutsRef.current.clear();
+    },
+    []
+  );
 
   // Animação de entrada da drawer
   useEffect(() => {
@@ -405,18 +386,127 @@ export const CampaignDocument: React.FC<CampaignDocumentProps> = ({
     setAllocationOverrides((prev) => ({ ...prev, [mt]: value }));
   }, []);
 
+  const maybeScheduleBudgetLowComment = useCallback((prevBudget: number, nextBudget: number) => {
+    const crossedBelowThreshold =
+      prevBudget >= BUDGET_LOW_THRESHOLD && nextBudget < BUDGET_LOW_THRESHOLD;
+    if (!crossedBelowThreshold) return;
+    const targetId = 'row-budget-total';
+    const pending = budgetLowCommentTimeoutsRef.current.get(targetId);
+    if (pending) clearTimeout(pending);
+    const timer = setTimeout(() => {
+      budgetLowCommentTimeoutsRef.current.delete(targetId);
+      setThreadsByTarget((tp) => ({
+        ...tp,
+        [targetId]: [
+          ...(tp[targetId] ?? []),
+          {
+            id: `agent-budget-low-${Date.now()}`,
+            author: 'Campaign Manager',
+            message: [
+              `A alocação total ficou em R$ ${formatBr(nextBudget)} BRL — abaixo de R$ ${formatBr(BUDGET_LOW_THRESHOLD)} o orçamento costuma ser insuficiente para a campanha performar bem (alcance, testes e otimização ficam limitados).`,
+              '',
+              `${AGENT_BUDGET_OFFER_MARKER} R$ ${formatBr(RECOMMENDED_BUDGET_BRL)} BRL no total. Quer que eu aplique esse valor?`,
+              '',
+              'Responda "sim" para aplicar.',
+            ].join('\n'),
+            createdAt: Date.now(),
+          },
+        ],
+      }));
+      setActiveThreadTargetId(targetId);
+      setActiveThreadLabel(COMMENT_TARGET_LABELS['row-budget-total']);
+      setThreadDrafts((d) => ({ ...d, [targetId]: d[targetId] ?? '' }));
+    }, CAMPAIGN_MANAGER_AGENT_DELAY_MS);
+    budgetLowCommentTimeoutsRef.current.set(targetId, timer);
+  }, []);
+
+  const handleBudgetChange = useCallback(
+    (newBudget: number) => {
+      setBudget((prev) => {
+        maybeScheduleBudgetLowComment(prev, newBudget);
+        return newBudget;
+      });
+      setDailyLimit(dailyFromBudget(newBudget));
+    },
+    [dailyFromBudget, maybeScheduleBudgetLowComment]
+  );
+
+  const handleDailyChange = useCallback(
+    (newDaily: number) => {
+      const nextBudget = budgetFromDaily(newDaily);
+      setDailyLimit(newDaily);
+      setBudget((prev) => {
+        maybeScheduleBudgetLowComment(prev, nextBudget);
+        return nextBudget;
+      });
+    },
+    [budgetFromDaily, maybeScheduleBudgetLowComment]
+  );
+
+  /** Ao mudar o período da campanha, mantém a alocação total e recalcula a média diária. */
+  useEffect(() => {
+    setDailyLimit(dailyFromBudget(budget));
+    // budget: valor atual do total nesta renderização quando `campaignDays` muda
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- não incluir `budget`: evita sobrescrever a média após edição direta do utilizador
+  }, [campaignDays, dailyFromBudget]);
+
   const handleBidChange = useCallback((mt: MediaType, patch: { currentBid?: number; suggestedBid?: number }) => {
-    setBids((prev) =>
-      prev.map((b) =>
-        b.mediaType === mt ? { ...b, ...patch } : b
-      )
-    );
+    setBids((prev) => {
+      const old = prev.find((b) => b.mediaType === mt);
+      const newCurrent =
+        patch.currentBid !== undefined ? patch.currentBid : old?.currentBid;
+      const oldCurrent = old?.currentBid;
+      const bidLabel = MEDIA_LABELS[mt]?.bidLabel;
+
+      const crossedBelowThreshold =
+        patch.currentBid !== undefined &&
+        bidLabel === 'CPC' &&
+        newCurrent !== undefined &&
+        newCurrent < CPC_LOW_THRESHOLD &&
+        (oldCurrent === undefined || oldCurrent >= CPC_LOW_THRESHOLD);
+
+      if (crossedBelowThreshold && newCurrent !== undefined) {
+        const targetId = `media-${mt}`;
+        const currentCpc = newCurrent;
+        const pending = cpcLowCommentTimeoutsRef.current.get(targetId);
+        if (pending) clearTimeout(pending);
+        const timer = setTimeout(() => {
+          cpcLowCommentTimeoutsRef.current.delete(targetId);
+          setThreadsByTarget((tp) => ({
+            ...tp,
+            [targetId]: [
+              ...(tp[targetId] ?? []),
+              {
+                id: `agent-cpc-low-${Date.now()}`,
+                author: 'Campaign Manager',
+                message: [
+                  `O CPC de R$ ${formatBr(currentCpc)} BRL está abaixo do patamar usual (R$ ${formatBr(CPC_LOW_THRESHOLD)}). Com isso, é bem provável que você entregue pouca ou nenhuma mídia.`,
+                  '',
+                  `${AGENT_CPC_OFFER_MARKER} R$ ${formatBr(RECOMMENDED_CPC_BRL)} BRL por clique. Quer que eu aplique esse valor?`,
+                  '',
+                  'Responda "sim" para aplicar.',
+                ].join('\n'),
+                createdAt: Date.now(),
+              },
+            ],
+          }));
+          setActiveThreadTargetId(targetId);
+          setActiveThreadLabel(`Tipo de mídia: ${mt}`);
+          setThreadDrafts((d) => ({ ...d, [targetId]: d[targetId] ?? '' }));
+        }, CAMPAIGN_MANAGER_AGENT_DELAY_MS);
+        cpcLowCommentTimeoutsRef.current.set(targetId, timer);
+      }
+
+      return prev.map((b) => (b.mediaType === mt ? { ...b, ...patch } : b));
+    });
   }, []);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key !== 'Escape') return;
-      if (showSegmentDrawer) {
+      if (activeThreadTargetId) {
+        setActiveThreadTargetId(null);
+      } else if (showSegmentDrawer) {
         handleCloseSegmentDrawer();
       } else if (openMediaDetail) {
         handleCloseDrawer();
@@ -426,7 +516,7 @@ export const CampaignDocument: React.FC<CampaignDocumentProps> = ({
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [openMediaDetail, handleCloseDrawer, showSegmentDrawer, handleCloseSegmentDrawer, onClose]);
+  }, [activeThreadTargetId, openMediaDetail, handleCloseDrawer, showSegmentDrawer, handleCloseSegmentDrawer, onClose]);
 
   const scrollToSection = (id: string) => {
     const el = document.getElementById(`doc-section-${id}`);
@@ -439,6 +529,242 @@ export const CampaignDocument: React.FC<CampaignDocumentProps> = ({
   const monthName = startDate.toLocaleDateString('pt-BR', { month: 'long' });
   const capMonth = monthName.charAt(0).toUpperCase() + monthName.slice(1);
   const piLabel = `Pedido de Inserção - ${capMonth} ${startDate.getFullYear()} - ${publishers.join(', ') || '—'}`;
+  const activeThreadComments = activeThreadTargetId ? (threadsByTarget[activeThreadTargetId] ?? []) : [];
+  const activeThreadDraft = activeThreadTargetId ? (threadDrafts[activeThreadTargetId] ?? '') : '';
+
+  const openCommentThread = useCallback((targetId: string, label?: string) => {
+    setActiveThreadTargetId(targetId);
+    setActiveThreadLabel(label ?? COMMENT_TARGET_LABELS[targetId] ?? 'Comentário');
+    setThreadDrafts((prev) => ({ ...prev, [targetId]: prev[targetId] ?? '' }));
+  }, []);
+
+  const closeCommentThread = useCallback(() => {
+    setActiveThreadTargetId(null);
+  }, []);
+
+  const handleThreadDraftChange = useCallback((targetId: string, message: string) => {
+    setThreadDrafts((prev) => ({ ...prev, [targetId]: message }));
+  }, []);
+
+  const handleAddCommentToThread = useCallback((targetId: string) => {
+    const message = (threadDrafts[targetId] ?? '').trim();
+    if (!message) return;
+
+    const existing = threadsByTarget[targetId] ?? [];
+    const lastBeforeUser = existing[existing.length - 1];
+    const hasPendingCpcOffer =
+      lastBeforeUser?.author === 'Campaign Manager' &&
+      lastBeforeUser.message.includes(AGENT_CPC_OFFER_MARKER);
+    const hasPendingBudgetOffer =
+      lastBeforeUser?.author === 'Campaign Manager' &&
+      lastBeforeUser.message.includes(AGENT_BUDGET_OFFER_MARKER);
+    const wantsApply =
+      hasPendingCpcOffer &&
+      targetId.startsWith('media-') &&
+      userMessageAcceptsCpcRecommendation(message);
+    const wantsApplyBudget =
+      hasPendingBudgetOffer &&
+      targetId === 'row-budget-total' &&
+      userMessageAcceptsCpcRecommendation(message);
+
+    const nextComment: DocComment = {
+      id: `${targetId}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      author: 'Você',
+      message,
+      createdAt: Date.now(),
+    };
+
+    setThreadsByTarget((prev) => ({
+      ...prev,
+      [targetId]: [...(prev[targetId] ?? []), nextComment],
+    }));
+
+    if (wantsApply) {
+      const mt = targetId.slice('media-'.length) as MediaType;
+      const pending = cpcSimApplyTimeoutsRef.current.get(targetId);
+      if (pending) clearTimeout(pending);
+      const timer = setTimeout(() => {
+        cpcSimApplyTimeoutsRef.current.delete(targetId);
+        setBids((bprev) =>
+          bprev.map((b) =>
+            b.mediaType === mt ? { ...b, currentBid: RECOMMENDED_CPC_BRL } : b
+          )
+        );
+        setThreadsByTarget((tp) => ({
+          ...tp,
+          [targetId]: [
+            ...(tp[targetId] ?? []),
+            {
+              id: `agent-cpc-applied-${Date.now()}`,
+              author: 'Campaign Manager',
+              message: `Feito — CPC ajustado para R$ ${formatBr(RECOMMENDED_CPC_BRL)} BRL neste tipo de mídia.`,
+              createdAt: Date.now(),
+            },
+          ],
+        }));
+      }, CAMPAIGN_MANAGER_AGENT_DELAY_MS);
+      cpcSimApplyTimeoutsRef.current.set(targetId, timer);
+    }
+
+    if (wantsApplyBudget) {
+      const pending = cpcSimApplyTimeoutsRef.current.get(targetId);
+      if (pending) clearTimeout(pending);
+      const timer = setTimeout(() => {
+        cpcSimApplyTimeoutsRef.current.delete(targetId);
+        setBudget(RECOMMENDED_BUDGET_BRL);
+        setDailyLimit(dailyFromBudget(RECOMMENDED_BUDGET_BRL));
+        setThreadsByTarget((tp) => ({
+          ...tp,
+          [targetId]: [
+            ...(tp[targetId] ?? []),
+            {
+              id: `agent-budget-applied-${Date.now()}`,
+              author: 'Campaign Manager',
+              message: `Feito — alocação total ajustada para R$ ${formatBr(RECOMMENDED_BUDGET_BRL)} BRL.`,
+              createdAt: Date.now(),
+            },
+          ],
+        }));
+      }, CAMPAIGN_MANAGER_AGENT_DELAY_MS);
+      cpcSimApplyTimeoutsRef.current.set(targetId, timer);
+    }
+
+    setThreadDrafts((prev) => ({ ...prev, [targetId]: '' }));
+  }, [threadDrafts, threadsByTarget, dailyFromBudget]);
+
+  const handleEditThreadComment = useCallback((targetId: string, commentId: string, message: string) => {
+    const trimmed = message.trim();
+    if (!trimmed) return;
+    setThreadsByTarget((prev) => ({
+      ...prev,
+      [targetId]: (prev[targetId] ?? []).map((c) =>
+        c.id === commentId ? { ...c, message: trimmed } : c
+      ),
+    }));
+  }, []);
+
+  const handleDeleteThreadComment = useCallback((targetId: string, commentId: string) => {
+    setThreadsByTarget((prev) => ({
+      ...prev,
+      [targetId]: (prev[targetId] ?? []).filter((c) => c.id !== commentId),
+    }));
+  }, []);
+
+  const handleToggleThreadReaction = useCallback((targetId: string, commentId: string, emoji: string) => {
+    const reactor = 'me';
+    setThreadsByTarget((prev) => {
+      const list = prev[targetId] ?? [];
+      return {
+        ...prev,
+        [targetId]: list.map((c) => {
+          if (c.id !== commentId) return c;
+          const raw: Record<string, string[]> = { ...(c.reactions ?? {}) };
+          const onThis = [...(raw[emoji] ?? [])];
+          const already = onThis.indexOf(reactor);
+          if (already >= 0) {
+            onThis.splice(already, 1);
+            if (onThis.length === 0) delete raw[emoji];
+            else raw[emoji] = onThis;
+          } else {
+            for (const k of Object.keys(raw)) {
+              const u = (raw[k] ?? []).filter((x) => x !== reactor);
+              if (u.length === 0) delete raw[k];
+              else raw[k] = u;
+            }
+            raw[emoji] = [reactor];
+          }
+          const keys = Object.keys(raw);
+          return { ...c, reactions: keys.length > 0 ? raw : undefined };
+        }),
+      };
+    });
+  }, []);
+
+  const handleResolveThread = useCallback((targetId: string) => {
+    setThreadsByTarget((prev) => {
+      const next = { ...prev };
+      delete next[targetId];
+      return next;
+    });
+    setThreadDrafts((prev) => {
+      const next = { ...prev };
+      delete next[targetId];
+      return next;
+    });
+    setActiveThreadTargetId((current) => (current === targetId ? null : current));
+  }, []);
+  const getThreadCount = useCallback((targetId: string) => (threadsByTarget[targetId] ?? []).length, [threadsByTarget]);
+  const hasThread = useCallback((targetId: string) => getThreadCount(targetId) > 0, [getThreadCount]);
+
+  const updateThreadPanelPosition = useCallback(() => {
+    if (!activeThreadTargetId) return;
+    const anchor = Array.from(document.querySelectorAll('[data-comment-target]')).find((n) => {
+      const el = n as HTMLElement;
+      return el.dataset.commentTarget === activeThreadTargetId || el.getAttribute('data-comment-target') === activeThreadTargetId;
+    }) as HTMLElement | undefined;
+    if (!anchor) {
+      setThreadPanelPos(null);
+      return;
+    }
+    const r = anchor.getBoundingClientRect();
+    const column = anchor.closest('.doc-page-column') as HTMLElement | null;
+    const colRect = column?.getBoundingClientRect();
+    const gap = 8;
+    const maxPanel = 480;
+    const minPanel = 280;
+
+    let centerX: number;
+    let w: number;
+
+    if (colRect) {
+      const contentLeft = colRect.left + DOC_COLUMN_CONTENT_INSET_PX;
+      const contentWidth = Math.max(0, colRect.width - DOC_COLUMN_CONTENT_INSET_PX);
+      centerX = contentLeft + contentWidth / 2;
+      w = Math.min(maxPanel, Math.max(minPanel, contentWidth - 24));
+    } else {
+      centerX = r.left + r.width / 2;
+      w = Math.min(maxPanel, Math.max(minPanel, r.width));
+    }
+
+    let left = centerX - w / 2;
+    if (left < 16) left = 16;
+    if (left + w > window.innerWidth - 16) left = Math.max(16, window.innerWidth - w - 16);
+
+    const isMediaPlanRow = activeThreadTargetId.startsWith('media-');
+    if (isMediaPlanRow) {
+      setThreadPanelPos({ top: r.top - gap, left, width: w, placement: 'above' });
+    } else {
+      setThreadPanelPos({ top: r.bottom + gap, left, width: w, placement: 'below' });
+    }
+  }, [activeThreadTargetId]);
+
+  useLayoutEffect(() => {
+    if (!activeThreadTargetId) {
+      setThreadPanelPos(null);
+      return;
+    }
+    updateThreadPanelPosition();
+    window.addEventListener('scroll', updateThreadPanelPosition, true);
+    window.addEventListener('resize', updateThreadPanelPosition);
+    return () => {
+      window.removeEventListener('scroll', updateThreadPanelPosition, true);
+      window.removeEventListener('resize', updateThreadPanelPosition);
+    };
+  }, [activeThreadTargetId, updateThreadPanelPosition]);
+
+  useEffect(() => {
+    if (!activeThreadTargetId) return;
+    const onPointerDown = (e: PointerEvent) => {
+      const t = e.target as Node;
+      if (threadPanelRef.current?.contains(t)) return;
+      if ((e.target as Element | null)?.closest?.('[data-comment-target]')) return;
+      // Portais do CommentThreadPanel (menu ⋮, @mentions) ficam em document.body fora de threadPanelRef
+      if ((e.target as Element | null)?.closest?.('[data-comment-thread-portal]')) return;
+      closeCommentThread();
+    };
+    document.addEventListener('pointerdown', onPointerDown, true);
+    return () => document.removeEventListener('pointerdown', onPointerDown, true);
+  }, [activeThreadTargetId, closeCommentThread]);
 
   return (
     <div ref={containerRef} className="h-full flex flex-col bg-white relative">
@@ -458,7 +784,7 @@ export const CampaignDocument: React.FC<CampaignDocumentProps> = ({
           <div className="flex items-center justify-center px-2">
             <span className="text-[11px] tracking-[-0.33px] text-[color:var(--sl-fg-base-soft)] whitespace-nowrap">Salvo agora há pouco</span>
           </div>
-          <div className="w-6 h-6 rounded-full bg-gradient-to-br from-blue-300 to-blue-500 shrink-0" />
+          <UserAvatar size="sm" />
           <button type="button" className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-black/5 text-[color:var(--sl-fg-base-soft)] transition-colors">
             <span className="material-symbols-outlined text-[16px]">history</span>
           </button>
@@ -482,47 +808,91 @@ export const CampaignDocument: React.FC<CampaignDocumentProps> = ({
       <div className="flex-1 flex min-h-0 relative">
         <div ref={scrollRef} className={`flex-1 overflow-y-auto${openMediaDetail || drawerClosing ? ' overflow-hidden' : ''}`}>
           {/* ── Título + Propriedades ── */}
-          <div className="flex flex-col gap-[30px] px-10 py-10">
-            <div className="w-full max-w-[800px] mx-auto pl-[106px]">
-              <input
-                type="text"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                className="w-full font-semibold text-[32px] leading-8 tracking-[-1.28px] text-[color:var(--sl-fg-base)] bg-transparent border-none outline-none placeholder:text-[color:var(--sl-fg-base-muted)] cursor-text rounded-lg px-3 -mx-3 py-1 -my-1 transition-colors hover:bg-gray-100"
-                placeholder="Nome da campanha"
-              />
+          <div className="flex flex-col gap-[30px] pl-10 pr-14 py-10">
+            <div className="doc-page-column w-full max-w-[800px] mx-auto pl-[106px]">
+              <CommentableField
+                targetId="input-title"
+                targetLabel={COMMENT_TARGET_LABELS['input-title']}
+                hasComments={hasThread('input-title')}
+                commentCount={getThreadCount('input-title')}
+                isActive={activeThreadTargetId === 'input-title'}
+                onOpenThread={openCommentThread}
+              >
+                <input
+                  type="text"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  className="w-full font-semibold text-[32px] leading-8 tracking-[-1.28px] text-[color:var(--sl-fg-base)] bg-transparent border-none outline-none placeholder:text-[color:var(--sl-fg-base-muted)] cursor-text rounded-lg px-3 -mx-3 py-1 -my-1 transition-colors hover:bg-gray-100"
+                  placeholder="Nome da campanha"
+                />
+              </CommentableField>
             </div>
-            <div className="w-full max-w-[800px] mx-auto pl-[106px] flex flex-col gap-[8px]">
+            <div className="doc-page-column w-full max-w-[800px] mx-auto pl-[106px] flex flex-col gap-[8px]">
               {/* PI */}
-              <PropertyRow label="PI">
-                <span className="text-sm leading-5 tracking-[-0.14px] text-[color:var(--sl-fg-base)]">↗ {piLabel}</span>
-              </PropertyRow>
+              <CommentableField
+                targetId="row-pi"
+                targetLabel={COMMENT_TARGET_LABELS['row-pi']}
+                hasComments={hasThread('row-pi')}
+                commentCount={getThreadCount('row-pi')}
+                isActive={activeThreadTargetId === 'row-pi'}
+                onOpenThread={openCommentThread}
+              >
+                <PropertyRow label="PI">
+                  <span className="text-sm leading-5 tracking-[-0.14px] text-[color:var(--sl-fg-base)]">↗ {piLabel}</span>
+                </PropertyRow>
+              </CommentableField>
 
               {/* Alocação (funil) */}
-              <PropertyRow label="Alocação">
-                <DropdownPill
-                  value={funnelPosition}
-                  open={showFunnelMenu}
-                  onToggle={() => setShowFunnelMenu(!showFunnelMenu)}
-                  onClose={() => setShowFunnelMenu(false)}
-                  options={FUNNEL_POSITIONS}
-                  onSelect={(v) => { setFunnelPosition(v); setShowFunnelMenu(false); }}
-                />
-              </PropertyRow>
+              <CommentableField
+                targetId="row-funnel"
+                targetLabel={COMMENT_TARGET_LABELS['row-funnel']}
+                hasComments={hasThread('row-funnel')}
+                commentCount={getThreadCount('row-funnel')}
+                isActive={activeThreadTargetId === 'row-funnel'}
+                onOpenThread={openCommentThread}
+              >
+                <PropertyRow label="Alocação">
+                  <DropdownPill
+                    value={funnelPosition}
+                    open={showFunnelMenu}
+                    onToggle={() => setShowFunnelMenu(!showFunnelMenu)}
+                    onClose={() => setShowFunnelMenu(false)}
+                    options={FUNNEL_POSITIONS}
+                    onSelect={(v) => { setFunnelPosition(v); setShowFunnelMenu(false); }}
+                  />
+                </PropertyRow>
+              </CommentableField>
 
               {/* Anunciante */}
-              <PropertyRow label="Anunciante">
-                <div className="flex items-center gap-1.5">
-                  <div className="w-5 h-5 rounded-full bg-black flex items-center justify-center shrink-0">
-                    <span className="text-white text-[10px] font-bold"></span>
+              <CommentableField
+                targetId="row-anunciante"
+                targetLabel={COMMENT_TARGET_LABELS['row-anunciante']}
+                hasComments={hasThread('row-anunciante')}
+                commentCount={getThreadCount('row-anunciante')}
+                isActive={activeThreadTargetId === 'row-anunciante'}
+                onOpenThread={openCommentThread}
+              >
+                <PropertyRow label="Anunciante">
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-5 h-5 rounded-full bg-black flex items-center justify-center shrink-0">
+                      <span className="text-white text-[10px] font-bold"></span>
+                    </div>
+                    <span className="text-sm leading-5 tracking-[-0.14px] text-[color:var(--sl-fg-base)]">Apple</span>
                   </div>
-                  <span className="text-sm leading-5 tracking-[-0.14px] text-[color:var(--sl-fg-base)]">Apple</span>
-                </div>
-              </PropertyRow>
+                </PropertyRow>
+              </CommentableField>
 
               {/* Publishers */}
-              <PropertyRow label="Publishers">
-                <div className="flex items-center gap-1.5 flex-wrap relative">
+              <CommentableField
+                targetId="row-publishers"
+                targetLabel={COMMENT_TARGET_LABELS['row-publishers']}
+                hasComments={hasThread('row-publishers')}
+                commentCount={getThreadCount('row-publishers')}
+                isActive={activeThreadTargetId === 'row-publishers'}
+                onOpenThread={openCommentThread}
+              >
+                <PropertyRow label="Publishers">
+                  <div className="flex items-center gap-1.5 flex-wrap relative">
                   {publishers.map((pub) => (
                     <button
                       key={pub}
@@ -557,36 +927,55 @@ export const CampaignDocument: React.FC<CampaignDocumentProps> = ({
                       </DropdownMenu>
                     )}
                   </div>
-                </div>
-              </PropertyRow>
+                  </div>
+                </PropertyRow>
+              </CommentableField>
 
               {/* Objetivo */}
-              <PropertyRow label="Objetivo">
-                <DropdownPill
-                  value={objective}
-                  open={showObjectiveMenu}
-                  onToggle={() => setShowObjectiveMenu(!showObjectiveMenu)}
-                  onClose={() => setShowObjectiveMenu(false)}
-                  options={OBJECTIVES}
-                  onSelect={(v) => { setObjective(v); setShowObjectiveMenu(false); }}
-                />
-              </PropertyRow>
+              <CommentableField
+                targetId="row-objetivo"
+                targetLabel={COMMENT_TARGET_LABELS['row-objetivo']}
+                hasComments={hasThread('row-objetivo')}
+                commentCount={getThreadCount('row-objetivo')}
+                isActive={activeThreadTargetId === 'row-objetivo'}
+                onOpenThread={openCommentThread}
+              >
+                <PropertyRow label="Objetivo">
+                  <DropdownPill
+                    value={objective}
+                    open={showObjectiveMenu}
+                    onToggle={() => setShowObjectiveMenu(!showObjectiveMenu)}
+                    onClose={() => setShowObjectiveMenu(false)}
+                    options={OBJECTIVES}
+                    onSelect={(v) => { setObjective(v); setShowObjectiveMenu(false); }}
+                  />
+                </PropertyRow>
+              </CommentableField>
 
               {/* Período */}
-              <PropertyRow label="Período">
-                <DateRangePicker
-                  startDate={startDate}
-                  endDate={endDate}
-                  onStartChange={setStartDate}
-                  onEndChange={setEndDate}
-                />
-              </PropertyRow>
+              <CommentableField
+                targetId="row-periodo"
+                targetLabel={COMMENT_TARGET_LABELS['row-periodo']}
+                hasComments={hasThread('row-periodo')}
+                commentCount={getThreadCount('row-periodo')}
+                isActive={activeThreadTargetId === 'row-periodo'}
+                onOpenThread={openCommentThread}
+              >
+                <PropertyRow label="Período">
+                  <DateRangePicker
+                    startDate={startDate}
+                    endDate={endDate}
+                    onStartChange={setStartDate}
+                    onEndChange={setEndDate}
+                  />
+                </PropertyRow>
+              </CommentableField>
             </div>
           </div>
 
           {/* ── Produtos ── */}
-          <div id="doc-section-produtos" className="flex flex-col px-10 py-10">
-            <div className="w-full max-w-[800px] mx-auto pl-[106px]">
+          <div id="doc-section-produtos" className="flex flex-col pl-10 pr-14 py-10">
+            <div className="doc-page-column w-full max-w-[800px] mx-auto pl-[106px]">
               <h2 className="font-semibold text-[20px] leading-7 tracking-[-0.8px] text-[color:var(--sl-fg-base)] pb-2">Produtos</h2>
               <div className="flex items-center justify-between h-10 mb-1 gap-2">
                 <div className="flex items-center gap-2 flex-1 min-w-0">
@@ -696,6 +1085,15 @@ export const CampaignDocument: React.FC<CampaignDocumentProps> = ({
                   )}
                 </div>
               </div>
+              <CommentableField
+                targetId="produtos"
+                targetLabel={COMMENT_TARGET_LABELS.produtos}
+                hasComments={hasThread('produtos')}
+                commentCount={getThreadCount('produtos')}
+                isActive={activeThreadTargetId === 'produtos'}
+                onOpenThread={openCommentThread}
+                highlightRounded={false}
+              >
               {(() => {
                 const searchLower = productSearch.toLowerCase();
                 const filtered = productSearch
@@ -795,24 +1193,54 @@ export const CampaignDocument: React.FC<CampaignDocumentProps> = ({
                   </>
                 );
               })()}
+              </CommentableField>
             </div>
           </div>
 
-          {/* ── Investimento ── */}
-          <div id="doc-section-investimento" className="flex flex-col px-10 py-10">
-            <div className="w-full max-w-[800px] mx-auto pl-[106px]">
+          {/* ── Investimento (sem wrapper comentável: evita dois botões ao hover nas linhas internas) ── */}
+          <div id="doc-section-investimento" className="flex flex-col pl-10 pr-14 py-10">
+            <div className="doc-page-column w-full max-w-[800px] mx-auto pl-[106px]">
               <h2 className="font-semibold text-[20px] leading-7 tracking-[-0.8px] text-[color:var(--sl-fg-base)] pb-2">Investimento</h2>
               <div className="flex flex-col">
-                <EditableMoneyRow
-                  label="Alocação total"
-                  value={budget}
-                  onChange={(v) => { setBudget(v); setDailyLimit(Math.round(v / 30)); }}
-                />
-                <EditableMoneyRow
-                  label="Limite diário"
-                  value={dailyLimit}
-                  onChange={setDailyLimit}
-                />
+                <CommentableField
+                  targetId="row-budget-total"
+                  targetLabel={COMMENT_TARGET_LABELS['row-budget-total']}
+                  hasComments={hasThread('row-budget-total')}
+                  commentCount={getThreadCount('row-budget-total')}
+                  isActive={activeThreadTargetId === 'row-budget-total'}
+                  onOpenThread={openCommentThread}
+                  highlightRounded={false}
+                >
+                  <EditableMoneyRow
+                    label="Alocação total"
+                    value={budget}
+                    onChange={handleBudgetChange}
+                  />
+                </CommentableField>
+                <CommentableField
+                  targetId="row-daily-limit"
+                  targetLabel={COMMENT_TARGET_LABELS['row-daily-limit']}
+                  hasComments={hasThread('row-daily-limit')}
+                  commentCount={getThreadCount('row-daily-limit')}
+                  isActive={activeThreadTargetId === 'row-daily-limit'}
+                  onOpenThread={openCommentThread}
+                  highlightRounded={false}
+                >
+                  <EditableMoneyRow
+                    label="Média diária"
+                    value={dailyLimit}
+                    onChange={handleDailyChange}
+                  />
+                </CommentableField>
+                <CommentableField
+                  targetId="row-spending-rhythm"
+                  targetLabel={COMMENT_TARGET_LABELS['row-spending-rhythm']}
+                  hasComments={hasThread('row-spending-rhythm')}
+                  commentCount={getThreadCount('row-spending-rhythm')}
+                  isActive={activeThreadTargetId === 'row-spending-rhythm'}
+                  onOpenThread={openCommentThread}
+                  highlightRounded={false}
+                >
                 <div className="flex items-center gap-5 py-3 border-b" style={{ borderColor: '#e0e0e0' }}>
                   <div className="w-[240px] shrink-0">
                     <span className="font-medium text-sm leading-5 tracking-[-0.14px] text-[color:var(--sl-fg-base)]">Ritmo de gasto</span>
@@ -828,53 +1256,64 @@ export const CampaignDocument: React.FC<CampaignDocumentProps> = ({
                     />
                   </div>
                 </div>
+                </CommentableField>
               </div>
             </div>
           </div>
 
           {/* ── Segmentação ── */}
-          <div id="doc-section-segmentacao" className="flex flex-col px-10 py-10">
-            <div className="w-full max-w-[800px] mx-auto pl-[106px]">
+          <div id="doc-section-segmentacao" className="flex flex-col pl-10 pr-14 py-10">
+            <div className="doc-page-column w-full max-w-[800px] mx-auto pl-[106px]">
               <h2 className="font-semibold text-[20px] leading-7 tracking-[-0.8px] text-[color:var(--sl-fg-base)] pb-4">Segmentação</h2>
-              <div className="flex items-center gap-5 py-3 border-b" style={{ borderColor: '#e0e0e0' }}>
-                <div className="w-[240px] shrink-0">
-                  <span className="font-medium text-sm leading-5 tracking-[-0.14px] text-[color:var(--sl-fg-base)]">Segmentar por</span>
+              <CommentableField
+                targetId="row-segmentar-por"
+                targetLabel={COMMENT_TARGET_LABELS['row-segmentar-por']}
+                hasComments={hasThread('row-segmentar-por')}
+                commentCount={getThreadCount('row-segmentar-por')}
+                isActive={activeThreadTargetId === 'row-segmentar-por'}
+                onOpenThread={openCommentThread}
+                highlightRounded={false}
+              >
+                <div className="flex items-center gap-5 py-3 border-b" style={{ borderColor: '#e0e0e0' }}>
+                  <div className="w-[240px] shrink-0">
+                    <span className="font-medium text-sm leading-5 tracking-[-0.14px] text-[color:var(--sl-fg-base)]">Segmentar por</span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    {(() => {
+                      const seg = SEGMENTS.find((s) => s.label === segment);
+                      const fmtBase = seg
+                        ? seg.base >= 1_000_000
+                          ? `${(seg.base / 1_000_000).toFixed(1).replace('.', ',')}M`
+                          : seg.base >= 1_000
+                          ? `${(seg.base / 1_000).toFixed(1).replace('.', ',')}K`
+                          : String(seg.base)
+                        : '';
+                      return (
+                        <button
+                          type="button"
+                          onClick={handleOpenSegmentDrawer}
+                          className="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-[#f8f8f8] hover:bg-[#ebebeb] transition-colors cursor-pointer"
+                        >
+                          {seg && (
+                            <span className="material-symbols-outlined text-[16px] text-[color:var(--sl-fg-base-soft)]">{seg.icon}</span>
+                          )}
+                          <span className="text-sm leading-5 tracking-[-0.14px] text-[color:var(--sl-fg-base)]">{segment}</span>
+                          {seg && (
+                            <span className="text-xs text-[color:var(--sl-fg-base-muted)] tabular-nums">{fmtBase}</span>
+                          )}
+                          <span className="material-symbols-outlined text-[14px] text-[color:var(--sl-fg-base-soft)]">chevron_right</span>
+                        </button>
+                      );
+                    })()}
+                  </div>
                 </div>
-                <div className="flex-1 min-w-0">
-                  {(() => {
-                    const seg = SEGMENTS.find((s) => s.label === segment);
-                    const fmtBase = seg
-                      ? seg.base >= 1_000_000
-                        ? `${(seg.base / 1_000_000).toFixed(1).replace('.', ',')}M`
-                        : seg.base >= 1_000
-                        ? `${(seg.base / 1_000).toFixed(1).replace('.', ',')}K`
-                        : String(seg.base)
-                      : '';
-                    return (
-                      <button
-                        type="button"
-                        onClick={handleOpenSegmentDrawer}
-                        className="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-[#f8f8f8] hover:bg-[#ebebeb] transition-colors cursor-pointer"
-                      >
-                        {seg && (
-                          <span className="material-symbols-outlined text-[16px] text-[color:var(--sl-fg-base-soft)]">{seg.icon}</span>
-                        )}
-                        <span className="text-sm leading-5 tracking-[-0.14px] text-[color:var(--sl-fg-base)]">{segment}</span>
-                        {seg && (
-                          <span className="text-xs text-[color:var(--sl-fg-base-muted)] tabular-nums">{fmtBase}</span>
-                        )}
-                        <span className="material-symbols-outlined text-[14px] text-[color:var(--sl-fg-base-soft)]">chevron_right</span>
-                      </button>
-                    );
-                  })()}
-                </div>
-              </div>
+              </CommentableField>
             </div>
           </div>
 
-          {/* ── Plano de mídia ── */}
-          <div id="doc-section-plano-midia" className="flex flex-col px-10 py-10 min-w-0">
-            <div className="w-full min-w-0 max-w-[800px] mx-auto pl-[106px]">
+          {/* ── Plano de mídia (sem wrapper comentável: cada MediaRow tem o seu botão) ── */}
+          <div id="doc-section-plano-midia" className="flex flex-col pl-10 pr-14 py-10 min-w-0">
+            <div className="doc-page-column w-full min-w-0 max-w-[800px] mx-auto pl-[106px]">
               <h2 className="font-semibold text-[20px] leading-7 tracking-[-0.8px] text-[color:var(--sl-fg-base)] mb-[24px]">Plano de mídia</h2>
               <div className="flex items-center justify-between h-12 mb-1">
                 <span className="text-sm leading-5 tracking-[-0.14px] text-[color:var(--sl-fg-base-soft)] font-normal">Mídias</span>
@@ -894,11 +1333,16 @@ export const CampaignDocument: React.FC<CampaignDocumentProps> = ({
                             <button
                               key={type}
                               type="button"
-                              onClick={() => addMediaType(type)}
-                              disabled={isAdded}
-                              className={`w-full flex items-center gap-3 px-3 py-2.5 text-left transition-colors ${
-                                isAdded ? 'opacity-60 cursor-default' : 'hover:bg-black/[0.04]'
-                              }`}
+                              onClick={() => {
+                                if (isAdded) {
+                                  setShowMediaMenu(false);
+                                  handleOpenDrawer(type);
+                                } else {
+                                  addMediaType(type);
+                                  handleOpenDrawer(type);
+                                }
+                              }}
+                              className="w-full flex items-center gap-3 px-3 py-2.5 text-left transition-colors hover:bg-black/[0.04] cursor-pointer"
                             >
                               <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: style.bg }}>
                                 <span className="material-symbols-outlined text-[18px] text-[color:var(--sl-fg-base)]/70">{style.icon}</span>
@@ -925,6 +1369,12 @@ export const CampaignDocument: React.FC<CampaignDocumentProps> = ({
                   <MediaRow
                     key={mt}
                     mediaType={mt}
+                    commentId={`media-${mt}`}
+                    commentLabel={`Tipo de mídia: ${mt}`}
+                    hasComments={hasThread(`media-${mt}`)}
+                    commentCount={getThreadCount(`media-${mt}`)}
+                    isCommentActive={activeThreadTargetId === `media-${mt}`}
+                    onOpenCommentThread={openCommentThread}
                     allocation={getAllocation(mt)}
                     bid={bids.find((b) => b.mediaType === mt)}
                     productCount={products.length}
@@ -941,6 +1391,42 @@ export const CampaignDocument: React.FC<CampaignDocumentProps> = ({
         </div>
 
       </div>
+
+      {activeThreadTargetId &&
+        threadPanelPos &&
+        createPortal(
+          <div
+            ref={threadPanelRef}
+            className="fixed pointer-events-auto"
+            style={{
+              top: threadPanelPos.top,
+              left: threadPanelPos.left,
+              width: threadPanelPos.width,
+              zIndex: 10050,
+              transform: threadPanelPos.placement === 'above' ? 'translateY(-100%)' : undefined,
+            }}
+          >
+            <CommentThreadPanel
+              comments={activeThreadComments}
+              draft={activeThreadDraft}
+              onDraftChange={(v) => activeThreadTargetId && handleThreadDraftChange(activeThreadTargetId, v)}
+              onSend={() => activeThreadTargetId && handleAddCommentToThread(activeThreadTargetId)}
+              onResolve={() => activeThreadTargetId && handleResolveThread(activeThreadTargetId)}
+              onClose={closeCommentThread}
+              contextLabel={activeThreadLabel}
+              onEditComment={(commentId, message) =>
+                activeThreadTargetId && handleEditThreadComment(activeThreadTargetId, commentId, message)
+              }
+              onDeleteComment={(commentId) =>
+                activeThreadTargetId && handleDeleteThreadComment(activeThreadTargetId, commentId)
+              }
+              onToggleReaction={(commentId, emoji) =>
+                activeThreadTargetId && handleToggleThreadReaction(activeThreadTargetId, commentId, emoji)
+              }
+            />
+          </div>,
+          document.body
+        )}
 
       {/* Drawer de detalhe da mídia */}
       {(openMediaDetail || drawerClosing) && (
@@ -1059,6 +1545,115 @@ const PropertyRow: React.FC<{ label: string; children: React.ReactNode }> = ({ l
     <div className="flex-1 min-w-0">{children}</div>
   </div>
 );
+
+const getCommentHighlightClasses = (hasComments: boolean, isActive: boolean) => {
+  if (isActive) return 'bg-[#e0f0ff] ring-1 ring-[#7bb7ff]/70';
+  if (hasComments) return 'bg-[#e9f4ff] ring-1 ring-[#c4dfff]';
+  return '';
+};
+
+interface CommentableFieldProps {
+  targetId: string;
+  targetLabel: string;
+  hasComments: boolean;
+  commentCount: number;
+  isActive: boolean;
+  onOpenThread: (targetId: string, label?: string) => void;
+  children: React.ReactNode;
+  className?: string;
+  /** Cantos do destaque de comentário; false = retos (ex. linhas da tabela de investimento). */
+  highlightRounded?: boolean;
+}
+
+/** 8px para fora da borda direita da coluna de conteúdo (gutter estilo Notion). */
+const COMMENT_BTN_GUTTER_CLASS =
+  'absolute left-full top-1/2 z-20 ml-2 -translate-y-1/2';
+
+const CommentableField: React.FC<CommentableFieldProps> = ({
+  targetId,
+  targetLabel,
+  hasComments,
+  commentCount,
+  isActive,
+  onOpenThread,
+  children,
+  className,
+  highlightRounded = true,
+}) => {
+  const [hovered, setHovered] = useState(false);
+  /** Com thread: ícone + contagem sempre visíveis; sem thread: só no hover (gutter Notion). */
+  const showBtn = hovered || hasComments;
+  const rootRef = useRef<HTMLDivElement>(null);
+  const lastClientYRef = useRef<number | null>(null);
+  const rafRef = useRef<number | null>(null);
+
+  const syncHoverToPointerY = useCallback(() => {
+    const el = rootRef.current;
+    const y = lastClientYRef.current;
+    if (!el || y === null) return;
+    const r = el.getBoundingClientRect();
+    setHovered(y >= r.top && y <= r.bottom);
+  }, []);
+
+  useEffect(() => {
+    const onMove = (e: MouseEvent) => {
+      lastClientYRef.current = e.clientY;
+      if (rafRef.current != null) return;
+      rafRef.current = window.requestAnimationFrame(() => {
+        rafRef.current = null;
+        syncHoverToPointerY();
+      });
+    };
+    const onScroll = () => {
+      syncHoverToPointerY();
+    };
+    window.addEventListener('mousemove', onMove, { passive: true });
+    window.addEventListener('scroll', onScroll, true);
+    window.addEventListener('resize', onScroll);
+    return () => {
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('scroll', onScroll, true);
+      window.removeEventListener('resize', onScroll);
+      if (rafRef.current != null) {
+        window.cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
+    };
+  }, [syncHoverToPointerY]);
+
+  useEffect(() => {
+    const onLeaveDoc = () => setHovered(false);
+    document.documentElement.addEventListener('mouseleave', onLeaveDoc);
+    return () => document.documentElement.removeEventListener('mouseleave', onLeaveDoc);
+  }, []);
+
+  return (
+    <div
+      ref={rootRef}
+      data-comment-target={targetId}
+      className={`relative overflow-visible ${className ?? ''}`}
+    >
+      <div
+        className={`${highlightRounded ? 'rounded-[10px]' : 'rounded-none'} transition-colors w-full min-w-0 ${getCommentHighlightClasses(hasComments, isActive)}`}
+      >
+        {children}
+      </div>
+      <button
+        type="button"
+        onClick={() => onOpenThread(targetId, targetLabel)}
+        className={`${COMMENT_BTN_GUTTER_CLASS} inline-flex items-center gap-1 rounded-full border px-2 py-1 text-xs font-medium transition-opacity duration-150 bg-white border-[#e4e4e7] text-[color:var(--sl-fg-base-soft)] hover:text-[color:var(--sl-fg-base)] ${
+          showBtn ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+        }`}
+        aria-label="Abrir thread de comentários"
+        title="Comentar elemento"
+        tabIndex={showBtn ? 0 : -1}
+      >
+        <span className="material-symbols-outlined text-[14px]">comment</span>
+        {hasComments && <span className="tabular-nums">{commentCount}</span>}
+      </button>
+    </div>
+  );
+};
 
 const SmallIconBtn: React.FC<{ icon: string; size?: number; onClick?: () => void }> = ({ icon, size = 24, onClick }) => (
   <button
@@ -1353,7 +1948,7 @@ const DropdownMenu: React.FC<{ onClose: () => void; children: React.ReactNode; w
   );
 };
 
-/** Linha editável (Investimento): máscara pt-BR (. milhar, , decimal), valida no blur. */
+/** Linha editável (Investimento): máscara pt-BR; caret estável; Enter/Esc; colar valor. */
 const EditableMoneyRow: React.FC<{
   label: string;
   value: number;
@@ -1363,7 +1958,29 @@ const EditableMoneyRow: React.FC<{
   const [draft, setDraft] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
   const skipBlurCommitRef = useRef(false);
+  const pendingCaretRef = useRef<{ s: number; e: number } | null>(null);
+  const selectAllOnFocusRef = useRef(false);
   const decimals = 2;
+
+  useLayoutEffect(() => {
+    if (!editing || !inputRef.current) return;
+    inputRef.current.focus({ preventScroll: true });
+    if (selectAllOnFocusRef.current) {
+      selectAllOnFocusRef.current = false;
+      inputRef.current.select();
+      pendingCaretRef.current = null;
+      return;
+    }
+    const p = pendingCaretRef.current;
+    if (p) {
+      pendingCaretRef.current = null;
+      try {
+        inputRef.current.setSelectionRange(p.s, p.e);
+      } catch {
+        /* ignore */
+      }
+    }
+  }, [draft, editing]);
 
   const commit = () => {
     const t = draft.trim();
@@ -1383,24 +2000,33 @@ const EditableMoneyRow: React.FC<{
 
   const startEditing = () => {
     setDraft(formatBr(value, decimals));
+    selectAllOnFocusRef.current = true;
     setEditing(true);
   };
 
   const handleDraftChange = (ev: React.ChangeEvent<HTMLInputElement>) => {
+    selectAllOnFocusRef.current = false;
     const raw = ev.target.value;
     const selStart = ev.target.selectionStart ?? 0;
     const selEnd = ev.target.selectionEnd ?? 0;
     const { text, selStart: nextStart, selEnd: nextEnd } = applyMoneyMask(raw, selStart, selEnd, decimals);
+    pendingCaretRef.current = { s: nextStart, e: nextEnd };
     setDraft(text);
-    queueMicrotask(() => {
-      const el = inputRef.current;
-      if (!el) return;
-      try {
-        el.setSelectionRange(nextStart, nextEnd);
-      } catch {
-        /* ignore */
-      }
-    });
+  };
+
+  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    selectAllOnFocusRef.current = false;
+    const pasted = normalizeMoneyDraft(e.clipboardData.getData('text'));
+    const el = inputRef.current;
+    if (!el) return;
+    const start = el.selectionStart ?? 0;
+    const end = el.selectionEnd ?? 0;
+    const merged = draft.slice(0, start) + pasted + draft.slice(end);
+    const caret = start + pasted.length;
+    const { text, selStart: ns, selEnd: ne } = applyMoneyMask(merged, caret, caret, decimals);
+    pendingCaretRef.current = { s: ns, e: ne };
+    setDraft(text);
   };
 
   const handleKeyDown = (ev: React.KeyboardEvent<HTMLInputElement>) => {
@@ -1424,6 +2050,8 @@ const EditableMoneyRow: React.FC<{
     commit();
   };
 
+  const hintId = `money-hint-row-${label.replace(/\s/g, '-')}`;
+
   return (
     <div className="flex items-center gap-5 py-3 border-b" style={{ borderColor: '#e0e0e0' }}>
       <div className="w-[240px] shrink-0">
@@ -1431,26 +2059,34 @@ const EditableMoneyRow: React.FC<{
       </div>
       <div className="flex-1 min-w-0">
         {editing ? (
-          <input
-            ref={inputRef}
-            type="text"
-            inputMode="decimal"
-            enterKeyHint="done"
-            autoComplete="off"
-            spellCheck={false}
-            aria-label={label}
-            value={draft}
-            onChange={handleDraftChange}
-            onKeyDown={handleKeyDown}
-            onBlur={handleBlur}
-            className="box-border min-w-[180px] w-max max-w-full rounded-lg border border-solid px-2 py-1 outline-none focus:outline-none text-sm leading-5 tracking-[-0.14px] text-[color:var(--sl-fg-base)] bg-blue-50/60 border-blue-200 caret-[color:var(--sl-fg-base)] whitespace-nowrap tabular-nums [field-sizing:content]"
-            autoFocus
-          />
+          <>
+            <span id={hintId} className="sr-only">
+              Use vírgula para centavos. Enter confirma, Esc cancela.
+            </span>
+            <input
+              ref={inputRef}
+              type="text"
+              inputMode="decimal"
+              enterKeyHint="done"
+              autoComplete="off"
+              spellCheck={false}
+              aria-label={label}
+              aria-describedby={hintId}
+              value={draft}
+              onChange={handleDraftChange}
+              onPaste={handlePaste}
+              onKeyDown={handleKeyDown}
+              onBlur={handleBlur}
+              className="box-border min-w-[12rem] w-max max-w-full rounded-lg border border-solid px-3 py-1.5 outline-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2563eb]/35 text-sm leading-5 tracking-[-0.14px] text-[color:var(--sl-fg-base)] bg-blue-50/60 border-blue-200 caret-[color:var(--sl-fg-base)] whitespace-nowrap tabular-nums [field-sizing:content]"
+            />
+          </>
         ) : (
           <button
             type="button"
+            onMouseDown={(e) => e.preventDefault()}
             onClick={startEditing}
-            className="box-border min-w-[180px] w-max max-w-full rounded-lg border border-solid px-2 py-1 outline-none text-sm leading-5 tracking-[-0.14px] text-[color:var(--sl-fg-base)] bg-transparent border-transparent hover:bg-black/[0.03] text-left transition-colors cursor-text whitespace-nowrap tabular-nums"
+            title="Editar valor (Enter confirma)"
+            className="box-border min-w-[12rem] w-max max-w-full rounded-lg border border-solid px-3 py-1.5 outline-none text-sm leading-5 tracking-[-0.14px] text-[color:var(--sl-fg-base)] bg-transparent border-transparent hover:bg-black/[0.04] text-left transition-colors cursor-text whitespace-nowrap tabular-nums"
           >
             {fmtMoney(value)}
           </button>
@@ -1460,10 +2096,7 @@ const EditableMoneyRow: React.FC<{
   );
 };
 
-/**
- * Valor monetário editável (pt-BR): máscara com milhar (.) e decimal (,),
- * caret estável por índice de dígitos; Enter confirma, Escape cancela, blur normaliza.
- */
+/** Valor monetário editável (pt-BR): máscara; caret com useLayoutEffect; colar; área de toque maior. */
 const EditableMoneyCell: React.FC<{
   value: number;
   onChange: (v: number) => void;
@@ -1476,14 +2109,36 @@ const EditableMoneyCell: React.FC<{
   const [draft, setDraft] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
   const skipBlurCommitRef = useRef(false);
+  const pendingCaretRef = useRef<{ s: number; e: number } | null>(null);
+  const selectAllOnFocusRef = useRef(false);
   const cellShape =
     size === 'md'
-      ? 'min-w-[12rem] rounded-md px-1.5 py-0.5 whitespace-nowrap tabular-nums w-max max-w-full [field-sizing:content]'
+      ? 'min-w-[12rem] rounded-md px-2 py-1 whitespace-nowrap tabular-nums w-max max-w-full [field-sizing:content]'
       : size === 'compactAllocation'
-      ? 'min-w-0 w-full max-w-[10rem] rounded-md pl-1 pr-1 py-0.5 whitespace-nowrap tabular-nums text-xs leading-4 [field-sizing:content]'
+      ? 'w-full min-w-[6rem] max-w-[11rem] rounded-md px-2 py-1 whitespace-nowrap tabular-nums text-xs leading-4 [field-sizing:content]'
       : size === 'compact'
-      ? 'min-w-0 w-full max-w-[4.75rem] rounded-md pl-1 pr-1 py-0.5 whitespace-nowrap tabular-nums text-xs leading-4 [field-sizing:content]'
-      : 'min-w-[6.5rem] rounded-md px-1.5 py-0.5 whitespace-nowrap tabular-nums w-max max-w-full [field-sizing:content]';
+      ? 'w-full min-w-[5.75rem] max-w-[9rem] rounded-md px-2 py-1 whitespace-nowrap tabular-nums text-xs leading-4 [field-sizing:content]'
+      : 'min-w-[6.5rem] rounded-md px-2 py-1 whitespace-nowrap tabular-nums w-max max-w-full [field-sizing:content]';
+
+  useLayoutEffect(() => {
+    if (!editing || !inputRef.current) return;
+    inputRef.current.focus({ preventScroll: true });
+    if (selectAllOnFocusRef.current) {
+      selectAllOnFocusRef.current = false;
+      inputRef.current.select();
+      pendingCaretRef.current = null;
+      return;
+    }
+    const p = pendingCaretRef.current;
+    if (p) {
+      pendingCaretRef.current = null;
+      try {
+        inputRef.current.setSelectionRange(p.s, p.e);
+      } catch {
+        /* ignore */
+      }
+    }
+  }, [draft, editing]);
 
   const commit = () => {
     const t = draft.trim();
@@ -1503,24 +2158,33 @@ const EditableMoneyCell: React.FC<{
 
   const startEditing = () => {
     setDraft(formatBr(value, decimals));
+    selectAllOnFocusRef.current = true;
     setEditing(true);
   };
 
   const handleDraftChange = (ev: React.ChangeEvent<HTMLInputElement>) => {
+    selectAllOnFocusRef.current = false;
     const raw = ev.target.value;
     const selStart = ev.target.selectionStart ?? 0;
     const selEnd = ev.target.selectionEnd ?? 0;
     const { text, selStart: nextStart, selEnd: nextEnd } = applyMoneyMask(raw, selStart, selEnd, decimals);
+    pendingCaretRef.current = { s: nextStart, e: nextEnd };
     setDraft(text);
-    queueMicrotask(() => {
-      const el = inputRef.current;
-      if (!el) return;
-      try {
-        el.setSelectionRange(nextStart, nextEnd);
-      } catch {
-        /* ignore */
-      }
-    });
+  };
+
+  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    selectAllOnFocusRef.current = false;
+    const pasted = normalizeMoneyDraft(e.clipboardData.getData('text'));
+    const el = inputRef.current;
+    if (!el) return;
+    const start = el.selectionStart ?? 0;
+    const end = el.selectionEnd ?? 0;
+    const merged = draft.slice(0, start) + pasted + draft.slice(end);
+    const caret = start + pasted.length;
+    const { text, selStart: ns, selEnd: ne } = applyMoneyMask(merged, caret, caret, decimals);
+    pendingCaretRef.current = { s: ns, e: ne };
+    setDraft(text);
   };
 
   const handleKeyDown = (ev: React.KeyboardEvent<HTMLInputElement>) => {
@@ -1544,35 +2208,46 @@ const EditableMoneyCell: React.FC<{
     commit();
   };
 
+  const hintId = `money-hint-${String(ariaLabel).replace(/\s/g, '-')}`;
+
   return (
     <div
+      onClick={(e) => e.stopPropagation()}
       className={`flex flex-col justify-center shrink-0 ${
         size === 'compact' || size === 'compactAllocation'
-          ? `w-full min-w-0 ${size === 'compactAllocation' ? 'max-w-[10rem]' : 'max-w-[4.75rem]'}`
+          ? `w-full min-w-0 ${size === 'compactAllocation' ? 'max-w-[11rem]' : 'max-w-[9rem]'}`
           : 'w-max max-w-full'
       }`}
     >
       {editing ? (
-        <input
-          ref={inputRef}
-          type="text"
-          inputMode="decimal"
-          enterKeyHint="done"
-          autoComplete="off"
-          spellCheck={false}
-          aria-label={ariaLabel}
-          value={draft}
-          onChange={handleDraftChange}
-          onKeyDown={handleKeyDown}
-          onBlur={handleBlur}
-          className={`box-border border border-solid outline-none focus:outline-none text-sm leading-5 tracking-[-0.14px] text-[color:var(--sl-fg-base)] bg-blue-50/60 border-blue-200 caret-[color:var(--sl-fg-base)] ${cellShape}`}
-          autoFocus
-        />
+        <>
+          <span id={hintId} className="sr-only">
+            Vírgula para centavos. Enter confirma, Esc cancela.
+          </span>
+          <input
+            ref={inputRef}
+            type="text"
+            inputMode="decimal"
+            enterKeyHint="done"
+            autoComplete="off"
+            spellCheck={false}
+            aria-label={ariaLabel}
+            aria-describedby={hintId}
+            value={draft}
+            onChange={handleDraftChange}
+            onPaste={handlePaste}
+            onKeyDown={handleKeyDown}
+            onBlur={handleBlur}
+            className={`box-border border border-solid outline-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2563eb]/35 text-sm leading-5 tracking-[-0.14px] text-[color:var(--sl-fg-base)] bg-blue-50/60 border-blue-200 caret-[color:var(--sl-fg-base)] ${cellShape}`}
+          />
+        </>
       ) : (
         <button
           type="button"
+          onMouseDown={(e) => e.preventDefault()}
           onClick={startEditing}
-          className={`box-border border border-solid outline-none text-sm leading-5 tracking-[-0.14px] text-[color:var(--sl-fg-base)] bg-transparent border-transparent hover:bg-black/[0.04] text-left transition-colors cursor-text ${cellShape}`}
+          title="Editar valor"
+          className={`box-border border border-solid outline-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2563eb]/30 text-sm leading-5 tracking-[-0.14px] text-[color:var(--sl-fg-base)] bg-transparent border-transparent hover:bg-black/[0.04] text-left transition-colors cursor-text ${cellShape}`}
         >
           {formatBr(value, decimals)}
           {suffix ? ` ${suffix}` : ''}
@@ -1584,6 +2259,12 @@ const EditableMoneyCell: React.FC<{
 
 const MediaRow: React.FC<{
   mediaType: MediaType;
+  commentId: string;
+  commentLabel: string;
+  hasComments: boolean;
+  commentCount: number;
+  isCommentActive: boolean;
+  onOpenCommentThread: (targetId: string, label?: string) => void;
   allocation: number;
   bid?: { currentBid: number; suggestedBid: number };
   productCount: number;
@@ -1591,7 +2272,22 @@ const MediaRow: React.FC<{
   onBidChange?: (patch: { currentBid?: number; suggestedBid?: number }) => void;
   onOpenDetail?: () => void;
   onRemove?: () => void;
-}> = ({ mediaType, allocation, bid, productCount, onAllocationChange, onBidChange, onOpenDetail, onRemove }) => {
+}> = ({
+  mediaType,
+  commentId,
+  commentLabel,
+  hasComments,
+  commentCount,
+  isCommentActive,
+  onOpenCommentThread,
+  allocation,
+  bid,
+  productCount,
+  onAllocationChange,
+  onBidChange,
+  onOpenDetail,
+  onRemove,
+}) => {
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const style = MEDIA_STYLES[mediaType] ?? { icon: 'campaign', bg: '#e0e0e0' };
@@ -1624,10 +2320,18 @@ const MediaRow: React.FC<{
   const stop = (e: React.MouseEvent) => e.stopPropagation();
 
   return (
-    <div className="flex items-center justify-center py-1 w-full min-w-0">
+    <CommentableField
+      targetId={commentId}
+      targetLabel={commentLabel}
+      hasComments={hasComments}
+      commentCount={commentCount}
+      isActive={isCommentActive}
+      onOpenThread={onOpenCommentThread}
+      className="block w-full min-w-0 py-1"
+    >
       <div
         onClick={onOpenDetail}
-        className={`flex items-center gap-3 flex-1 min-w-0 max-w-full rounded-xl border pl-4 pr-2.5 py-4 group transition-colors box-border ${onOpenDetail ? 'cursor-pointer hover:bg-black/[0.02]' : ''}`}
+        className={`flex w-full min-w-0 max-w-full items-center gap-3 rounded-xl border pl-4 pr-2.5 py-4 group transition-colors box-border ${onOpenDetail ? 'cursor-pointer hover:bg-black/[0.02]' : ''}`}
         style={{ borderColor: 'rgba(0,0,0,0.1)', boxShadow: '0 1px 1px rgba(0,0,0,0.08)' }}
       >
         <div className="flex items-center gap-3 flex-1 min-w-0 max-w-full">
@@ -1640,11 +2344,8 @@ const MediaRow: React.FC<{
               <span className="text-xs leading-4 text-[color:var(--sl-fg-base-soft)]">{descText}</span>
             </div>
           </div>
-          {/* Grid fixo: alocação alinhada à esquerda em todas as linhas; CPC/CPM com mesma largura */}
-          <div
-            className="grid flex-1 min-w-0 grid-cols-[minmax(0,1fr)_4.75rem_4.75rem] gap-x-2 sm:gap-x-3 items-start"
-            onClick={stop}
-          >
+          {/* Grid fixo: alocação alinhada à esquerda em todas as linhas; CPC/CPM com mesma largura (cliques nas células não abrem a drawer — stop no EditableMoneyCell) */}
+          <div className="grid flex-1 min-w-0 grid-cols-[minmax(0,1fr)_4.75rem_4.75rem] gap-x-2 sm:gap-x-3 items-start">
             <div className="flex flex-col justify-center min-w-0 items-start text-left">
               <span className="text-xs leading-4 text-[color:var(--sl-fg-base-soft)] pl-1">Alocação total</span>
               {canEdit && onAllocationChange ? (
@@ -1750,6 +2451,6 @@ const MediaRow: React.FC<{
           )}
         </div>
       </div>
-    </div>
+    </CommentableField>
   );
 };

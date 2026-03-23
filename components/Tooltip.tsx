@@ -7,11 +7,23 @@ interface TooltipProps {
   children?: React.ReactNode;
   className?: string;
   position?: 'top' | 'bottom';
+  /** z-index do overlay (ex.: acima de painéis modais). */
+  zIndex?: number;
+  /** Usa trigger inline (fluxo de texto / menções). */
+  inline?: boolean;
 }
 
 const TOOLTIP_Z_INDEX = 9999;
 
-export const Tooltip: React.FC<TooltipProps> = ({ text, content, children, className = "", position = 'top' }) => {
+export const Tooltip: React.FC<TooltipProps> = ({
+  text,
+  content,
+  children,
+  className = '',
+  position = 'top',
+  zIndex = TOOLTIP_Z_INDEX,
+  inline = false,
+}) => {
   const [visible, setVisible] = useState(false);
   const [coords, setCoords] = useState<DOMRect | null>(null);
   const triggerRef = useRef<HTMLDivElement>(null);
@@ -49,14 +61,14 @@ export const Tooltip: React.FC<TooltipProps> = ({ text, content, children, class
         visible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
       }`}
       style={{
-        zIndex: TOOLTIP_Z_INDEX,
+        zIndex,
         left: coords.left + coords.width / 2,
         top: isTop ? coords.top : coords.bottom,
         transform: `translate(-50%, ${isTop ? '-100%' : '0'}) translateY(${isTop ? '-8px' : '8px'}) scale(${visible ? 1 : 0.95})`,
       }}
     >
       <div
-        className={`${
+        className={`relative ${
           text ? 'h-[32px] flex items-center px-3 whitespace-nowrap leading-none' : 'p-3 min-w-max leading-tight'
         } bg-gray-900 text-white text-[12px] tracking-normal font-medium rounded-lg shadow-xl`}
       >
@@ -84,7 +96,7 @@ export const Tooltip: React.FC<TooltipProps> = ({ text, content, children, class
     <>
       <div
         ref={triggerRef}
-        className={`relative flex items-center justify-center w-fit ${className}`}
+        className={`relative ${inline ? 'inline-flex' : 'flex'} items-center justify-center w-fit max-w-full ${className}`}
         onMouseEnter={() => setVisible(true)}
         onMouseLeave={() => setVisible(false)}
       >

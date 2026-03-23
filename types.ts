@@ -65,7 +65,6 @@ export interface TimelineDay {
   monthName: string;
   year: number;
 }
-
 export type SortKey = 
   | 'title' 
   | 'publisher' 
@@ -102,3 +101,4 @@ export interface ColumnConfig {
   locked?: boolean;
   description?: string;
 }
+

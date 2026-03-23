@@ -1,5 +1,84 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useLayoutEffect } from 'react';
 import { Campaign, MediaType, Bid } from '../types';
+import { UserAvatar } from './UserAvatar';
+import {
+  formatBr,
+  clampMoney,
+  roundMoneyDecimals,
+  parseMaskedMoneyFull,
+  applyMoneyMask,
+  normalizeMoneyDraft,
+} from '../utils/moneyFormat';
+
+type ImageSlot = {
+  id: string;
+  label: string;
+  dimensions: string;
+};
+
+/** Slots iniciais — Banner patrocinado */
+const BANNER_INITIAL_SLOTS: ImageSlot[] = [
+  { id: 'banner-sw', label: 'Super wide', dimensions: '1920 x 120' },
+  { id: 'banner-sq', label: 'Square', dimensions: '400 x 400' },
+  { id: 'banner-sv', label: 'Super vertical', dimensions: '200 x 768' },
+];
+
+/** Formatos extras — Banner patrocinado (+) */
+const BANNER_EXTRA_FORMATS: { label: string; dimensions: string }[] = [
+  { label: 'Banner horizontal', dimensions: '1200 x 300' },
+  { label: 'Leaderboard', dimensions: '728 x 90' },
+  { label: 'Medium rectangle', dimensions: '300 x 250' },
+  { label: 'Wide skyscraper', dimensions: '160 x 600' },
+  { label: 'Half page', dimensions: '300 x 600' },
+  { label: 'Quadrado HD', dimensions: '1200 x 1200' },
+  { label: 'Retângulo feed', dimensions: '1200 x 628' },
+];
+
+/** Slots iniciais — Vídeo */
+const VIDEO_INITIAL_SLOTS: ImageSlot[] = [
+  { id: 'video-main', label: 'Vídeo', dimensions: '1920 x 1080' },
+];
+
+/** Formatos extras — Vídeo (+) */
+const VIDEO_EXTRA_FORMATS: { label: string; dimensions: string }[] = [
+  { label: 'Story vertical', dimensions: '1080 x 1920' },
+  { label: 'Quadrado', dimensions: '1080 x 1080' },
+  { label: '4K UHD', dimensions: '3840 x 2160' },
+  { label: 'Vertical curto', dimensions: '720 x 1280' },
+  { label: 'Horizontal wide', dimensions: '2560 x 1440' },
+];
+
+function initialDynamicSlots(mt: MediaType): ImageSlot[] {
+  switch (mt) {
+    case 'Banner patrocinado':
+      return [...BANNER_INITIAL_SLOTS];
+    case 'Video':
+      return [...VIDEO_INITIAL_SLOTS];
+    default:
+      return [];
+  }
+}
+
+function extraFormatsForMediaType(mt: MediaType): { label: string; dimensions: string }[] {
+  switch (mt) {
+    case 'Banner patrocinado':
+      return BANNER_EXTRA_FORMATS;
+    case 'Video':
+      return VIDEO_EXTRA_FORMATS;
+    default:
+      return [];
+  }
+}
+
+function fileAcceptForMediaType(mt: MediaType): string {
+  if (mt === 'Video') return 'video/*';
+  return 'image/*,video/*';
+}
+
+function newSlotId(): string {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();
+  return `slot-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+}
 
 interface MediaDetailDocumentProps {
   campaign: Campaign;
@@ -10,24 +89,6 @@ interface MediaDetailDocumentProps {
   onAllocationChange: (v: number) => void;
   onBidChange: (patch: { currentBid?: number; suggestedBid?: number }) => void;
 }
-
-const formatBr = (v: number, decimals = 2): string => {
-  const fixed = v.toFixed(decimals);
-  const [intPart, decPart] = fixed.split('.');
-  const withDots = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-  return decPart ? `${withDots},${decPart}` : withDots;
-};
-
-const parseBr = (s: string): number => {
-  const t = s.replace(/\s/g, '').trim();
-  if (!t) return 0;
-  const noDots = t.replace(/\./g, '');
-  const withPoint = noDots.replace(',', '.');
-  const n = parseFloat(withPoint);
-  return isNaN(n) ? 0 : n;
-};
-
-const MAX_CENTS = 999999999;
 
 const MEDIA_STYLES: Record<string, { icon: string; bg: string }> = {
   'Produto patrocinado':        { icon: 'search_check', bg: '#ffc8dc' },
@@ -47,23 +108,15 @@ const MEDIA_LABELS: Record<string, { name: string; bidLabel: string }> = {
   'Instore display':            { name: 'Tela em loja',            bidLabel: '' },
 };
 
-/** Slots do Figma: Banner = Super wide, Square, Super vertical. Outros tipos mapeados. */
+/**
+ * Slots fixos por tipo (drawer sem lista dinâmica).
+ * Banner patrocinado e Vídeo usam `initialDynamicSlots` + formatos extra.
+ * Busca patrocinada usa a secção «Termos de busca» (lista de termos).
+ */
 const UPLOAD_SLOTS: Record<string, { label: string; dimensions: string }[]> = {
-  'Produto patrocinado': [
-    { label: 'Imagem principal', dimensions: '800 x 800' },
-    { label: 'Imagem secundária', dimensions: '800 x 800' },
-  ],
-  'Banner patrocinado': [
-    { label: 'Super wide', dimensions: '1920 x 120' },
-    { label: 'Square', dimensions: '400 x 400' },
-    { label: 'Super vertical', dimensions: '200 x 768' },
-  ],
   'Marca patrocinada': [
     { label: 'Vídeo', dimensions: '1920 x 1080' },
     { label: 'Imagem', dimensions: '1200 x 628' },
-  ],
-  'Video': [
-    { label: 'Vídeo', dimensions: '1920 x 1080' },
   ],
   'Banner Patrocinado Offsite': [
     { label: 'Super wide', dimensions: '1920 x 120' },
@@ -74,6 +127,7 @@ const UPLOAD_SLOTS: Record<string, { label: string; dimensions: string }[]> = {
   ],
 };
 
+/** Mesmo padrão pt-BR que no documento da campanha: edição direta, colar, caret estável. */
 function EditableMoneyField({
   value,
   onChange,
@@ -84,56 +138,122 @@ function EditableMoneyField({
   className?: string;
 }) {
   const [editing, setEditing] = useState(false);
-  const [cents, setCents] = useState(0);
+  const [draft, setDraft] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
+  const skipBlurCommitRef = useRef(false);
+  const pendingCaretRef = useRef<{ s: number; e: number } | null>(null);
+  const selectAllOnFocusRef = useRef(false);
+  const decimals = 2;
+
+  useLayoutEffect(() => {
+    if (!editing || !inputRef.current) return;
+    inputRef.current.focus({ preventScroll: true });
+    if (selectAllOnFocusRef.current) {
+      selectAllOnFocusRef.current = false;
+      inputRef.current.select();
+      pendingCaretRef.current = null;
+      return;
+    }
+    const p = pendingCaretRef.current;
+    if (p) {
+      pendingCaretRef.current = null;
+      try {
+        inputRef.current.setSelectionRange(p.s, p.e);
+      } catch {
+        /* ignore */
+      }
+    }
+  }, [draft, editing]);
 
   const commit = () => {
-    onChange(cents / 100);
+    const t = draft.trim();
+    if (t === '') {
+      setDraft(formatBr(value, decimals));
+      setEditing(false);
+      return;
+    }
+    onChange(roundMoneyDecimals(clampMoney(parseMaskedMoneyFull(t, decimals)), decimals));
+    setEditing(false);
+  };
+
+  const revert = () => {
+    setDraft(formatBr(value, decimals));
     setEditing(false);
   };
 
   const startEditing = () => {
-    setCents(Math.round(value * 100));
+    setDraft(formatBr(value, decimals));
+    selectAllOnFocusRef.current = true;
     setEditing(true);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') { commit(); return; }
-    if (e.key === 'Escape') { setCents(Math.round(value * 100)); setEditing(false); return; }
-    if (e.key === 'Backspace') {
-      e.preventDefault();
-      setCents((c) => Math.floor(c / 10));
+  const handleDraftChange = (ev: React.ChangeEvent<HTMLInputElement>) => {
+    selectAllOnFocusRef.current = false;
+    const raw = ev.target.value;
+    const selStart = ev.target.selectionStart ?? 0;
+    const selEnd = ev.target.selectionEnd ?? 0;
+    const { text, selStart: nextStart, selEnd: nextEnd } = applyMoneyMask(raw, selStart, selEnd, decimals);
+    pendingCaretRef.current = { s: nextStart, e: nextEnd };
+    setDraft(text);
+  };
+
+  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    selectAllOnFocusRef.current = false;
+    const pasted = normalizeMoneyDraft(e.clipboardData.getData('text'));
+    const el = inputRef.current;
+    if (!el) return;
+    const start = el.selectionStart ?? 0;
+    const end = el.selectionEnd ?? 0;
+    const merged = draft.slice(0, start) + pasted + draft.slice(end);
+    const caret = start + pasted.length;
+    const { text, selStart: ns, selEnd: ne } = applyMoneyMask(merged, caret, caret, decimals);
+    pendingCaretRef.current = { s: ns, e: ne };
+    setDraft(text);
+  };
+
+  const handleKeyDown = (ev: React.KeyboardEvent<HTMLInputElement>) => {
+    if (ev.key === 'Enter') {
+      ev.preventDefault();
+      skipBlurCommitRef.current = true;
+      commit();
       return;
     }
-    const digit = e.key.replace(/\D/g, '');
-    if (digit.length === 1) {
-      e.preventDefault();
-      setCents((c) => Math.min(MAX_CENTS, c * 10 + parseInt(digit, 10)));
+    if (ev.key === 'Escape') {
+      ev.preventDefault();
+      revert();
     }
   };
 
-  const handlePaste = (e: React.ClipboardEvent) => {
-    e.preventDefault();
-    const parsed = parseBr(e.clipboardData.getData('text'));
-    setCents(Math.min(MAX_CENTS, Math.max(0, Math.round(parsed * 100))));
+  const handleBlur = () => {
+    if (skipBlurCommitRef.current) {
+      skipBlurCommitRef.current = false;
+      return;
+    }
+    commit();
   };
 
   return (
     <div className={className}>
       {editing ? (
         <input
+          ref={inputRef}
           type="text"
           inputMode="decimal"
-          value={formatBr(cents / 100)}
-          readOnly
-          onKeyDown={handleKeyDown}
+          enterKeyHint="done"
+          autoComplete="off"
+          spellCheck={false}
+          value={draft}
+          onChange={handleDraftChange}
           onPaste={handlePaste}
-          onBlur={commit}
-          className="font-medium text-[14px] leading-5 text-[color:var(--sl-fg-base)] tracking-[-0.14px] bg-blue-50/60 border border-blue-200 rounded-lg px-2 py-1 outline-none w-full max-w-[160px]"
-          autoFocus
+          onKeyDown={handleKeyDown}
+          onBlur={handleBlur}
+          className="font-medium text-[14px] leading-5 text-[color:var(--sl-fg-base)] tracking-[-0.14px] bg-blue-50/60 border border-blue-200 rounded-lg px-3 py-1.5 outline-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2563eb]/35 w-full max-w-[180px]"
         />
       ) : (
         <button
           type="button"
+          onMouseDown={(e) => e.preventDefault()}
           onClick={startEditing}
           className="font-medium text-[14px] leading-5 text-[color:var(--sl-fg-base)] tracking-[-0.14px] hover:bg-black/[0.04] rounded px-1 py-0.5 -ml-1 transition-colors cursor-text text-left"
         >
@@ -162,9 +282,51 @@ export const MediaDetailDocument: React.FC<MediaDetailDocumentProps> = ({
     { label: 'Super vertical', dimensions: '200 x 768' },
   ];
   const showSecondBid = mediaType === 'Marca patrocinada' || mediaType === 'Banner Patrocinado Offsite';
-  const sectionTitle = mediaType === 'Banner patrocinado' || mediaType === 'Banner Patrocinado Offsite' ? 'Banner' : mediaType === 'Produto patrocinado' ? 'Imagens' : 'Mídia';
+  const sectionTitle =
+    mediaType === 'Banner patrocinado' || mediaType === 'Banner Patrocinado Offsite'
+      ? 'Banner'
+      : mediaType === 'Produto patrocinado'
+        ? 'Termos de busca'
+        : 'Mídia';
+
+  const isBuscaPatrocinada = mediaType === 'Produto patrocinado';
+
+  const usesDynamicSlotUpload =
+    mediaType === 'Banner patrocinado' ||
+    mediaType === 'Video';
 
   const [uploads, setUploads] = useState<Record<number, { url: string; name: string }>>({});
+  const [dynamicSlots, setDynamicSlots] = useState<ImageSlot[]>(() => initialDynamicSlots(mediaType));
+  const [dynamicUploads, setDynamicUploads] = useState<
+    Record<string, { url: string; name: string; mime?: string }>
+  >({});
+  const [formatPickerOpen, setFormatPickerOpen] = useState(false);
+  const formatPickerRef = useRef<HTMLDivElement>(null);
+
+  const [searchTerms, setSearchTerms] = useState<{ id: string; text: string }[]>([]);
+  const [termDraft, setTermDraft] = useState('');
+
+  useEffect(() => {
+    setDynamicUploads((prev) => {
+      (Object.values(prev) as { url: string }[]).forEach((u) => URL.revokeObjectURL(u.url));
+      return {};
+    });
+    setDynamicSlots(initialDynamicSlots(mediaType));
+    setFormatPickerOpen(false);
+    setSearchTerms([]);
+    setTermDraft('');
+  }, [mediaType]);
+
+  useEffect(() => {
+    if (!formatPickerOpen) return;
+    const onDown = (e: MouseEvent) => {
+      if (formatPickerRef.current && !formatPickerRef.current.contains(e.target as Node)) {
+        setFormatPickerOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', onDown);
+    return () => document.removeEventListener('mousedown', onDown);
+  }, [formatPickerOpen]);
 
   const handleFileChange = (slotIndex: number, e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -182,6 +344,49 @@ export const MediaDetailDocument: React.FC<MediaDetailDocumentProps> = ({
       return next;
     });
   };
+
+  const handleDynamicFileChange = useCallback((slotId: string, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    setDynamicUploads((prev) => {
+      const next = { ...prev };
+      if (next[slotId]) URL.revokeObjectURL(next[slotId].url);
+      next[slotId] = { url, name: file.name, mime: file.type || undefined };
+      return next;
+    });
+    e.target.value = '';
+  }, []);
+
+  const removeDynamicSlot = useCallback((slotId: string) => {
+    setDynamicUploads((prev) => {
+      if (!prev[slotId]) return prev;
+      const next = { ...prev };
+      URL.revokeObjectURL(next[slotId].url);
+      delete next[slotId];
+      return next;
+    });
+    setDynamicSlots((prev) => prev.filter((s) => s.id !== slotId));
+  }, []);
+
+  const addDynamicFormat = useCallback((fmt: { label: string; dimensions: string }) => {
+    setDynamicSlots((prev) => [...prev, { id: newSlotId(), ...fmt }]);
+    setFormatPickerOpen(false);
+  }, []);
+
+  const extraFormats = extraFormatsForMediaType(mediaType);
+  const fileAccept = fileAcceptForMediaType(mediaType);
+
+  const addSearchTerm = useCallback(() => {
+    const t = termDraft.trim();
+    if (!t) return;
+    setSearchTerms((prev) => [...prev, { id: newSlotId(), text: t }]);
+    setTermDraft('');
+  }, [termDraft]);
+
+  const removeSearchTerm = useCallback((id: string) => {
+    setSearchTerms((prev) => prev.filter((x) => x.id !== id));
+  }, []);
 
   return (
     <div
@@ -202,7 +407,7 @@ export const MediaDetailDocument: React.FC<MediaDetailDocumentProps> = ({
           <p className="text-[11px] text-[color:var(--sl-fg-base-soft)] tracking-[-0.33px] whitespace-nowrap shrink-0 px-2">
             Salvo agora há pouco
           </p>
-          <div className="w-6 h-6 rounded-full bg-gray-300 shrink-0" />
+          <UserAvatar size="sm" />
           <button type="button" className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-black/5 text-[color:var(--sl-fg-base-soft)] shrink-0">
             <span className="material-symbols-outlined text-[18px]">history</span>
           </button>
@@ -290,64 +495,244 @@ export const MediaDetailDocument: React.FC<MediaDetailDocumentProps> = ({
             </h2>
           </div>
           <div className="flex flex-col gap-2">
-            {slots.map((slot, i) => {
-              const uploaded = uploads[i];
-              return (
-                <div
-                  key={`${slot.label}-${i}`}
-                  className="border border-black/[0.06] rounded-xl p-4 flex flex-col gap-2.5"
-                >
-                  <div className="flex font-medium text-[12px] leading-normal tracking-[-0.36px] justify-between w-full items-center">
-                    <p className="text-[color:var(--sl-fg-base)]">{slot.label}</p>
-                    <div className="flex items-center gap-2">
-                      {uploaded && (
+            {isBuscaPatrocinada ? (
+              <div className="flex flex-col gap-2.5 w-full">
+                <p className="text-[12px] leading-4 tracking-[-0.06px] text-[color:var(--sl-fg-base-soft)]">
+                  Palavras ou frases que aproximam o anúncio das pesquisas dos clientes.
+                </p>
+                <div className="flex flex-wrap items-center gap-1.5 rounded-2xl border border-black/[0.08] bg-white px-2.5 py-2 shadow-[0_1px_2px_rgba(0,0,0,0.04)] min-h-[2.875rem] focus-within:border-black/[0.14] focus-within:shadow-[0_1px_3px_rgba(0,0,0,0.06)] transition-[border-color,box-shadow]">
+                  {searchTerms.map((term) => (
+                    <span
+                      key={term.id}
+                      className="inline-flex items-center gap-0.5 max-w-[min(100%,20rem)] rounded-full bg-black/[0.06] pl-2.5 pr-0.5 py-0.5 text-[13px] leading-tight tracking-[-0.12px] text-[color:var(--sl-fg-base)] border border-black/[0.04]"
+                    >
+                      <span className="truncate min-w-0 pl-0.5">{term.text}</span>
+                      <button
+                        type="button"
+                        onClick={() => removeSearchTerm(term.id)}
+                        className="shrink-0 flex h-6 w-6 items-center justify-center rounded-full text-[color:var(--sl-fg-base-muted)] hover:bg-black/[0.08] hover:text-[color:var(--sl-fg-base)] transition-colors"
+                        aria-label={`Remover termo: ${term.text}`}
+                        title="Remover"
+                      >
+                        <span className="material-symbols-outlined text-[15px] leading-none">close</span>
+                      </button>
+                    </span>
+                  ))}
+                  <input
+                    type="text"
+                    value={termDraft}
+                    onChange={(e) => setTermDraft(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        addSearchTerm();
+                      }
+                      if (e.key === 'Backspace' && !termDraft && searchTerms.length > 0) {
+                        removeSearchTerm(searchTerms[searchTerms.length - 1].id);
+                      }
+                    }}
+                    placeholder={searchTerms.length === 0 ? 'Digite um termo…' : ''}
+                    className="min-w-[6rem] flex-1 basis-[6rem] bg-transparent py-1 px-1 text-[13px] leading-5 tracking-[-0.12px] text-[color:var(--sl-fg-base)] placeholder:text-[color:var(--sl-fg-base-muted)] outline-none border-0 focus:ring-0"
+                    aria-label="Novo termo de busca"
+                  />
+                  {termDraft.trim() ? (
+                    <button
+                      type="button"
+                      onClick={addSearchTerm}
+                      className="inline-flex h-9 min-w-[6.25rem] shrink-0 items-center justify-center rounded-[var(--sl-radius-2)] border-0 px-3 text-[13px] font-medium tracking-[-0.14px] bg-[var(--sl-bg-muted)] text-[var(--sl-fg-muted)] shadow-none transition-colors hover:bg-[var(--sl-bg-muted-hover)] hover:text-[var(--sl-fg-muted-hover)] active:bg-[var(--sl-bg-muted-pressed)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--sl-color-gray-8)] focus-visible:ring-offset-1"
+                    >
+                      Adicionar
+                    </button>
+                  ) : null}
+                </div>
+                <p className="text-[11px] leading-4 tracking-[-0.06px] text-[color:var(--sl-fg-base-muted)]">
+                  Enter para criar um chip. Backspace no campo vazio remove o último termo.
+                </p>
+              </div>
+            ) : usesDynamicSlotUpload
+              ? dynamicSlots.map((slot) => {
+                  const uploaded = dynamicUploads[slot.id];
+                  const isVideoPreview = Boolean(uploaded?.mime?.startsWith('video/'));
+                  return (
+                    <div
+                      key={slot.id}
+                      className="group border border-black/[0.06] rounded-xl p-4 flex flex-col gap-2.5"
+                    >
+                      <div className="flex font-medium text-[12px] leading-normal tracking-[-0.36px] justify-between w-full items-start gap-2">
+                        <div className="min-w-0 flex-1 flex flex-col gap-0.5">
+                          <p className="text-[color:var(--sl-fg-base)] truncate">{slot.label}</p>
+                          <p className="text-[11px] font-normal text-[color:var(--sl-fg-base-soft)] tabular-nums tracking-[-0.22px]">
+                            {slot.dimensions}
+                          </p>
+                        </div>
                         <button
                           type="button"
-                          onClick={() => removeUpload(i)}
-                          className="text-[color:var(--sl-fg-base-soft)] hover:text-[color:var(--sl-fg-base-soft)] transition-colors flex items-center gap-0.5"
+                          onClick={() => removeDynamicSlot(slot.id)}
+                          className="shrink-0 flex items-center gap-0.5 text-[color:var(--sl-fg-base-soft)] opacity-0 pointer-events-none transition-opacity duration-150 hover:text-red-600 group-hover:opacity-100 group-hover:pointer-events-auto group-focus-within:opacity-100 group-focus-within:pointer-events-auto"
+                          aria-label={`Apagar formato: ${slot.label}`}
+                          title="Apagar formato"
                         >
-                          <span className="material-symbols-outlined text-[14px]">delete</span>
-                          <span className="text-[11px]">Remover</span>
+                          <span className="material-symbols-outlined text-[16px]">delete</span>
+                          <span className="text-[11px] hidden sm:inline">Apagar</span>
                         </button>
-                      )}
-                      <p className="text-[color:var(--sl-fg-base-soft)] text-right">{slot.dimensions}</p>
-                    </div>
-                  </div>
-                  {uploaded ? (
-                    <label className="relative rounded-lg overflow-hidden cursor-pointer group">
-                      <img
-                        src={uploaded.url}
-                        alt={uploaded.name}
-                        className="w-full h-[120px] object-contain rounded-lg"
-                      />
-                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center opacity-0">
-                        <span className="text-white text-xs font-medium bg-black/50 rounded-lg px-3 py-1.5 flex items-center gap-1">
-                          <span className="material-symbols-outlined text-[16px]">swap_horiz</span>
-                          Trocar
-                        </span>
                       </div>
-                      <input
-                        type="file"
-                        accept="image/*,video/*"
-                        className="hidden"
-                        onChange={(e) => handleFileChange(i, e)}
-                      />
-                    </label>
-                  ) : (
-                    <label className="bg-[#fafafa] h-[120px] rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-gray-100/80 transition-colors gap-1.5 border border-dashed border-transparent hover:border-gray-300">
-                      <span className="material-symbols-outlined text-[24px] text-[color:var(--sl-fg-base-muted)]">cloud_upload</span>
-                      <span className="text-[12px] text-[color:var(--sl-fg-base-muted)]">Clique para enviar</span>
-                      <input
-                        type="file"
-                        accept="image/*,video/*"
-                        className="hidden"
-                        onChange={(e) => handleFileChange(i, e)}
-                      />
-                    </label>
-                  )}
-                </div>
-              );
-            })}
+                      {uploaded ? (
+                        isVideoPreview ? (
+                          <div className="flex flex-col gap-2">
+                            <video
+                              src={uploaded.url}
+                              className="w-full h-[120px] object-contain rounded-lg bg-black"
+                              controls
+                              playsInline
+                            />
+                            <label className="inline-flex cursor-pointer items-center gap-1 self-start text-[12px] font-medium text-[#2563eb] hover:text-[#1d4ed8] hover:underline">
+                              <span className="material-symbols-outlined text-[16px]">swap_horiz</span>
+                              Substituir vídeo
+                              <input
+                                type="file"
+                                accept={fileAccept}
+                                className="hidden"
+                                onChange={(e) => handleDynamicFileChange(slot.id, e)}
+                              />
+                            </label>
+                          </div>
+                        ) : (
+                          <label className="relative rounded-lg overflow-hidden cursor-pointer group/uv">
+                            <img
+                              src={uploaded.url}
+                              alt={uploaded.name}
+                              className="w-full h-[120px] object-contain rounded-lg"
+                            />
+                            <div className="absolute inset-0 bg-black/0 group-hover/uv:bg-black/30 transition-colors flex items-center justify-center opacity-0 group-hover/uv:opacity-100">
+                              <span className="text-white text-xs font-medium bg-black/50 rounded-lg px-3 py-1.5 flex items-center gap-1">
+                                <span className="material-symbols-outlined text-[16px]">swap_horiz</span>
+                                Trocar
+                              </span>
+                            </div>
+                            <input
+                              type="file"
+                              accept={fileAccept}
+                              className="hidden"
+                              onChange={(e) => handleDynamicFileChange(slot.id, e)}
+                            />
+                          </label>
+                        )
+                      ) : (
+                        <label className="bg-[#fafafa] h-[120px] rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-gray-100/80 transition-colors gap-1.5 border border-dashed border-transparent hover:border-gray-300">
+                          <span className="material-symbols-outlined text-[24px] text-[color:var(--sl-fg-base-muted)]">
+                            {mediaType === 'Video' ? 'smart_display' : 'cloud_upload'}
+                          </span>
+                          <span className="text-[12px] text-[color:var(--sl-fg-base-muted)]">Clique para enviar</span>
+                          <input
+                            type="file"
+                            accept={fileAccept}
+                            className="hidden"
+                            onChange={(e) => handleDynamicFileChange(slot.id, e)}
+                          />
+                        </label>
+                      )}
+                    </div>
+                  );
+                })
+              : slots.map((slot, i) => {
+                  const uploaded = uploads[i];
+                  return (
+                    <div
+                      key={`${slot.label}-${i}`}
+                      className="group border border-black/[0.06] rounded-xl p-4 flex flex-col gap-2.5"
+                    >
+                      <div className="flex font-medium text-[12px] leading-normal tracking-[-0.36px] justify-between w-full items-start gap-2">
+                        <div className="min-w-0 flex-1 flex flex-col gap-0.5">
+                          <p className="text-[color:var(--sl-fg-base)]">{slot.label}</p>
+                          <p className="text-[11px] font-normal text-[color:var(--sl-fg-base-soft)] tabular-nums tracking-[-0.22px]">
+                            {slot.dimensions}
+                          </p>
+                        </div>
+                        {uploaded ? (
+                          <button
+                            type="button"
+                            onClick={() => removeUpload(i)}
+                            className="shrink-0 flex items-center gap-0.5 text-[color:var(--sl-fg-base-soft)] opacity-0 pointer-events-none transition-opacity duration-150 hover:text-red-600 group-hover:opacity-100 group-hover:pointer-events-auto group-focus-within:opacity-100 group-focus-within:pointer-events-auto"
+                            aria-label={`Remover ${slot.label}`}
+                          >
+                            <span className="material-symbols-outlined text-[14px]">delete</span>
+                            <span className="text-[11px]">Remover</span>
+                          </button>
+                        ) : null}
+                      </div>
+                      {uploaded ? (
+                        <label className="relative rounded-lg overflow-hidden cursor-pointer group">
+                          <img
+                            src={uploaded.url}
+                            alt={uploaded.name}
+                            className="w-full h-[120px] object-contain rounded-lg"
+                          />
+                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center opacity-0">
+                            <span className="text-white text-xs font-medium bg-black/50 rounded-lg px-3 py-1.5 flex items-center gap-1">
+                              <span className="material-symbols-outlined text-[16px]">swap_horiz</span>
+                              Trocar
+                            </span>
+                          </div>
+                          <input
+                            type="file"
+                            accept="image/*,video/*"
+                            className="hidden"
+                            onChange={(e) => handleFileChange(i, e)}
+                          />
+                        </label>
+                      ) : (
+                        <label className="bg-[#fafafa] h-[120px] rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-gray-100/80 transition-colors gap-1.5 border border-dashed border-transparent hover:border-gray-300">
+                          <span className="material-symbols-outlined text-[24px] text-[color:var(--sl-fg-base-muted)]">
+                            cloud_upload
+                          </span>
+                          <span className="text-[12px] text-[color:var(--sl-fg-base-muted)]">Clique para enviar</span>
+                          <input
+                            type="file"
+                            accept="image/*,video/*"
+                            className="hidden"
+                            onChange={(e) => handleFileChange(i, e)}
+                          />
+                        </label>
+                      )}
+                    </div>
+                  );
+                })}
+            {usesDynamicSlotUpload && (
+              <div className="relative pt-1" ref={formatPickerRef}>
+                <button
+                  type="button"
+                  onClick={() => setFormatPickerOpen((o) => !o)}
+                  className="w-full rounded-xl border border-black/[0.06] bg-[#fafafa] hover:bg-gray-100/90 transition-colors py-3 px-4 flex items-center justify-center gap-2 text-[13px] font-medium text-[color:var(--sl-fg-base-soft)] hover:text-[color:var(--sl-fg-base)]"
+                  aria-expanded={formatPickerOpen}
+                  aria-haspopup="listbox"
+                >
+                  <span className="material-symbols-outlined text-[20px]">add</span>
+                  {dynamicSlots.length === 0 ? 'Adicionar formato' : 'Adicionar outro formato'}
+                </button>
+                {formatPickerOpen && (
+                  <div
+                    className="absolute left-0 right-0 top-full z-20 mt-1 rounded-xl border border-black/[0.08] bg-white py-1 shadow-[0_8px_24px_rgba(0,0,0,0.12)] max-h-[min(280px,50vh)] overflow-y-auto"
+                    role="listbox"
+                  >
+                    <p className="px-3 py-2 text-[11px] tracking-wide text-[color:var(--sl-fg-base-soft)]">
+                      Escolha o formato
+                    </p>
+                    {extraFormats.map((fmt) => (
+                      <button
+                        key={`${fmt.label}-${fmt.dimensions}`}
+                        type="button"
+                        role="option"
+                        className="w-full text-left px-3 py-2.5 hover:bg-black/[0.04] transition-colors border-t border-black/[0.04] first:border-t-0"
+                        onClick={() => addDynamicFormat(fmt)}
+                      >
+                        <span className="block text-[13px] font-medium text-[color:var(--sl-fg-base)]">{fmt.label}</span>
+                        <span className="block text-[11px] text-[color:var(--sl-fg-base-soft)] tabular-nums">{fmt.dimensions}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>

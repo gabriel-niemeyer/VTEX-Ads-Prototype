@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { UserAvatar } from './UserAvatar';
 
 const STARTERS = [
   'Desdobrar JBP de 2026 com as Casas Bahia',
@@ -44,7 +45,8 @@ export const AgentWelcome: React.FC<AgentWelcomeProps> = ({ onSend }) => {
 
       {/* Prompt card */}
       <div className="w-full flex flex-col gap-5 bg-white border border-gray-200 rounded-[28px] p-4 pl-6 pr-3 pt-4 pb-3 shadow-sm">
-        <div className="min-h-[24px] flex items-end w-full">
+        <div className="min-h-[24px] flex items-end gap-3 w-full">
+          <UserAvatar size="md" className="self-end mb-0.5 shrink-0" />
           <textarea
             ref={inputRef}
             value={input}

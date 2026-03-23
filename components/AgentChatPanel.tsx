@@ -34,7 +34,7 @@ export const AgentChatPanel: React.FC<AgentChatPanelProps> = ({ messages, isThin
           {messages.map((msg) => (
             <div
               key={msg.id}
-              className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+              className={`flex w-full ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
             >
               <div
                 className={`max-w-[520px] px-4 py-2 rounded-2xl text-sm text-[color:var(--sl-fg-base)] leading-[1.56] ${
