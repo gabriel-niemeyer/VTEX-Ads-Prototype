@@ -1,5 +1,4 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { UserAvatar } from './UserAvatar';
 
 export interface ChatSendPayload {
   text: string;
@@ -90,27 +89,24 @@ export const AgentChatComposer: React.FC<AgentChatComposerProps> = ({
         aria-hidden
       />
 
-      <div className={`flex w-full min-w-0 ${isWelcome ? 'items-end gap-3' : 'flex-col gap-2'}`}>
-        {isWelcome && <UserAvatar size="md" className="mb-0.5 shrink-0 self-end" />}
-        <div className={`flex min-w-0 flex-1 flex-col gap-2 ${!isWelcome ? 'w-full' : ''}`}>
-          {file && <PdfPreviewChip name={file.name} onRemove={() => setFile(null)} />}
-          <textarea
-            ref={inputRef}
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                handleSubmit();
-              }
-            }}
-            placeholder={placeholder}
-            rows={isWelcome ? 1 : 2}
-            className={`w-full min-h-[24px] resize-none bg-transparent text-base text-[color:var(--sl-fg-base)] placeholder:text-[color:var(--sl-fg-base-muted)] outline-none leading-6 ${
-              !isWelcome ? 'min-h-[44px] text-[15px]' : ''
-            }`}
-          />
-        </div>
+      <div className="flex w-full min-w-0 flex-col gap-2">
+        {file && <PdfPreviewChip name={file.name} onRemove={() => setFile(null)} />}
+        <textarea
+          ref={inputRef}
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault();
+              handleSubmit();
+            }
+          }}
+          placeholder={placeholder}
+          rows={isWelcome ? 1 : 2}
+          className={`w-full min-h-[24px] resize-none bg-transparent text-[14px] leading-5 text-[color:var(--sl-fg-base)] placeholder:text-[color:var(--sl-fg-base-muted)] outline-none ${
+            !isWelcome ? 'min-h-[44px]' : ''
+          }`}
+        />
       </div>
 
       <div className="flex w-full items-center justify-between">
